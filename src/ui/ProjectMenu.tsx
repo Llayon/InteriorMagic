@@ -1,0 +1,3 @@
+import { useState } from 'react';
+import { useEditorStore } from '@/editor/state/store';
+export function ProjectMenu(){const [open,setOpen]=useState(false);return <div className="project-menu"><button className="round glass" onClick={()=>setOpen(v=>!v)}>•••</button>{open&&<div className="project-pop glass"><button onClick={()=>{useEditorStore.getState().save();setOpen(false)}}>Сохранить</button><button onClick={()=>{useEditorStore.getState().load();setOpen(false)}}>Загрузить</button><button className="danger-text" onClick={()=>{if(confirm('Очистить комнату?'))useEditorStore.getState().reset();setOpen(false)}}>Сбросить комнату</button></div>}</div>}
