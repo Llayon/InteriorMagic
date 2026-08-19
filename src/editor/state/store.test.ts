@@ -7,6 +7,14 @@ const object = (instanceId: string, assetId: string, x: number): FurnitureInstan
 const memoryStorage = (loaded: ReturnType<typeof createDefaultProject> | null = null): ProjectStorage => ({ load: () => loaded, save: () => undefined, clear: () => undefined });
 
 describe('editor history and placement integration', () => {
+  it('keeps workspace state outside project and history', () => {
+    const store = createEditorStore(createDefaultProject(), memoryStorage());
+    const project = structuredClone(store.getState().project);
+    store.getState().setWorkspacePanel('materials');
+    store.getState().setSheetState('expanded');
+    expect(store.getState().project).toEqual(project);
+    expect(store.getState().session.undoStack).toHaveLength(0);
+  });
   it('records one move and supports undo/redo', () => {
     const project = createDefaultProject(); project.objects = [object('sofa', 'sofa', 0)];
     const store = createEditorStore(project, memoryStorage());

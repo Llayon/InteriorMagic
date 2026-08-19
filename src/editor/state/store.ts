@@ -6,11 +6,16 @@ import { loadInitialProject, storage, type ProjectStorage } from '@/editor/seria
 import { catalogRequestGate } from '@/editor/assets/requestGate';
 
 type Mode = 'idle' | 'dragging';
+export type WorkspacePanel = 'catalog' | 'materials' | null;
+export type SheetState = 'closed' | 'peek' | 'expanded';
 export interface EditorSession {
   selectedId: string | null;
   mode: Mode;
   activeTool: 'select';
   catalogCategory: Category;
+  workspacePanel: WorkspacePanel;
+  sheetState: SheetState;
+  fitRoomRevision: number;
   undoStack: RoomProject[];
   redoStack: RoomProject[];
 }
@@ -20,6 +25,9 @@ export interface EditorStore {
   select(id: string | null): void;
   setMode(mode: Mode): void;
   setCatalogCategory(category: Category): void;
+  setWorkspacePanel(panel: WorkspacePanel): void;
+  setSheetState(state: SheetState): void;
+  requestFitRoom(): void;
   add(assetId: string): string | null;
   move(id: string, position: Vec3): void;
   rotate(id: string, direction: -1 | 1): void;
@@ -35,7 +43,7 @@ export interface EditorStore {
 }
 
 const emptySession = (): EditorSession => ({
-  selectedId: null, mode: 'idle', activeTool: 'select', catalogCategory: 'sofas', undoStack: [], redoStack: [],
+  selectedId: null, mode: 'idle', activeTool: 'select', catalogCategory: 'sofas', workspacePanel: 'catalog', sheetState: 'peek', fitRoomRevision: 0, undoStack: [], redoStack: [],
 });
 const uid = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
 const updateObject = (project: RoomProject, id: string, update: (object: FurnitureInstance) => FurnitureInstance): RoomProject => ({
@@ -58,6 +66,9 @@ export const createEditorStore = (
   select: (selectedId) => set((state) => ({ session: { ...state.session, selectedId } })),
   setMode: (mode) => set((state) => ({ session: { ...state.session, mode } })),
   setCatalogCategory: (catalogCategory) => set((state) => ({ session: { ...state.session, catalogCategory } })),
+  setWorkspacePanel: (workspacePanel) => set((state) => ({ session: { ...state.session, workspacePanel, sheetState: workspacePanel && state.session.sheetState === 'closed' ? 'peek' : state.session.sheetState } })),
+  setSheetState: (sheetState) => set((state) => ({ session: { ...state.session, sheetState, workspacePanel: sheetState === 'closed' ? null : state.session.workspacePanel ?? 'catalog' } })),
+  requestFitRoom: () => set((state) => ({ session: { ...state.session, fitRoomRevision: state.session.fitRoomRevision + 1 } })),
   add(assetId) {
     const state = get();
     const position = findPlacement(state.project, assetId);

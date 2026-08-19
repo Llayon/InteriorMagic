@@ -99,3 +99,29 @@ First Beautiful Room: 20–25 согласованных лицензирова�
 ## Next recommended chunk
 
 Run the physical-device matrix in `DEVICE_TEST.md`, fix only measured gesture/rendering defects, then curate a visually consistent trial catalog of roughly 20–25 licensed assets. Use the resulting network/GPU measurements before deciding on Meshopt or KTX2.
+## 2026-08-19 — Mobile Workspace UX
+
+### Completed
+
+- Replaced the stacked mobile layout with a full-height 3D workspace and overlay header, controls and shared bottom sheet.
+- Added closed, peek and expanded sheet states, pointer handle gestures, catalog/material panel switching and post-load auto-collapse.
+- Added centralized usable-viewport-aware Fit Room framing and a Home action while preserving demand rendering.
+- Split global history/camera controls from contextual object controls.
+- Replaced native reset confirmation with an in-app destructive dialog.
+- Added Telegram stable viewport/content-safe-area CSS integration and removed the production grid helper.
+- Added product E2E coverage for sheet state, materials boundaries, reset, gesture isolation, responsive workspace and Fit Room.
+
+### Architecture decisions
+
+- Workspace layout state remains in `EditorSession`; `RoomProject` and its schema are unchanged.
+- Camera distance is derived from room bounds and usable FOV; focal offset centers the room in the unoccupied viewport rather than using handler-specific offsets.
+- Sheet gestures settle state once and CSS animates the overlay without resizing or remounting Canvas.
+
+### Known limitations
+
+- Physical Telegram Android/iOS and Safari iPhone verification remains outstanding.
+- The current room and fixture assets intentionally retain the pre-existing rendering baseline.
+
+### Next recommended chunk
+
+Rendering Baseline + First Beautiful Room: lightweight IBL and calibrated tone/exposure, cheap grounding, 8–12 coherent licensed assets and real thumbnails, followed by network/triangle/draw-call/VRAM measurements and a physical Android/iPhone Telegram pass. Expand toward 20–25 assets only after that measured trial succeeds.

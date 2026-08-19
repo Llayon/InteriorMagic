@@ -47,3 +47,9 @@ Catalog thumbnails do not preload models. Concurrent selection uses latest-reque
 ## Rendering
 
 R3F reconstructs the scene from the project using `frameloop="demand"`. Camera movement, drag and asset completion request frames; idle does not run a WebGL loop. DPR profiles remain capped at 1.5. There are no physics, realtime shadows or post-processing.
+
+## Mobile workspace
+
+On portrait screens the 3D room is the workspace; the header, global/context controls and one shared catalog/materials bottom sheet overlay it. `workspacePanel`, `sheetState` and Fit Room intent are `EditorSession` data and never enter `RoomProject`, persistence or command history.
+
+Camera fitting is centralized in `scene/camera/fitRoom.ts`. It derives the usable CSS rectangle from the canvas and settled header/sheet occupancy, fits the room dimensions against the usable horizontal and vertical FOV, and applies a focal offset from the canvas center to the usable-area center. Sheet transitions trigger one fit after settling rather than camera updates on every gesture pixel. The explicit Home action restores the canonical dollhouse direction through the same algorithm.

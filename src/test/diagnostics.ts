@@ -78,7 +78,8 @@ export interface InteriorMagicTestApi {
   getPlacementInfo(instanceId: string): { room: RoomProject['room']; footprint: { width: number; depth: number } } | null;
   getRendererStats(): { ready: boolean; frameloop: 'demand'; calls: number; triangles: number; textures: number; geometries: number; dpr: number; canvas: ScreenBounds | null };
   getAssetCacheStats(): ReturnType<typeof assetCache.diagnostics>;
-  getSessionSummary(): { interactionMode: string; undoCount: number; redoCount: number };
+  getSessionSummary(): { interactionMode: string; undoCount: number; redoCount: number; sheetState: string; workspacePanel: string | null };
+  getRoomScreenBounds(): ScreenBounds | null;
   getCameraState(): { position: Vec3; target: Vec3; controlsEnabled: boolean } | null;
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
 }
@@ -111,7 +112,15 @@ const api: InteriorMagicTestApi = {
     return { ready: true, frameloop: 'demand', calls: sceneContext.gl.info.render.calls, triangles: sceneContext.gl.info.render.triangles, textures: sceneContext.gl.info.memory.textures, geometries: sceneContext.gl.info.memory.geometries, dpr: sceneContext.gl.getPixelRatio(), canvas: { x: rect.left, y: rect.top, width: rect.width, height: rect.height } };
   },
   getAssetCacheStats: () => assetCache.diagnostics(),
-  getSessionSummary: () => { const { session } = useEditorStore.getState(); return { interactionMode: session.mode, undoCount: session.undoStack.length, redoCount: session.redoStack.length }; },
+  getSessionSummary: () => { const { session } = useEditorStore.getState(); return { interactionMode: session.mode, undoCount: session.undoStack.length, redoCount: session.redoStack.length, sheetState: session.sheetState, workspacePanel: session.workspacePanel }; },
+  getRoomScreenBounds: () => {
+    const room = useEditorStore.getState().project.room;
+    const points: ScreenPoint[] = [];
+    for (const x of [-room.width / 2, room.width / 2]) for (const y of [0, room.height]) for (const z of [-room.depth / 2, room.depth / 2]) { const point = projectPoint(new THREE.Vector3(x, y, z)); if (point) points.push(point); }
+    if (points.length !== 8) return null;
+    const xs = points.map((point) => point.x), ys = points.map((point) => point.y);
+    return { x: Math.min(...xs), y: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
+  },
   getCameraState: () => {
     if (!sceneContext) return null;
     const controls = sceneContext.getControls();

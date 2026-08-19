@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { useEditorStore } from '@/editor/state/store';
 
 const floor = [['oak', '#b89468'], ['walnut', '#73513e'], ['concrete', '#a8a49c']];
 const wall = [['linen', '#e8e0d1'], ['mist', '#c9d5d4'], ['clay', '#d8b5a2']];
 
 export function Finishes() {
-  const [open, setOpen] = useState(false), finishes = useEditorStore((state) => state.project.finishes);
-  return <div className="finish-wrap"><button className="round glass" onClick={() => setOpen((value) => !value)} aria-label="Materials">◐</button>{open && <div className="finish-pop glass"><b>Материалы</b><label>Пол</label><Swatches kind="floor" list={floor} active={finishes.floorMaterialId} apply={(id) => useEditorStore.getState().changeFinish('floorMaterialId', id)} /><label>Стены</label><Swatches kind="wall" list={wall} active={finishes.wallMaterialId} apply={(id) => useEditorStore.getState().changeFinish('wallMaterialId', id)} /></div>}</div>;
+  const finishes = useEditorStore((state) => state.project.finishes);
+  return <div className="materials-panel" data-testid="materials-panel"><div className="sheet-title"><div><small>ОТДЕЛКА</small><strong>Материалы комнаты</strong></div></div><label>Пол</label><Swatches kind="floor" list={floor} active={finishes.floorMaterialId} apply={(id) => useEditorStore.getState().changeFinish('floorMaterialId', id)} /><label>Стены</label><Swatches kind="wall" list={wall} active={finishes.wallMaterialId} apply={(id) => useEditorStore.getState().changeFinish('wallMaterialId', id)} /></div>;
 }
 
 function Swatches({ kind, list, active, apply }: { kind: 'floor' | 'wall'; list: string[][]; active: string; apply: (id: string) => void }) {

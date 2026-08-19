@@ -1,5 +1,7 @@
 # Interior Magic
 
+On mobile, the 3D room fills the viewport. Use the bottom sheet handle to switch between peek and expanded catalog states, open Materials in the same sheet, and use the Home button to fit the room around the currently occupied UI area. Object actions appear contextually above the sheet.
+
 [Live demo](https://llayon.github.io/InteriorMagic/)
 
 Mobile-first прототип Telegram Mini App для расстановки мебели в заранее созданной 3D-комнате. Источником истины является сериализуемый проект; Three.js только отображает его.
