@@ -146,6 +146,13 @@ class AssetCache {
     const ready = [...this.entries.values()].filter((entry) => entry.status === 'ready' && entry.value);
     return { loadedAssets: ready.length, byteSize: ready.reduce((sum, entry) => sum + (entry.value?.byteSize ?? 0), 0) };
   }
+
+  diagnostics() {
+    return {
+      ...this.metrics(),
+      assets: [...this.entries.entries()].map(([assetId, entry]) => ({ assetId, status: entry.status, byteSize: entry.value?.byteSize ?? 0 })),
+    };
+  }
 }
 
 export const assetCache = new AssetCache();

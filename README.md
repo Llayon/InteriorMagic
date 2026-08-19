@@ -13,6 +13,15 @@ npm install
 npm run dev
 ```
 
+Browser QA запускается без отдельного ручного Vite server:
+
+```bash
+npm run playwright:install
+npm run test:e2e
+```
+
+Подробности: [BROWSER_TESTING.md](BROWSER_TESTING.md).
+
 Проверки: `npm test`, `npm run typecheck`, `npm run lint`, `npm run build`. Тестовые GLB воспроизводятся командой `npm run assets:generate`.
 
 ## Стек

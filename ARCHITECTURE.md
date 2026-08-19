@@ -1,5 +1,11 @@
 # Architecture
 
+## Testing pyramid
+
+Framework-independent editor logic проверяется Vitest. Chromium Playwright поверх него выполняет реальные DOM/canvas pointer-сценарии и читает только диагностические snapshots через test-mode API. Финальный уровень — ручная проверка физического Telegram Android/iOS WebView; browser emulation её не заменяет.
+
+`window.__INTERIOR_MAGIC_TEST__` устанавливается только в Vite mode `test`. Scene registry проецирует interaction proxies через текущую camera и CSS bounding rect canvas; API не содержит editor mutations и отсутствует в production Pages runtime.
+
 ## State boundaries
 
 `RoomProject` version 1 is the only persistent source of truth: room, finishes and furniture instances. Asset metadata, Three.js objects, selection and history are not serialized.

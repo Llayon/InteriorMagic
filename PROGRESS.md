@@ -1,5 +1,30 @@
 # Progress
 
+## 2026-08-19 — Playwright browser QA
+
+### Completed
+
+- Добавлены Playwright Chromium, автоматический Vite test server и проекты 390×844, 430×932, 1440×900.
+- Покрыты startup, Telegram mock, внешний GLB, request race, proxy selection, edge drag/grabOffset, collision masks, wall snap, history, persistence и responsive layout.
+- Добавлен production-gated read-only diagnostics API и контроль console/page/network failures.
+- Pages deployment теперь зависит от green quality и E2E jobs; failure artifacts сохраняются Actions.
+- Browser run обнаружил и исправил intrinsic grid overflow на viewport 390 px.
+
+### Architecture decisions
+
+- Test API предоставляет только snapshots и screen projection; пользовательские операции проходят через UI/canvas.
+- Chromium — единственный blocking browser на этом этапе, CI использует один worker для устойчивого WebGL.
+- Trace, screenshot и video сохраняются только при failure.
+
+### Known limitations
+
+- Playwright не доказывает поведение physical Telegram Android/iOS WebView.
+- Firefox/WebKit и pixel-perfect WebGL snapshots не входят в blocking matrix.
+
+### Next recommended chunk
+
+First Beautiful Room: 20–25 согласованных лицензированных assets и измерения на реальных мобильных устройствах без массового production-импорта.
+
 ## Completed
 
 - Metadata-driven asset contract with dimensions, anchors, collision, snapping, rotation, interaction, variants and normalization.

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { type ThreeEvent, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { getAsset } from '@/editor/assets/registry';
@@ -8,11 +8,13 @@ import { useEditorStore } from '@/editor/state/store';
 import { AssetModel } from '@/scene/assets/AssetModel';
 import { useCameraGate } from '@/scene/interactions/CameraGate';
 import { ProceduralFurniture } from './ProceduralFurniture';
+import { isTestMode, registerTestObject } from '@/test/diagnostics';
 
 const ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
 export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   const group = useRef<THREE.Group>(null);
+  const proxy = useRef<THREE.Mesh>(null);
   const feedbackMaterial = useRef<THREE.MeshBasicMaterial>(null);
   const controller = useRef(new DragController());
   const invalidate = useThree((state) => state.invalidate);
@@ -22,6 +24,11 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   const padding = asset.interaction?.paddingXZ ?? 0.08;
   const proxyHeight = Math.max(asset.dimensions.height, asset.interaction?.minHeight ?? 0.45);
   const proxySize: [number, number, number] = [asset.dimensions.width + padding * 2, proxyHeight, asset.dimensions.depth + padding * 2];
+  useEffect(() => {
+    if (!isTestMode || !group.current || !proxy.current) return;
+    registerTestObject(object.instanceId, { group: group.current, proxy: proxy.current });
+    return () => registerTestObject(object.instanceId, null);
+  }, [object.instanceId]);
 
   const setFeedback = (invalid: boolean) => { if (feedbackMaterial.current) feedbackMaterial.current.visible = invalid; };
   const intersectFloor = (event: ThreeEvent<PointerEvent>) => {
@@ -73,6 +80,7 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   return <group ref={group} position={[object.position.x, object.position.y, object.position.z]} rotation-y={object.rotationY}>
     {asset.modelUrl ? <AssetModel assetId={object.assetId} variantId={object.variantId} fallback={fallback} /> : fallback}
     <mesh
+      ref={proxy}
       position={[0, proxyHeight / 2, 0]}
       userData={{ instanceId: object.instanceId, interactionProxy: true }}
       onPointerDown={onPointerDown}
