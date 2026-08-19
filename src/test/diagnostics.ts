@@ -4,8 +4,9 @@ import { getAsset } from '@/editor/assets/registry';
 import type { FurnitureInstance, RoomProject, Vec3 } from '@/editor/model/types';
 import { useEditorStore } from '@/editor/state/store';
 import { assetCache } from '@/scene/assets/AssetCache';
+import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
 
-type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null };
+type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
 export type ScreenPoint = { x: number; y: number };
 export type ScreenBounds = ScreenPoint & { width: number; height: number };
@@ -80,8 +81,9 @@ export interface InteriorMagicTestApi {
   getAssetCacheStats(): ReturnType<typeof assetCache.diagnostics>;
   getSessionSummary(): { interactionMode: string; undoCount: number; redoCount: number; sheetState: string; workspacePanel: string | null };
   getRoomScreenBounds(): ScreenBounds | null;
-  getCameraState(): { position: Vec3; target: Vec3; controlsEnabled: boolean } | null;
+  getCameraState(): { position: Vec3; target: Vec3; direction: Vec3; controlsEnabled: boolean } | null;
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
+  getWorkspaceGeometry(): WorkspaceGeometry | null;
 }
 
 const api: InteriorMagicTestApi = {
@@ -126,9 +128,11 @@ const api: InteriorMagicTestApi = {
     const controls = sceneContext.getControls();
     const target = controls?.getTarget(new THREE.Vector3(), false) ?? new THREE.Vector3();
     const position = sceneContext.camera.position;
-    return { position: { x: position.x, y: position.y, z: position.z }, target: { x: target.x, y: target.y, z: target.z }, controlsEnabled: controls?.enabled ?? false };
+    const direction = sceneContext.camera.getWorldDirection(new THREE.Vector3()).negate();
+    return { position: { x: position.x, y: position.y, z: position.z }, target: { x: target.x, y: target.y, z: target.z }, direction: { x: direction.x, y: direction.y, z: direction.z }, controlsEnabled: controls?.enabled ?? false };
   },
   getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
+  getWorkspaceGeometry: () => sceneContext ? structuredClone(sceneContext.getWorkspace()) : null,
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }

@@ -110,6 +110,7 @@ Run the physical-device matrix in `DEVICE_TEST.md`, fix only measured gesture/re
 - Replaced native reset confirmation with an in-app destructive dialog.
 - Added Telegram stable viewport/content-safe-area CSS integration and removed the production grid helper.
 - Added product E2E coverage for sheet state, materials boundaries, reset, gesture isolation, responsive workspace and Fit Room.
+- Correctness follow-up unified expanded-sheet geometry for the sheet and object toolbar, switched camera fitting to measured safe-area-aware DOM geometry and projected room bounds, and fixed orientation preservation after any prior Home action.
 
 ### Architecture decisions
 

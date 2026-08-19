@@ -16,6 +16,9 @@ test('sheet toggles without mutating project and auto-collapses after add', asyn
   await page.getByRole('button', { name: 'Expand panel' }).click();
   await addAsset(page, 'chairs', 'chair');
   await expect(sheet).toHaveAttribute('data-sheet-state', 'peek');
+  await page.getByRole('button', { name: 'Expand panel' }).click();
+  const expandedSheet = (await sheet.boundingBox())!, toolbar = (await page.getByTestId('object-toolbar').boundingBox())!;
+  expect(toolbar.y + toolbar.height, 'context controls stay above expanded sheet').toBeLessThanOrEqual(expandedSheet.y + 1);
 });
 
 test('materials are project data while workspace state remains session-only', async ({ monitoredPage: page }) => {
@@ -72,4 +75,20 @@ test('Fit Room restores a usable room framing', async ({ monitoredPage: page }) 
   expect(room).not.toBeNull();
   expect(room!.x).toBeGreaterThanOrEqual(canvasBox.x - 12); expect(room!.x + room!.width).toBeLessThanOrEqual(canvasBox.x + canvasBox.width + 12);
   expect(room!.y).toBeGreaterThanOrEqual(canvasBox.y - 12); expect(room!.y + room!.height).toBeLessThanOrEqual(canvasBox.y + canvasBox.height + 12);
+});
+
+test('layout fit after Home preserves the subsequently orbited direction', async ({ monitoredPage: page }, testInfo) => {
+  test.skip(testInfo.project.name === 'desktop', 'mobile sheet transition regression');
+  await openApp(page);
+  await page.getByRole('button', { name: 'Fit Room' }).click();
+  await expect.poll(async () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getCameraState()!.position.x)).toBeGreaterThan(3);
+  const canvas = (await page.locator('canvas').boundingBox())!;
+  await page.mouse.move(canvas.x + canvas.width * .35, canvas.y + canvas.height * .4); await page.mouse.down();
+  await page.mouse.move(canvas.x + canvas.width * .58, canvas.y + canvas.height * .4, { steps: 8 }); await page.mouse.up();
+  await expect.poll(async () => page.evaluate(() => { const current = window.__INTERIOR_MAGIC_TEST__!.getCameraState()!.direction; const holder = window as unknown as { __directionSample?: typeof current }; const previous = holder.__directionSample; holder.__directionSample = current; return previous ? current.x * previous.x + current.y * previous.y + current.z * previous.z : 0; })).toBeGreaterThan(.99999);
+  const direction = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getCameraState()!.direction);
+  const beforeBottom = (await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getWorkspaceGeometry()!)).insets.bottom;
+  await page.getByRole('button', { name: 'Materials' }).click();
+  await expect.poll(async () => (await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getWorkspaceGeometry()!)).insets.bottom).toBeGreaterThan(beforeBottom + 50);
+  await expect.poll(async () => page.evaluate((before) => { const current = window.__INTERIOR_MAGIC_TEST__!.getCameraState()!.direction; return current.x * before.x + current.y * before.y + current.z * before.z; }, direction)).toBeGreaterThan(.998);
 });

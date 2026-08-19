@@ -27,3 +27,18 @@ test('boots against a Telegram WebApp mock', async ({ monitoredPage: page }) => 
   const calls = await page.evaluate(() => (window as unknown as { __telegramCalls: string[] }).__telegramCalls);
   expect(calls).toEqual(expect.arrayContaining(['ready', 'expand']));
 });
+
+test('shares Telegram safe-area geometry with layout and camera fitting', async ({ monitoredPage: page }, testInfo) => {
+  test.skip(testInfo.project.name === 'desktop', 'safe-area regression is mobile-specific');
+  await page.addInitScript(() => Object.assign(window, { Telegram: { WebApp: {
+    viewportStableHeight: 820,
+    contentSafeAreaInset: { top: 24, right: 13, bottom: 18, left: 11 },
+    ready: () => undefined, expand: () => undefined, onEvent: () => undefined,
+  } } }));
+  await openApp(page);
+  const geometry = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getWorkspaceGeometry()!);
+  expect(geometry.height).toBe(820); expect(geometry.insets.left).toBe(11); expect(geometry.insets.right).toBe(13); expect(geometry.insets.bottom).toBeGreaterThan(150);
+  const css = await page.evaluate(() => ({ left: getComputedStyle(document.documentElement).getPropertyValue('--tg-safe-left'), bottom: getComputedStyle(document.documentElement).getPropertyValue('--tg-safe-bottom') }));
+  expect(css).toEqual({ left: '11px', bottom: '18px' });
+  await expect.poll(async () => { const room = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getRoomScreenBounds()); const current = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getWorkspaceGeometry()!); return room ? room.y + room.height <= current.height - current.insets.bottom + 2 : false; }).toBe(true);
+});
