@@ -32,6 +32,17 @@ export const furnitureAssets = {
       { id: 'cream', color: '#d5c5a8', materialOverrides: { upholstery: { color: '#d5c5a8' } } },
     ], tags: ['seating'], fallbackPrimitive: 'chair',
   }),
+  sheenChair: define({
+    ...common, id: 'sheenChair', name: 'Бархатное кресло', icon: '◫', category: 'chairs',
+    modelUrl: 'models/sheen_chair.glb', thumbnailUrl: 'thumbnails/sheen_chair.jpg',
+    dimensions: { width: 0.827, height: 0.687, depth: 0.571 }, footprint: { width: 0.84, depth: 0.59 },
+    collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, interaction: { paddingXZ: 0.08, minHeight: 0.55 },
+    normalization: { recenterToFootprint: true },
+    variants: [
+      { id: 'mango', color: '#b86f3e' },
+      { id: 'peacock', color: '#346b72', materialOverrides: { 'fabric Mystere Mango Velvet': { color: '#4f9298' } } },
+    ], tags: ['seating', 'external', 'textured', 'cc0'], fallbackPrimitive: 'chair',
+  }),
   table: define({
     ...common, id: 'table', name: 'Стол', icon: '▬', category: 'tables',
     modelUrl: 'models/table.glb', thumbnailUrl: 'thumbnails/table.svg',

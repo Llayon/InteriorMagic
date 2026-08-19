@@ -16,6 +16,7 @@ export function DebugOverlay() {
   }, []);
   const idle = performance.now() - metrics.sampledAt > 700;
   return <div className="debug">{[
+    `${window.innerWidth}×${window.innerHeight} · touch ${navigator.maxTouchPoints}`,
     `FPS ${idle ? 'idle' : metrics.fps.toFixed(0)} · ${metrics.frameTime.toFixed(1)} ms`,
     `calls ${metrics.calls} · tris ${metrics.triangles}`,
     `tex ${metrics.textures} · geo ${metrics.geometries}`,

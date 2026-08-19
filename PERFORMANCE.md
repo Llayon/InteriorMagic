@@ -13,7 +13,9 @@
 
 Five GLB files total 55,000 bytes (53.7 KiB): sofa 9.6 KiB, chair 10.9 KiB, table 9.1 KiB, plant 21.9 KiB and rug 2.2 KiB. They use embedded colors and no textures. Their combined visual geometry is well below 1k triangles and roughly 22 mesh draws before room/selection overlays.
 
-The development overlay reports actual renderer FPS/frame time, calls, triangles, texture/geometry memory counters, DPR, selection and cache bytes. It updates HTML independently and does not keep WebGL awake while idle.
+The first external audit asset, Sheen Chair, is deliberately unoptimized: 4.13 MB GLB, 39,936 triangles, four mesh primitives and seven embedded PNG textures. Texture resolutions are 512–1024 px; glTF Transform estimates roughly 15.4 MB minimum texture GPU allocation. These numbers establish a real baseline and are not yet a reason to introduce Meshopt/KTX2 for the whole pipeline.
+
+The development overlay, also available explicitly with `?debug=1`, reports actual renderer FPS/frame time, calls, triangles, texture/geometry memory counters, DPR, selection and cache bytes. It updates HTML independently and does not keep WebGL awake while idle.
 
 ## Profiling method
 

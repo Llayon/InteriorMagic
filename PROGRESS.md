@@ -13,6 +13,10 @@
 - Camera gate, pointer cancel/lost-capture cleanup and separate invalid placement overlay.
 - Development renderer/cache diagnostics.
 - Domain, history, async race and actual GLB parsing tests.
+- CI-gated Pages pipeline: quality must pass before the deploy artifact is built.
+- External CC0 textured Sheen Chair with source/license record and production-like texture/triangle measurements.
+- Official Telegram WebApp bridge, safe-area viewport metadata and opt-in Pages diagnostics via `?debug=1`.
+- Lightweight room pass with warm hemisphere lighting and baseboards, without shadows or post-processing.
 
 ## Architecture decisions
 
@@ -24,24 +28,24 @@
 
 ## Verification
 
-- 19 automated tests pass across seven test files.
+- 20 automated tests pass across eight test files.
 - TypeScript strict, ESLint and production build pass.
-- Local runtime returned HTTP 200 and correct `model/gltf-binary` MIME for all five GLBs; thumbnails returned `image/svg+xml`.
+- Local runtime returned HTTP 200 and correct asset MIME types; the Pages build includes all fixture and external GLBs.
 - Automated audit proves the malformed sofa normalizes to floor-level, centered canonical bounds while preserving its nested graph.
 
 ## Known limitations
 
 - The environment exposed no in-app or Chrome browser backend, so the full visual 390×844 touch scenario could not be executed here.
+- A real CC0 textured Sheen Chair is integrated and audited, but still needs the documented physical-device pass.
 - Only rectangular rooms and floor placement are active.
-- GLB fixtures use embedded flat materials; production textures/Meshopt/KTX2 are not enabled.
+- Fixture GLBs use embedded flat materials; the external chair establishes the unoptimized textured baseline. Meshopt/KTX2 are intentionally not enabled.
 - No object-to-object snap, clearance recommendations, autosave or production LRU.
 
 ## Technical debt
 
 - Run the documented mobile scenario on physical Android/iPhone Telegram WebViews.
-- Add one licensed external furniture model to the normalization audit when a production pack is selected.
 - Add automated browser interaction coverage once a browser backend is available.
 
 ## Next recommended chunk
 
-Device hardening and the first external asset-pack trial: physical WebView profiling, one licensed textured model, loader error/retry UX, snap guides, accessibility pass and browser-level interaction tests. Do not import the full production catalog yet.
+Run the physical-device matrix in `DEVICE_TEST.md`, fix only measured gesture/rendering defects, then curate a visually consistent trial catalog of roughly 20–25 licensed assets. Use the resulting network/GPU measurements before deciding on Meshopt or KTX2.
