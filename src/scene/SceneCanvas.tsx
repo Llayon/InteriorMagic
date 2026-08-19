@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, type RefObject } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { CameraControls } from '@react-three/drei';
 import CameraControlsImpl from 'camera-controls';
@@ -11,10 +11,10 @@ import { DebugStatsBridge } from '@/scene/debug/DebugStats';
 import { isDebugEnabled } from '@/shared/debug';
 import { isTestMode, registerTestScene } from '@/test/diagnostics';
 
-function TestSceneBridge() {
+function TestSceneBridge({ controls }: { controls: RefObject<CameraControlsImpl | null> }) {
   const camera = useThree((state) => state.camera);
   const gl = useThree((state) => state.gl);
-  useEffect(() => { registerTestScene({ camera, gl }); return () => registerTestScene(null); }, [camera, gl]);
+  useEffect(() => { registerTestScene({ camera, gl, getControls: () => controls.current }); return () => registerTestScene(null); }, [camera, controls, gl]);
   return null;
 }
 
@@ -31,7 +31,7 @@ function Content() {
     {objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}
     <CameraControls ref={controls} enabled={!dragging} makeDefault minDistance={4.8} maxDistance={8.5} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />
     {isDebugEnabled && <DebugStatsBridge />}
-    {isTestMode && <TestSceneBridge />}
+    {isTestMode && <TestSceneBridge controls={controls} />}
   </CameraGateContext.Provider>;
 }
 

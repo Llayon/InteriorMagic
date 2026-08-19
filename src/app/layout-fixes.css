@@ -9,3 +9,9 @@ main {
     grid-template-columns: minmax(0, 1fr) 280px;
   }
 }
+
+@media (max-width: 699px) {
+  .categories button {
+    min-height: 40px;
+  }
+}

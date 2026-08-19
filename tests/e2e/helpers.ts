@@ -1,4 +1,6 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type CDPSession, type Page } from '@playwright/test';
+
+export type Point = { x: number; y: number };
 
 export async function openApp(page: Page) {
   await page.goto('/');
@@ -24,9 +26,41 @@ export async function proxyBounds(page: Page, instanceId: string) {
   return bounds!;
 }
 
-export async function drag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, steps = 12) {
+export async function drag(page: Page, from: Point, to: Point, steps = 12) {
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(to.x, to.y, { steps });
   await page.mouse.up();
+}
+
+export class TouchGesture {
+  private constructor(private readonly session: CDPSession, private current: Point) {}
+
+  static async start(page: Page, point: Point) {
+    const session = await page.context().newCDPSession(page);
+    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [TouchGesture.touchPoint(point)] });
+    return new TouchGesture(session, point);
+  }
+
+  async move(to: Point, steps = 1) {
+    const from = this.current;
+    for (let step = 1; step <= steps; step += 1) {
+      const ratio = step / steps;
+      const point = { x: from.x + (to.x - from.x) * ratio, y: from.y + (to.y - from.y) * ratio };
+      await this.session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [TouchGesture.touchPoint(point)] });
+    }
+    this.current = to;
+  }
+
+  async end() { await this.finish('touchEnd'); }
+  async cancel() { await this.finish('touchCancel'); }
+
+  private async finish(type: 'touchEnd' | 'touchCancel') {
+    await this.session.send('Input.dispatchTouchEvent', { type, touchPoints: [] });
+    await this.session.detach();
+  }
+
+  private static touchPoint(point: Point) {
+    return { x: point.x, y: point.y, id: 1, radiusX: 8, radiusY: 8, force: 1 };
+  }
 }

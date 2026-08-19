@@ -24,6 +24,6 @@ test('boots against a Telegram WebApp mock', async ({ monitoredPage: page }) => 
     });
   });
   await openApp(page);
-  const calls = await page.evaluate(() => (window as Window & { __telegramCalls: string[] }).__telegramCalls);
+  const calls = await page.evaluate(() => (window as unknown as { __telegramCalls: string[] }).__telegramCalls);
   expect(calls).toEqual(expect.arrayContaining(['ready', 'expand']));
 });

@@ -18,15 +18,22 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'mobile-short',
+      testMatch: /(?:interactions-touch|responsive)\.spec\.ts/,
+      use: { browserName: 'chromium', viewport: { width: 360, height: 700 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
+    },
+    {
       name: 'mobile-small',
       use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
       name: 'mobile-large',
+      testMatch: /responsive\.spec\.ts/,
       use: { browserName: 'chromium', viewport: { width: 430, height: 932 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
       name: 'desktop',
+      testIgnore: /interactions-touch\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],

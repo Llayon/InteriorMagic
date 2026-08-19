@@ -1,5 +1,30 @@
 # Progress
 
+## 2026-08-19 — Final browser QA hardening
+
+### Completed
+
+- Added real Chromium touch selection, edge drag, camera isolation, commit and cancellation coverage using touchscreen/CDP input.
+- Added deterministic lost-pointer-capture cleanup and verified rollback without a Move history entry.
+- Replaced the permissive 35 cm grab check with an 8 CSS px pointer-to-object screen-offset invariant for mouse and touch.
+- Added E2E TypeScript compilation, CI enforcement, a 15-minute browser-job timeout, and a bounded four-viewport matrix.
+- Covered the 360×700 short-height branch, popup bounds, toolbar/catalog separation, critical touch targets, catalog visibility and page overflow.
+
+### Architecture decisions
+
+- Diagnostics remain read-only and test-mode-only; camera and interaction observations do not expose editor commands.
+- Touch drag uses Chromium CDP only because Playwright touchscreen has no multi-step drag API.
+- Core tests run on mobile-small and desktop; touch runs on mobile-short/mobile-small; responsive runs on all four profiles.
+
+### Known limitations
+
+- Chromium emulation is not a physical Telegram Android/iOS WebView test.
+- WebKit, broad diagnostics refactors and additional QA frameworks are intentionally deferred.
+
+### Next recommended chunk
+
+Mobile Workspace UX + First Beautiful Room: fullscreen workspace, collapsible sheet states, UI-aware camera framing, consolidated materials/reset flows, one coherent room and 20–25 licensed consistent assets.
+
 ## 2026-08-19 — Playwright browser QA
 
 ### Completed

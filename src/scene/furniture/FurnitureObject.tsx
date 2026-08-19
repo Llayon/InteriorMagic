@@ -8,7 +8,7 @@ import { useEditorStore } from '@/editor/state/store';
 import { AssetModel } from '@/scene/assets/AssetModel';
 import { useCameraGate } from '@/scene/interactions/CameraGate';
 import { ProceduralFurniture } from './ProceduralFurniture';
-import { isTestMode, registerTestObject } from '@/test/diagnostics';
+import { beginTestInteraction, endTestInteraction, isTestMode, registerTestObject } from '@/test/diagnostics';
 
 const ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
@@ -17,7 +17,9 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   const proxy = useRef<THREE.Mesh>(null);
   const feedbackMaterial = useRef<THREE.MeshBasicMaterial>(null);
   const controller = useRef(new DragController());
+  const clearNativeCancelListeners = useRef<() => void>(() => undefined);
   const invalidate = useThree((state) => state.invalidate);
+  const canvas = useThree((state) => state.gl.domElement);
   const gateCamera = useCameraGate();
   const selected = useEditorStore((state) => state.session.selectedId === object.instanceId);
   const asset = getAsset(object.assetId);
@@ -39,11 +41,13 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
     if (!controller.current.snapshot || !group.current) return;
     const position = cancelled ? controller.current.cancel(pointerId) : controller.current.finish(pointerId);
     if (!position) return;
+    clearNativeCancelListeners.current();
     group.current.position.set(position.x, position.y, position.z);
     setFeedback(false);
     gateCamera(true);
     useEditorStore.getState().setMode('idle');
     if (!cancelled) useEditorStore.getState().move(object.instanceId, position);
+    endTestInteraction(cancelled ? 'cancel' : 'commit');
     invalidate();
   };
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
@@ -52,7 +56,16 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
     if (!floorHit) return;
     event.stopPropagation();
     (event.target as Element).setPointerCapture(event.pointerId);
+    const cancel = (nativeEvent: PointerEvent) => { if (nativeEvent.pointerId === event.pointerId) finish(event.pointerId, true); };
+    canvas.addEventListener('pointercancel', cancel);
+    canvas.addEventListener('lostpointercapture', cancel);
+    clearNativeCancelListeners.current = () => {
+      canvas.removeEventListener('pointercancel', cancel);
+      canvas.removeEventListener('lostpointercapture', cancel);
+      clearNativeCancelListeners.current = () => undefined;
+    };
     controller.current.begin(event.pointerId, object, floorHit);
+    beginTestInteraction(event.pointerType, event.pointerId);
     useEditorStore.getState().select(object.instanceId);
     gateCamera(false);
     useEditorStore.getState().setMode('dragging');

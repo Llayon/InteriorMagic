@@ -30,6 +30,8 @@ jobs:
         run: npm test
       - name: Typecheck
         run: npm run typecheck
+      - name: Typecheck E2E
+        run: npm run typecheck:e2e
       - name: Lint
         run: npm run lint
       - name: Build
@@ -38,6 +40,7 @@ jobs:
   e2e-chromium:
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:

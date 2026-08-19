@@ -13,12 +13,16 @@ test('selects through proxy and commits one edge-grab move', async ({ monitoredP
   await page.mouse.click(edge.x, edge.y);
   await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getSelectedInstanceId())).toBe(chair.instanceId);
 
-  const before = await page.evaluate((id) => window.__INTERIOR_MAGIC_TEST__!.getRenderedTransform(id), chair.instanceId);
+  const objectScreenBefore = await page.evaluate((id) => window.__INTERIOR_MAGIC_TEST__!.getObjectScreenPosition(id), chair.instanceId);
+  const offsetBefore = { x: objectScreenBefore!.x - edge.x, y: objectScreenBefore!.y - edge.y };
   const historyBefore = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getSessionSummary().undoCount);
   await page.mouse.move(edge.x, edge.y); await page.mouse.down();
-  await page.mouse.move(edge.x + 8, edge.y + 4, { steps: 2 });
-  const early = await page.evaluate((id) => window.__INTERIOR_MAGIC_TEST__!.getRenderedTransform(id), chair.instanceId);
-  expect(Math.hypot(early!.position.x - before!.position.x, early!.position.z - before!.position.z)).toBeLessThan(0.35);
+  const firstMove = { x: edge.x + 18, y: edge.y + 8 };
+  await page.mouse.move(firstMove.x, firstMove.y, { steps: 2 });
+  await expect.poll(async () => {
+    const objectScreen = await page.evaluate((id) => window.__INTERIOR_MAGIC_TEST__!.getObjectScreenPosition(id), chair.instanceId);
+    return Math.hypot(objectScreen!.x - firstMove.x - offsetBefore.x, objectScreen!.y - firstMove.y - offsetBefore.y);
+  }).toBeLessThanOrEqual(8);
   await page.mouse.move(edge.x + 110, edge.y + 20, { steps: 10 }); await page.mouse.up();
   const after = (await project(page)).objects.find((object) => object.instanceId === chair.instanceId)!;
   expect(Math.hypot(after.position.x - chair.position.x, after.position.z - chair.position.z)).toBeGreaterThan(0.05);

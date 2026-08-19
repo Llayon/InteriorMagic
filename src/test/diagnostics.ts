@@ -1,22 +1,40 @@
 import * as THREE from 'three';
+import type CameraControlsImpl from 'camera-controls';
 import { getAsset } from '@/editor/assets/registry';
 import type { FurnitureInstance, RoomProject, Vec3 } from '@/editor/model/types';
 import { useEditorStore } from '@/editor/state/store';
 import { assetCache } from '@/scene/assets/AssetCache';
 
-type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer };
+type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
 export type ScreenPoint = { x: number; y: number };
 export type ScreenBounds = ScreenPoint & { width: number; height: number };
 
 let sceneContext: SceneContext | null = null;
 const sceneObjects = new Map<string, SceneObject>();
+let activePointerType: string | null = null;
+let activePointerId: number | null = null;
+let lastPointerType: string | null = null;
+let lastEndReason: 'commit' | 'cancel' | null = null;
 
 export const isTestMode = import.meta.env.MODE === 'test';
 export const registerTestScene = (value: SceneContext | null) => { sceneContext = value; };
 export const registerTestObject = (instanceId: string, value: SceneObject | null) => {
   if (value) sceneObjects.set(instanceId, value);
   else sceneObjects.delete(instanceId);
+};
+export const beginTestInteraction = (pointerType: string, pointerId: number) => {
+  if (!isTestMode) return;
+  activePointerType = pointerType;
+  activePointerId = pointerId;
+  lastPointerType = pointerType;
+  lastEndReason = null;
+};
+export const endTestInteraction = (reason: 'commit' | 'cancel') => {
+  if (!isTestMode) return;
+  activePointerType = null;
+  activePointerId = null;
+  lastEndReason = reason;
 };
 
 const projectPoint = (point: THREE.Vector3): ScreenPoint | null => {
@@ -61,10 +79,12 @@ export interface InteriorMagicTestApi {
   getRendererStats(): { ready: boolean; frameloop: 'demand'; calls: number; triangles: number; textures: number; geometries: number; dpr: number; canvas: ScreenBounds | null };
   getAssetCacheStats(): ReturnType<typeof assetCache.diagnostics>;
   getSessionSummary(): { interactionMode: string; undoCount: number; redoCount: number };
+  getCameraState(): { position: Vec3; target: Vec3; controlsEnabled: boolean } | null;
+  getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
 }
 
 const api: InteriorMagicTestApi = {
-  isReady: () => Boolean(sceneContext),
+  isReady: () => Boolean(sceneContext?.getControls()),
   getProject: () => structuredClone(useEditorStore.getState().project),
   getSelectedInstanceId: () => useEditorStore.getState().session.selectedId,
   getObject: (instanceId) => structuredClone(useEditorStore.getState().project.objects.find((item) => item.instanceId === instanceId) ?? null),
@@ -92,6 +112,14 @@ const api: InteriorMagicTestApi = {
   },
   getAssetCacheStats: () => assetCache.diagnostics(),
   getSessionSummary: () => { const { session } = useEditorStore.getState(); return { interactionMode: session.mode, undoCount: session.undoStack.length, redoCount: session.redoStack.length }; },
+  getCameraState: () => {
+    if (!sceneContext) return null;
+    const controls = sceneContext.getControls();
+    const target = controls?.getTarget(new THREE.Vector3(), false) ?? new THREE.Vector3();
+    const position = sceneContext.camera.position;
+    return { position: { x: position.x, y: position.y, z: position.z }, target: { x: target.x, y: target.y, z: target.z }, controlsEnabled: controls?.enabled ?? false };
+  },
+  getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }
