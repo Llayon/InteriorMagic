@@ -1,5 +1,33 @@
 # Progress
 
+## 2026-08-19 — Rendering Baseline + First Beautiful Room
+
+### Completed
+
+- Added a cached local RoomEnvironment/PMREM baseline, ACES Filmic tone mapping, calibrated exposure/environment/key intensities, and cheap blob grounding without shadow maps or post-processing.
+- Imported ten coherent CC0 Kenney Furniture Kit floor assets with local thumbnails, canonical normalization metadata and minimal `semantic.role` values.
+- Added a separate nine-object `?demo=1` curated living-room fixture; the normal user project remains unchanged.
+- Audited every trial GLB and recorded network, triangle, primitive, material, texture and estimated GPU texture costs in `ASSET_AUDIT.md`.
+- Added GLB normalization tests and browser-level catalog/demo budget checks; captured headed Chromium evidence at 390×844, 430×932 and 1440×900.
+
+### Architecture decisions
+
+- RoomProject remains version 1 and FurnitureInstance is unchanged; semantics live in static AssetRegistry metadata.
+- Grounding is a render overlay and does not mutate shared GLB materials or domain collision state.
+- The chosen family is intentionally texture-free and very light; the existing textured Sheen Chair remains the material-extension stress test, not the catalog average.
+- No ECS, surface placement, asset-specific React renderers, compression pipeline or post-processing was introduced.
+
+### Known limitations
+
+- The coherent low-poly family proves a pleasant inexpensive visual direction, but it does not prove a photorealistic textured catalog.
+- Blob shadows are deliberately approximate and do not react to furniture height or inter-object occlusion.
+- Physical Telegram Android/iOS and Safari iPhone furnished-room passes are still outstanding.
+- Cold-load impressions and sustained thermals require real network/device measurements; localhost Chromium timing is not representative.
+
+### Next recommended review
+
+Review screenshots, `ASSET_AUDIT.md`, browser metrics and physical-device results before expanding. Choose one path: **A)** successful trial → extend the same family toward 20–25 assets; **B)** assets too heavy → a measured optimization experiment; **C)** assets good but presentation insufficient → one focused rendering adjustment; **D)** device limits → a mobile performance pass.
+
 ## 2026-08-19 — Final browser QA hardening
 
 ### Completed

@@ -46,10 +46,25 @@ Catalog thumbnails do not preload models. Concurrent selection uses latest-reque
 
 ## Rendering
 
-R3F reconstructs the scene from the project using `frameloop="demand"`. Camera movement, drag and asset completion request frames; idle does not run a WebGL loop. DPR profiles remain capped at 1.5. There are no physics, realtime shadows or post-processing.
+R3F reconstructs the scene from the project using `frameloop="demand"`. Camera movement, drag and asset completion request frames; idle does not run a WebGL loop. DPR profiles remain capped at 1.5. A local `RoomEnvironment` is converted once into a PMREM and used as a non-visible IBL source. ACES Filmic tone mapping at exposure 1.05, environment intensity 0.72 and one directional key at 1.15 form the explicit production baseline.
+
+Furniture grounding is a shared low-poly radial blob overlay, not realtime shadow mapping. Rugs skip this overlay. There is no physics, external HDR dependency, shadow map, post-processing or permanent render loop.
 
 ## Mobile workspace
 
 On portrait screens the 3D room is the workspace; the header, global/context controls and one shared catalog/materials bottom sheet overlay it. `workspacePanel`, `sheetState` and Fit Room intent are `EditorSession` data and never enter `RoomProject`, persistence or command history.
 
 Camera fitting is centralized in `scene/camera/fitRoom.ts`. A workspace hook measures the actual settled header/sheet overlap and resolved browser/Telegram safe-area padding; the same root sheet-height variable positions both the sheet and contextual toolbar. The fitter projects all eight room corners through the real canvas camera, centers those projected bounds in the usable rectangle, and uses a 16-step binary search for the minimum fitting distance. Sheet/viewport changes preserve the camera's actual view direction, while an explicit Home revision alone restores the canonical dollhouse direction.
+
+## Domain evolution principles
+
+1. The model is ECS-friendly, not ECS-driven.
+2. Static asset metadata, dynamic instance state, derived spatial state, and render/editor-only state stay separate.
+3. A capability is not added when existing configuration already determines it.
+4. Production assets receive only semantic metadata required by current product behavior.
+5. Persist intent and structural dependencies; derive geometry.
+6. Behavior never branches on a concrete `assetId`.
+7. `FurnitureInstance` does not become a bag of optional future fields.
+8. Relative or surface placement is a likely RoomProject v2/schema-review trigger.
+9. Several overlapping component-query systems would trigger an ECS review.
+10. That review compares the current domain model, custom component-oriented storage, and a lightweight ECS before choosing a migration.

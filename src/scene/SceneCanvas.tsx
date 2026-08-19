@@ -13,6 +13,7 @@ import { isDebugEnabled } from '@/shared/debug';
 import { isTestMode, registerTestScene } from '@/test/diagnostics';
 import { fitRoom } from '@/scene/camera/fitRoom';
 import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
+import { EnvironmentLighting, RENDERING_BASELINE } from '@/scene/lighting/EnvironmentLighting';
 
 function TestSceneBridge({ controls, workspace }: { controls: RefObject<CameraControlsImpl | null>; workspace: WorkspaceGeometry }) {
   const camera = useThree((state) => state.camera), gl = useThree((state) => state.gl);
@@ -33,9 +34,9 @@ function Content({ workspace }: { workspace: WorkspaceGeometry }) {
     initialFit.current = true;
   }, [camera, fitRevision, room, workspace]);
   const setCameraEnabled = useCallback((enabled: boolean) => { if (controls.current) controls.current.enabled = enabled; }, []);
-  return <CameraGateContext.Provider value={setCameraEnabled}><color attach="background" args={['#eee9df']} /><hemisphereLight args={['#fff8e8', '#756b61', 1.35]} /><directionalLight color="#fff1d6" position={[3, 6, 4]} intensity={1.85} /><Room />{objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}<CameraControls ref={controls} enabled={!dragging} makeDefault minDistance={4.8} maxDistance={18} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />{isDebugEnabled && <DebugStatsBridge />}{isTestMode && <TestSceneBridge controls={controls} workspace={workspace} />}</CameraGateContext.Provider>;
+  return <CameraGateContext.Provider value={setCameraEnabled}><color attach="background" args={['#e9e4da']} /><EnvironmentLighting /><Room />{objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}<CameraControls ref={controls} enabled={!dragging} makeDefault minDistance={4.8} maxDistance={18} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />{isDebugEnabled && <DebugStatsBridge />}{isTestMode && <TestSceneBridge controls={controls} workspace={workspace} />}</CameraGateContext.Provider>;
 }
 
 export function SceneCanvas({ workspace }: { workspace: WorkspaceGeometry }) {
-  return <Canvas onPointerMissed={() => useEditorStore.getState().select(null)} frameloop="demand" dpr={QUALITY[qualityProfile].dpr} camera={{ position: [5, 4.6, 6.5], fov: 44, near: .1, far: 40 }} gl={{ antialias: qualityProfile !== 'low', powerPreference: 'high-performance' }}><Content workspace={workspace} /></Canvas>;
+  return <Canvas onCreated={({ gl }) => { gl.toneMapping = RENDERING_BASELINE.toneMapping; gl.toneMappingExposure = RENDERING_BASELINE.exposure; gl.outputColorSpace = THREE.SRGBColorSpace; }} onPointerMissed={() => useEditorStore.getState().select(null)} frameloop="demand" dpr={QUALITY[qualityProfile].dpr} camera={{ position: [5, 4.6, 6.5], fov: 44, near: .1, far: 40 }} gl={{ antialias: qualityProfile !== 'low', powerPreference: 'high-performance' }}><Content workspace={workspace} /></Canvas>;
 }

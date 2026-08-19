@@ -17,6 +17,19 @@ The first external audit asset, Sheen Chair, is deliberately unoptimized: 4.13 M
 
 The development overlay, also available explicitly with `?debug=1`, reports actual renderer FPS/frame time, calls, triangles, texture/geometry memory counters, DPR, selection and cache bytes. It updates HTML independently and does not keep WebGL awake while idle.
 
+## First Beautiful Room baseline
+
+The CC0 Kenney trial catalog adds ten production assets totaling 107.7 KiB, 1,480 triangles and 25 primitives. The curated room loads nine of them (89.0 KiB). Headed Chromium captures at 390×844, 430×932 and 1440×900 consistently reported:
+
+- DPR 1.5;
+- 33 renderer calls;
+- 1,288 visible triangles;
+- 44 geometries and two renderer textures;
+- nine cached assets / 91,164 loaded GLB bytes;
+- demand rendering at idle.
+
+The Kenney assets contain no texture images, so their decoded GPU texture allocation is zero. The two renderer textures belong to the local PMREM/environment baseline. Detailed per-asset measurements and the Sheen Chair comparison are in `ASSET_AUDIT.md`.
+
 ## Profiling method
 
 - Fill a representative room, then read `renderer.info` after camera movement settles.

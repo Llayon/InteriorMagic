@@ -5,7 +5,7 @@ export type Point = { x: number; y: number };
 export async function openApp(page: Page) {
   await page.goto('/');
   await expect(page.getByTestId('app-root')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady())).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady()), { timeout: 15_000 }).toBe(true);
 }
 
 export async function project(page: Page) {

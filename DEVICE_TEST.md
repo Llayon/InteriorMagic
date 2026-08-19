@@ -26,3 +26,15 @@ Run first in the device browser, then from Telegram. A true Telegram Mini App pa
 ## Record
 
 For each device record model/OS, browser or Telegram version, viewport, DPR profile, peak active frame time, calls/triangles with the external chair visible, cold chair load time, and any gesture conflict. Screen recording is more useful than subjective notes for snap/camera defects.
+
+## Furnished-room visual pass
+
+Open `https://llayon.github.io/InteriorMagic/?demo=1&debug=1` after deployment.
+
+1. Let all nine trial assets appear and record the subjective cold-load delay.
+2. Orbit and pinch; confirm the curated room remains framed above the sheet.
+3. Select and drag the sofa, both armchairs, table, lamp and plants through their proxies.
+4. Expand/collapse the catalog and background/foreground Telegram.
+5. Record active frame time, calls, triangles, DPR, renderer memory and loaded bytes.
+6. Inspect fabric, wood, metal, rug and foliage; look for clipping, floating, overexposure or crushed colors.
+7. Repeat in the device browser and Telegram WebView, then capture a short screen recording.

@@ -80,6 +80,56 @@ export const furnitureAssets = {
     variants: [{ id: 'brass', color: '#b69358' }, { id: 'graphite', color: '#55585c' }],
     tags: ['decor', 'lighting'], fallbackPrimitive: 'lamp',
   }),
+  nordicSofa: define({
+    ...common, id: 'nordicSofa', name: 'Диван Нордик', icon: '▰', category: 'sofas', modelUrl: 'models/kenney/loungeDesignSofa.glb', thumbnailUrl: 'thumbnails/kenney/loungeDesignSofa.png',
+    dimensions: { width: 2.02, height: 0.72, depth: 0.74 }, footprint: { width: 2.02, depth: 0.74 }, collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, normalization: { scale: 1.8, recenterToFootprint: true },
+    variants: [{ id: 'blue', color: '#5d82dd' }], tags: ['trial', 'kenney', 'seating'], semantic: { role: 'sofa' }, fallbackPrimitive: 'sofa',
+  }),
+  nordicArmchair: define({
+    ...common, id: 'nordicArmchair', name: 'Кресло Нордик', icon: '◫', category: 'chairs', modelUrl: 'models/kenney/loungeDesignChair.glb', thumbnailUrl: 'thumbnails/kenney/loungeDesignChair.png',
+    dimensions: { width: 0.91, height: 0.5, depth: 0.51 }, footprint: { width: 0.91, depth: 0.51 }, collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, normalization: { scale: 1.25, recenterToFootprint: true },
+    variants: [{ id: 'blue', color: '#5d82dd' }], tags: ['trial', 'kenney', 'seating'], semantic: { role: 'armchair' }, fallbackPrimitive: 'chair',
+  }),
+  relaxArmchair: define({
+    ...common, id: 'relaxArmchair', name: 'Кресло Релакс', icon: '◫', category: 'chairs', modelUrl: 'models/kenney/loungeChairRelax.glb', thumbnailUrl: 'thumbnails/kenney/loungeChairRelax.png',
+    dimensions: { width: 0.61, height: 0.79, depth: 0.84 }, footprint: { width: 0.61, depth: 0.84 }, collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, normalization: { scale: 1.25, recenterToFootprint: true },
+    variants: [{ id: 'blue', color: '#5d82dd' }], tags: ['trial', 'kenney', 'seating'], semantic: { role: 'armchair' }, fallbackPrimitive: 'chair',
+  }),
+  glassCoffeeTable: define({
+    ...common, id: 'glassCoffeeTable', name: 'Столик Гласс', icon: '▬', category: 'tables', modelUrl: 'models/kenney/tableCoffeeGlass.glb', thumbnailUrl: 'thumbnails/kenney/tableCoffeeGlass.png',
+    dimensions: { width: 1.19, height: 0.41, depth: 0.72 }, footprint: { width: 1.19, depth: 0.72 }, collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, normalization: { scale: 1.8, recenterToFootprint: true },
+    variants: [{ id: 'glass', color: '#9bc7d1' }], tags: ['trial', 'kenney', 'table'], semantic: { role: 'coffeeTable' }, fallbackPrimitive: 'table',
+  }),
+  drawerSideTable: define({
+    ...common, id: 'drawerSideTable', name: 'Тумба Оак', icon: '▬', category: 'tables', modelUrl: 'models/kenney/sideTableDrawers.glb', thumbnailUrl: 'thumbnails/kenney/sideTableDrawers.png',
+    dimensions: { width: 0.75, height: 0.54, depth: 0.31 }, footprint: { width: 0.75, depth: 0.31 }, collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, normalization: { scale: 1.4, recenterToFootprint: true },
+    variants: [{ id: 'oak', color: '#b99262' }], tags: ['trial', 'kenney', 'storage'], semantic: { role: 'sideTable' }, fallbackPrimitive: 'table',
+  }),
+  roundedRug: define({
+    ...common, id: 'roundedRug', name: 'Ковёр Софт', icon: '▱', category: 'rugs', modelUrl: 'models/kenney/rugRounded.glb', thumbnailUrl: 'thumbnails/kenney/rugRounded.png',
+    dimensions: { width: 2.51, height: 0.016, depth: 1.47 }, footprint: { width: 2.51, depth: 1.47 }, collision: { group: CollisionGroup.RUG, mask: CollisionGroup.RUG }, interaction: { minHeight: 0.18 }, normalization: { scale: 1.6, recenterToFootprint: true },
+    variants: [{ id: 'sand', color: '#cbb48e' }], tags: ['trial', 'kenney', 'textile'], semantic: { role: 'rug' }, fallbackPrimitive: 'rug',
+  }),
+  roundFloorLamp: define({
+    ...common, id: 'roundFloorLamp', name: 'Торшер Луна', icon: '◉', category: 'lamps', modelUrl: 'models/kenney/lampRoundFloor.glb', thumbnailUrl: 'thumbnails/kenney/lampRoundFloor.png',
+    dimensions: { width: 0.29, height: 1.63, depth: 0.33 }, footprint: { width: 0.29, depth: 0.33 }, collision: { group: CollisionGroup.DECOR, mask: DECOR_MASK }, interaction: { paddingXZ: 0.12 }, normalization: { scale: 1.9, recenterToFootprint: true },
+    variants: [{ id: 'warm', color: '#e9d7aa' }], tags: ['trial', 'kenney', 'lighting'], semantic: { role: 'floorLamp' }, fallbackPrimitive: 'lamp',
+  }),
+  tallPottedPlant: define({
+    ...common, id: 'tallPottedPlant', name: 'Пальма', icon: '♣', category: 'plants', modelUrl: 'models/kenney/pottedPlant.glb', thumbnailUrl: 'thumbnails/kenney/pottedPlant.png',
+    dimensions: { width: 0.42, height: 1.31, depth: 0.48 }, footprint: { width: 0.42, depth: 0.48 }, collision: { group: CollisionGroup.DECOR, mask: DECOR_MASK }, interaction: { paddingXZ: 0.12 }, normalization: { scale: 2, recenterToFootprint: true },
+    variants: [{ id: 'green', color: '#5d8f58' }], tags: ['trial', 'kenney', 'nature'], semantic: { role: 'plant' }, fallbackPrimitive: 'plant',
+  }),
+  leafyPlant: define({
+    ...common, id: 'leafyPlant', name: 'Фикус Лиф', icon: '♣', category: 'plants', modelUrl: 'models/kenney/plantSmall2.glb', thumbnailUrl: 'thumbnails/kenney/plantSmall2.png',
+    dimensions: { width: 0.47, height: 0.7, depth: 0.47 }, footprint: { width: 0.47, depth: 0.47 }, collision: { group: CollisionGroup.DECOR, mask: DECOR_MASK }, interaction: { paddingXZ: 0.12 }, normalization: { scale: 5, recenterToFootprint: true },
+    variants: [{ id: 'green', color: '#5d8f58' }], tags: ['trial', 'kenney', 'nature'], semantic: { role: 'plant' }, fallbackPrimitive: 'plant',
+  }),
+  lowBookcase: define({
+    ...common, id: 'lowBookcase', name: 'Консоль Бук', icon: '▤', category: 'tables', modelUrl: 'models/kenney/bookcaseOpenLow.glb', thumbnailUrl: 'thumbnails/kenney/bookcaseOpenLow.png',
+    dimensions: { width: 0.88, height: 0.88, depth: 0.55 }, footprint: { width: 0.88, depth: 0.55 }, collision: { group: CollisionGroup.FURNITURE, mask: FURNITURE_MASK }, normalization: { scale: 2.2, recenterToFootprint: true },
+    variants: [{ id: 'oak', color: '#b99262' }], tags: ['trial', 'kenney', 'storage'], semantic: { role: 'console' }, fallbackPrimitive: 'table',
+  }),
 } as const;
 
 export type AssetId = keyof typeof furnitureAssets;

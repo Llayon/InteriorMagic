@@ -9,6 +9,7 @@ import { AssetModel } from '@/scene/assets/AssetModel';
 import { useCameraGate } from '@/scene/interactions/CameraGate';
 import { ProceduralFurniture } from './ProceduralFurniture';
 import { beginTestInteraction, endTestInteraction, isTestMode, registerTestObject } from '@/test/diagnostics';
+import { FurnitureGrounding } from './FurnitureGrounding';
 
 const ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
@@ -91,6 +92,7 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
 
   const fallback = <ProceduralFurniture assetId={object.assetId} variantId={object.variantId} />;
   return <group ref={group} position={[object.position.x, object.position.y, object.position.z]} rotation-y={object.rotationY}>
+    {asset.semantic?.role !== 'rug' && <FurnitureGrounding width={asset.footprint.width} depth={asset.footprint.depth} />}
     {asset.modelUrl ? <AssetModel assetId={object.assetId} variantId={object.variantId} fallback={fallback} /> : fallback}
     <mesh
       ref={proxy}

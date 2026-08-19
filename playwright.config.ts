@@ -7,7 +7,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Several parallel WebGL + PMREM contexts can starve software-rendered local/CI GPUs.
+  workers: process.env.CI ? 1 : 4,
   reporter: [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
   use: {
@@ -28,7 +29,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-large',
-      testMatch: /responsive\.spec\.ts/,
+      testMatch: /(?:responsive|beautiful-room)\.spec\.ts/,
       use: { browserName: 'chromium', viewport: { width: 430, height: 932 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
