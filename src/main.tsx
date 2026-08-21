@@ -14,6 +14,12 @@ const bootstrap = async () => {
     const { installIthappyRegistryPrototype } = await import('@/app/local/ithappyRegistryPrototype');
     await installIthappyRegistryPrototype();
   }
+  const thumbnailAssetId = import.meta.env.MODE === 'test' && query.get('thumbnail') === 'ithappy' ? query.get('asset') : null;
+  if (thumbnailAssetId) {
+    const { IthappyThumbnailView } = await import('@/app/local/IthappyThumbnailView');
+    createRoot(document.getElementById('root')!).render(<IthappyThumbnailView assetId={thumbnailAssetId} />);
+    return;
+  }
   if (query.get('demo') === '1') useEditorStore.setState({ project: createBeautifulRoomProject() });
   createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>);
 };

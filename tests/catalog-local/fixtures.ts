@@ -1,0 +1,1 @@
+export const prototypeIds = ['sofa_026', 'sofa_037', 'sofa_041', 'chair_024', 'chair_036', 'chair_058', 'coffee_table', 'coffee_table_068', 'work_table_003', 'work_table_012', 'cupboard_003', 'dresser_085', 'shelf_071', 'entertainment_035', 'lamp_030', 'lamp_048', 'lamp_058', 'flower', 'flower_039', 'flower_043', 'carpet_017', 'carpet_022', 'ladder', 'ladder_008'] as const;

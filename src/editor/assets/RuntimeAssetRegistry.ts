@@ -51,6 +51,10 @@ export class RuntimeAssetRegistry {
 
   get size() { return this.entries.size; }
 
+  list(): RuntimeCatalogEntry[] {
+    return [...this.entries.values()].map((entry) => ({ ...entry }));
+  }
+
   get(assetId: string): RuntimeCatalogEntry {
     const entry = this.entries.get(assetId);
     if (!entry) throw new Error(`Unknown runtime asset: ${assetId}`);

@@ -1,35 +1,63 @@
-import { CollisionGroup, type FurnitureAssetDefinition } from '@/editor/model/types';
+import { CollisionGroup, type FurnitureAssetDefinition, type FurnitureSemanticRole } from '@/editor/model/types';
 import { registerEphemeralAssets } from '@/editor/assets/registry';
 import { parseRuntimeCatalog, RuntimeAssetRegistry } from '@/editor/assets/RuntimeAssetRegistry';
+import { CatalogRepository, configureCatalogRepository, type CatalogItem } from '@/editor/catalog/CatalogRepository';
+import { useEditorStore } from '@/editor/state/store';
 
 export const ITHAPPY_REGISTRY_BASE_URL = '/.local-assets/ithappy-registry/';
-export const ITHAPPY_PROTOTYPE_IDS = ['sofa_037', 'chair_024', 'lamp_048'] as const;
+export const ITHAPPY_PROTOTYPE_IDS = [
+  'sofa_026', 'sofa_037', 'sofa_041', 'chair_024', 'chair_036', 'chair_058',
+  'coffee_table', 'coffee_table_068', 'work_table_003', 'work_table_012',
+  'cupboard_003', 'dresser_085', 'shelf_071', 'entertainment_035',
+  'lamp_030', 'lamp_048', 'lamp_058', 'flower', 'flower_039', 'flower_043',
+  'carpet_017', 'carpet_022', 'ladder', 'ladder_008',
+] as const;
 
+// Raw scene bounds exist only to exercise the local add flow and frame offline thumbnails.
+// They are not authoritative asset-contract dimensions, footprints, or production placement metadata.
+type PrototypePlacementDocument = { provenance: 'prototype-raw-scene-bounds-not-production-metadata'; assets: Record<string, { dimensions: { width: number; height: number; depth: number } }> };
 const furnitureMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const decorMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const common = { placement: { anchor: 'floor' as const }, snapping: { grid: true, walls: true }, rotation: { enabled: true, stepDegrees: 45 } };
-type PrototypeId = typeof ITHAPPY_PROTOTYPE_IDS[number];
-type EditorMetadata = Omit<FurnitureAssetDefinition, 'id' | 'modelUrl' | 'placement' | 'snapping' | 'rotation'>;
 
-const editorMetadata: Record<PrototypeId, EditorMetadata> = {
-  sofa_037: {
-    name: 'ITHappy Sofa 037', icon: '▰', category: 'sofas', dimensions: { width: 2.2994, height: 1.0765, depth: 1.3572 }, footprint: { width: 2.2994, depth: 1.3572 },
-    collision: { group: CollisionGroup.FURNITURE, mask: furnitureMask }, normalization: { recenterToFootprint: true }, variants: [{ id: 'source', color: '#ffffff' }], tags: ['local-prototype', 'ithappy'], semantic: { role: 'sofa' }, fallbackPrimitive: 'sofa',
-  },
-  chair_024: {
-    name: 'ITHappy Chair 024', icon: '◫', category: 'chairs', dimensions: { width: 0.7319, height: 1.1372, depth: 0.7123 }, footprint: { width: 0.7319, depth: 0.7123 },
-    collision: { group: CollisionGroup.FURNITURE, mask: furnitureMask }, normalization: { recenterToFootprint: true }, variants: [{ id: 'source', color: '#ffffff' }], tags: ['local-prototype', 'ithappy'], semantic: { role: 'armchair' }, fallbackPrimitive: 'chair',
-  },
-  lamp_048: {
-    name: 'ITHappy Lamp 048', icon: '◉', category: 'lamps', dimensions: { width: 0.5142, height: 0.7893, depth: 0.6101 }, footprint: { width: 0.5142, depth: 0.6101 },
-    collision: { group: CollisionGroup.DECOR, mask: decorMask }, interaction: { paddingXZ: 0.12 }, normalization: { recenterToFootprint: true }, variants: [{ id: 'source', color: '#ffffff' }], tags: ['local-prototype', 'ithappy'], semantic: { role: 'floorLamp' }, fallbackPrimitive: 'lamp',
-  },
+const behaviorFor = (item: CatalogItem): { category: FurnitureAssetDefinition['category']; role: FurnitureSemanticRole; group: number; mask: number; fallback: FurnitureAssetDefinition['fallbackPrimitive']; interaction?: FurnitureAssetDefinition['interaction'] } => {
+  if (item.sourceCategory === 'sofa') return { category: 'sofas', role: 'sofa', group: CollisionGroup.FURNITURE, mask: furnitureMask, fallback: 'sofa' };
+  if (item.sourceCategory === 'chair') return { category: 'chairs', role: 'armchair', group: CollisionGroup.FURNITURE, mask: furnitureMask, fallback: 'chair' };
+  if (item.sourceCategory === 'coffee' || item.sourceCategory === 'work') return { category: 'tables', role: 'coffeeTable', group: CollisionGroup.FURNITURE, mask: furnitureMask, fallback: 'table' };
+  if (['cupboard', 'dresser', 'shelf', 'entertainment'].includes(item.sourceCategory)) return { category: 'tables', role: 'console', group: CollisionGroup.FURNITURE, mask: furnitureMask, fallback: 'table' };
+  if (item.sourceCategory === 'lamp') return { category: 'lamps', role: 'floorLamp', group: CollisionGroup.DECOR, mask: decorMask, fallback: 'lamp', interaction: { paddingXZ: .12 } };
+  if (item.sourceCategory === 'flower') return { category: 'plants', role: 'plant', group: CollisionGroup.DECOR, mask: decorMask, fallback: 'plant', interaction: { paddingXZ: .12 } };
+  if (item.sourceCategory === 'carpet') return { category: 'rugs', role: 'rug', group: CollisionGroup.RUG, mask: CollisionGroup.RUG, fallback: 'rug', interaction: { minHeight: .18 } };
+  return { category: 'plants', role: 'floorDecor', group: CollisionGroup.DECOR, mask: decorMask, fallback: 'plant', interaction: { paddingXZ: .1 } };
+};
+
+const parsePlacementDocument = (value: unknown): PrototypePlacementDocument => {
+  if (!value || typeof value !== 'object') throw new Error('Invalid prototype placement metadata');
+  const document = value as PrototypePlacementDocument;
+  if (document.provenance !== 'prototype-raw-scene-bounds-not-production-metadata' || !document.assets) throw new Error('Invalid prototype placement metadata provenance');
+  for (const id of ITHAPPY_PROTOTYPE_IDS) {
+    const dimensions = document.assets[id]?.dimensions;
+    if (!dimensions || ![dimensions.width, dimensions.height, dimensions.depth].every((number) => Number.isFinite(number) && number > 0)) throw new Error(`Missing prototype placement metadata: ${id}`);
+  }
+  return document;
 };
 
 export const installIthappyRegistryPrototype = async () => {
-  const response = await fetch(`${ITHAPPY_REGISTRY_BASE_URL}runtime-catalog.json`);
-  if (!response.ok) throw new Error(`Could not load ITHappy runtime catalog: ${response.status}`);
-  const registry = new RuntimeAssetRegistry(parseRuntimeCatalog(await response.json()), ITHAPPY_REGISTRY_BASE_URL);
-  registerEphemeralAssets(ITHAPPY_PROTOTYPE_IDS.map((id) => ({ ...common, ...editorMetadata[id], id, modelUrl: registry.resolveAssetUrl(id) })));
-  return registry;
+  const [catalogResponse, placementResponse] = await Promise.all([fetch(`${ITHAPPY_REGISTRY_BASE_URL}runtime-catalog.json`), fetch(`${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`)]);
+  if (!catalogResponse.ok) throw new Error(`Could not load ITHappy runtime catalog: ${catalogResponse.status}`);
+  if (!placementResponse.ok) throw new Error(`Could not load prototype placement metadata: ${placementResponse.status}`);
+  const registry = new RuntimeAssetRegistry(parseRuntimeCatalog(await catalogResponse.json()), ITHAPPY_REGISTRY_BASE_URL);
+  const catalog = new CatalogRepository(registry, `${ITHAPPY_REGISTRY_BASE_URL}thumbnails/`);
+  const placement = parsePlacementDocument(await placementResponse.json());
+  registerEphemeralAssets(ITHAPPY_PROTOTYPE_IDS.map((id): FurnitureAssetDefinition => {
+    const item = catalog.get(id), behavior = behaviorFor(item), dimensions = placement.assets[id]!.dimensions;
+    return {
+      ...common, id, name: item.displayName, icon: '●', category: behavior.category, modelUrl: registry.resolveAssetUrl(id),
+      dimensions, footprint: { width: dimensions.width, depth: dimensions.depth }, collision: { group: behavior.group, mask: behavior.mask }, interaction: behavior.interaction,
+      normalization: { recenterToFootprint: true }, variants: [{ id: 'source', color: '#ffffff' }], tags: ['local-catalog-prototype', 'ithappy'], semantic: { role: behavior.role }, fallbackPrimitive: behavior.fallback,
+    };
+  }));
+  configureCatalogRepository(catalog, ITHAPPY_PROTOTYPE_IDS);
+  useEditorStore.setState((state) => ({ session: { ...state.session, catalogCategory: 'seating' } }));
+  return { registry, catalog };
 };

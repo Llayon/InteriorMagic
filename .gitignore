@@ -4,5 +4,4 @@ dist
 *.tsbuildinfo
 playwright-report
 test-results
-public/.local-assets/
 visual-evidence
