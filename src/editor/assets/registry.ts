@@ -134,8 +134,18 @@ export const furnitureAssets = {
 
 export type AssetId = keyof typeof furnitureAssets;
 export const assetList: FurnitureAssetDefinition[] = Object.values(furnitureAssets);
+const ephemeralAssets = new Map<string, FurnitureAssetDefinition>();
+
+export const registerEphemeralAssets = (assets: FurnitureAssetDefinition[]) => {
+  for (const asset of assets) {
+    if ((furnitureAssets as Record<string, FurnitureAssetDefinition>)[asset.id] || ephemeralAssets.has(asset.id)) throw new Error(`Asset already registered: ${asset.id}`);
+    ephemeralAssets.set(asset.id, asset);
+    assetList.push(asset);
+  }
+};
+
 export const getAsset = (id: string): FurnitureAssetDefinition => {
-  const asset = (furnitureAssets as Record<string, FurnitureAssetDefinition>)[id];
+  const asset = (furnitureAssets as Record<string, FurnitureAssetDefinition>)[id] ?? ephemeralAssets.get(id);
   if (!asset) throw new Error(`Unknown asset: ${id}`);
   return asset;
 };
