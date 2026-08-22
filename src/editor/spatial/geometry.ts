@@ -60,3 +60,13 @@ export const rectContainedInRoom = (room: RectBounds, rect: OrientedRect): boole
     && point.z >= -halfDepth - CONTAINMENT_EPSILON
     && point.z <= halfDepth + CONTAINMENT_EPSILON);
 };
+
+export const pointDistance = (a: Vec2, b: Vec2): number => Math.hypot(b.x - a.x, b.z - a.z);
+
+export const xzHeading = (from: Vec2, to: Vec2): number => Math.atan2(to.x - from.x, to.z - from.z);
+
+export const angularDifference = (a: number, b: number): number => {
+  const fullTurn = Math.PI * 2;
+  const difference = ((a - b + Math.PI) % fullTurn + fullTurn) % fullTurn - Math.PI;
+  return Math.abs(difference);
+};
