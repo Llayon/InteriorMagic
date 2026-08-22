@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:ithappy": "node scripts/run-ithappy-preview.mjs",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "typecheck:e2e": "tsc -p tsconfig.e2e.json --pretty false",
