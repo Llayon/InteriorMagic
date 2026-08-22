@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite",
     "dev:ithappy": "node scripts/run-ithappy-preview.mjs",
+    "assets:r2:dry-run": "node scripts/ithappy-r2-delivery.mjs --release v1",
+    "assets:r2:setup": "node scripts/setup-ithappy-r2.mjs interiormagic-assets",
+    "assets:r2:deploy": "node scripts/ithappy-r2-delivery.mjs --release v1 --upload",
+    "assets:r2:verify": "node scripts/ithappy-r2-delivery.mjs --release v1 --verify",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "typecheck:e2e": "tsc -p tsconfig.e2e.json --pretty false",
@@ -17,6 +21,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:update": "playwright test --update-snapshots",
     "test:registry:ithappy:local": "node scripts/run-ithappy-registry-local.mjs",
+    "test:registry:ithappy:remote-local": "node scripts/run-ithappy-remote-local.mjs",
+    "test:registry:ithappy:remote": "node scripts/run-ithappy-remote-local.mjs",
     "playwright:install": "playwright install chromium",
     "assets:generate": "node scripts/generate-fixture-glbs.mjs",
     "format": "prettier --write ."
@@ -46,6 +52,7 @@
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.42.0",
     "vite": "^7.1.4",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.125.0"
   }
 }

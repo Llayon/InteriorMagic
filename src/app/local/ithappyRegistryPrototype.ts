@@ -7,6 +7,15 @@ import { useEditorStore } from '@/editor/state/store';
 export const ITHAPPY_REGISTRY_BASE_URL = '/.local-assets/ithappy-registry/';
 export const ITHAPPY_PLACEMENT_ENABLED_CATEGORIES: DisplayCategory[] = ['seating', 'tables', 'storage', 'lighting', 'plants', 'decor'];
 
+export const normalizeRemoteAssetOrigin = (value: string) => {
+  const url = new URL(value);
+  const loopback = ['127.0.0.1', 'localhost'].includes(url.hostname);
+  if (url.protocol !== 'https:' && !(loopback && url.protocol === 'http:')) throw new Error('Remote ITHappy asset origin must use HTTPS outside loopback development');
+  url.search = '';
+  url.hash = '';
+  return url.toString().replace(/\/+$/, '') + '/';
+};
+
 // Raw scene bounds exist only to exercise the local add flow and frame offline thumbnails.
 // They are not authoritative asset-contract dimensions, footprints, or production placement metadata.
 type PrototypePlacementDocument = { provenance: 'prototype-raw-scene-bounds-not-production-metadata'; assets: Record<string, { dimensions: { width: number; height: number; depth: number } }> };
@@ -36,17 +45,17 @@ const parsePlacementDocument = (value: unknown, requiredIds: readonly string[]):
   return document;
 };
 
-export const installIthappyRegistryPrototype = async () => {
+const installCatalog = async (assetOrigin: string, placementMetadataUrl: string) => {
   const [runtimeResponse, payloadResponse, placementResponse] = await Promise.all([
-    fetch(`${ITHAPPY_REGISTRY_BASE_URL}runtime-catalog.json`),
-    fetch(`${ITHAPPY_REGISTRY_BASE_URL}catalog-payload.json`),
-    fetch(`${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`),
+    fetch(`${assetOrigin}runtime-catalog.json`),
+    fetch(`${assetOrigin}catalog-payload.json`),
+    fetch(placementMetadataUrl),
   ]);
   if (!runtimeResponse.ok) throw new Error(`Could not load ITHappy runtime catalog: ${runtimeResponse.status}`);
   if (!payloadResponse.ok) throw new Error(`Could not load ITHappy catalog payload: ${payloadResponse.status}`);
   if (!placementResponse.ok) throw new Error(`Could not load prototype placement metadata: ${placementResponse.status}`);
-  const registry = new RuntimeAssetRegistry(parseRuntimeCatalog(await runtimeResponse.json()), ITHAPPY_REGISTRY_BASE_URL);
-  const catalog = new CatalogRepository(registry, parseCatalogPayload(await payloadResponse.json()), ITHAPPY_REGISTRY_BASE_URL);
+  const registry = new RuntimeAssetRegistry(parseRuntimeCatalog(await runtimeResponse.json()), assetOrigin);
+  const catalog = new CatalogRepository(registry, parseCatalogPayload(await payloadResponse.json()), assetOrigin);
   const placementEnabled = new Set(ITHAPPY_PLACEMENT_ENABLED_CATEGORIES);
   const placementIds = catalog.list().filter((item) => placementEnabled.has(item.displayCategory)).map((item) => item.assetId);
   const placement = parsePlacementDocument(await placementResponse.json(), placementIds);
@@ -62,3 +71,8 @@ export const installIthappyRegistryPrototype = async () => {
   useEditorStore.setState((state) => ({ session: { ...state.session, catalogCategory: 'seating' } }));
   return { registry, catalog };
 };
+
+export const installIthappyRegistryPrototype = () => installCatalog(ITHAPPY_REGISTRY_BASE_URL, `${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`);
+
+export const installIthappyRemoteRegistryPrototype = (assetOrigin: string) =>
+  installCatalog(normalizeRemoteAssetOrigin(assetOrigin), `${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`);
