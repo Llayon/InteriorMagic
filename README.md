@@ -4,7 +4,7 @@ On mobile, the 3D room fills the viewport. Use the bottom sheet handle to switch
 
 [Live demo](https://llayon.github.io/InteriorMagic/)
 
-The curated visual-QA room is available with `?demo=1`; combine it with `&debug=1` for renderer/cache metrics. Trial asset measurements are recorded in [`ASSET_AUDIT.md`](./ASSET_AUDIT.md).
+The curated visual-QA room is available with `?demo=1`; combine it with `&debug=1` for renderer/cache metrics. Trial asset measurements are recorded in [`ASSET_AUDIT.md`](./ASSET_AUDIT.md). Physical Telegram Mini App benchmarking uses opt-in `?deviceQa=1` diagnostics; the procedure lives in [`docs/qa/telegram-device-performance.md`](./docs/qa/telegram-device-performance.md).
 
 Mobile-first прототип Telegram Mini App для расстановки мебели в заранее созданной 3D-комнате. Источником истины является сериализуемый проект; Three.js только отображает его.
 

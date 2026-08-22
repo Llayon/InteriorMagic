@@ -1,5 +1,31 @@
 # Progress
 
+## 2026-08-23 — Track D: Telegram physical-device measurement harness
+
+### Completed
+
+- Introduced `src/platform/telegram/host.ts` as the single typed access point to the official Telegram WebApp host (platform/version/isActive/viewportStableHeight/safe-area insets, `activated`/`deactivated` events, verified against core.telegram.org/bots/webapps); `src/telegram/telegram.ts` now consumes it and remains the only CSS safe-area writer.
+- Added opt-in `?deviceQa=1` physical-device diagnostics under `src/deviceqa/`: environment snapshot (viewport, DPR, touch, UA, Telegram host fields, unmasked WebGL vendor/renderer), demand-render renderer snapshot (no idle FPS), AssetCache-derived asset/byte/failure state, texture count plus an explicitly labelled estimate with method/coverage, lifecycle log (visibility, pagehide/show, Telegram activated/deactivated, observational WebGL context loss/restoration), and frame-pacing windows (p50/p95/worst, >33 ms / >50 ms shares) observed via `useFrame` only — the recorder never invalidates frames.
+- Fixed 5-second capture windows for orbit/pinch/sheet; automatic drag window driven by session mode transitions; named export checkpoints A (cold-ready), B (loaded-session), C (post-resume), D (heavy-stress, Sheen Chair as intentionally heavyweight stress object, not the production target).
+- One-tap JSON report export with clipboard fallback dialog; documented frozen benchmark procedure in `docs/qa/telegram-device-performance.md`.
+
+### Architecture decisions
+
+- Device QA is separate from the developer `?debug=1` overlay; when `?deviceQa=1` is absent it causes no behavioral or runtime measurement activity (no zero-bundle-payload claim is made). Fixed pacing windows close on exact wall-clock timers without inducing rendering.
+- Texture memory is reported as `kind: "estimate"` with method/coverage; renderer texture COUNT stays the authoritative measured value. The environment report carries both official Telegram inset sources (`safeAreaInset`, `contentSafeAreaInset`).
+- `webglcontextlost`/`restored` are logged without `preventDefault()` or recovery behavior — the first physical run must reveal natural WebView behavior.
+- No optimization shipped in this track: no LRU, no KTX2/Meshopt, no DPR change, no cache manager. All such decisions are deferred until physical measurements exist.
+
+### Known limitations
+
+- No physical Telegram Android/iOS data yet; the PR ends at READY FOR PHYSICAL DEVICE BASELINE.
+- Sheet animation is CSS-driven, so its pacing window may legitimately contain few rendered frames.
+- Cold-open timing is human-judged ("room visibly usable"), not instrumented.
+
+### Next recommended chunk
+
+Run the physical benchmark per the runbook on one iPhone and one Android (portrait), return REPORT A/B/C(/D) + FINAL JSON and observations, then classify findings P0/P1/P2 and only then consider minimal fixes.
+
 ## 2026-08-19 — Rendering Baseline + First Beautiful Room
 
 ### Completed

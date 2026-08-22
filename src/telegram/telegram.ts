@@ -1,12 +1,6 @@
-interface Insets { top?: number; right?: number; bottom?: number; left?: number }
-interface TelegramWebApp {
-  ready(): void; expand(): void; setHeaderColor?(color: string): void; setBackgroundColor?(color: string): void;
-  viewportStableHeight?: number; safeAreaInset?: Insets; contentSafeAreaInset?: Insets;
-  onEvent?(event: string, listener: () => void): void;
-}
-declare global { interface Window { Telegram?: { WebApp?: TelegramWebApp } } }
+import { getTelegramWebApp } from '@/platform/telegram/host';
 
-const applyViewport = (app?: TelegramWebApp) => {
+const applyViewport = (app: ReturnType<typeof getTelegramWebApp>) => {
   const root = document.documentElement;
   if (app?.viewportStableHeight) root.style.setProperty('--tg-viewport-stable-height', `${app.viewportStableHeight}px`);
   const inset = app?.contentSafeAreaInset ?? app?.safeAreaInset;
@@ -14,7 +8,7 @@ const applyViewport = (app?: TelegramWebApp) => {
 };
 
 export const initTelegram = () => {
-  const app = window.Telegram?.WebApp;
+  const app = getTelegramWebApp();
   applyViewport(app);
   if (!app) return;
   app.ready(); app.expand(); app.setHeaderColor?.('#eee9df'); app.setBackgroundColor?.('#eee9df');

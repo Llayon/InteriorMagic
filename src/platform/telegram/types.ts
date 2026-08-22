@@ -1,0 +1,1 @@
+export interface TelegramInsets { top?: number; right?: number; bottom?: number; left?: number }
