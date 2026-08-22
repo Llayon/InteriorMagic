@@ -41,8 +41,17 @@ For a real remote run, start Vite in test mode with an HTTPS release root and op
 
 ```powershell
 $env:VITE_ITHAPPY_ASSET_ORIGIN = "https://<bucket-id>.r2.dev/catalog/v1/"
+$env:VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED = "true"
 npm run dev -- --mode test
 ```
+
+The GitHub Pages build enables this preview capability explicitly while normal navigation remains unchanged. Manual preview URL:
+
+```text
+https://llayon.github.io/InteriorMagic/?registry=ithappy-remote
+```
+
+Without `VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED=true`, the query is ignored. Even with the flag enabled, the normal `/InteriorMagic/` URL never activates ITHappy.
 
 `r2.dev` is only the remote development gate. Cloudflare edge cache verification is **N/A — r2.dev development endpoint**. Production enablement waits for a custom asset domain and a narrowly scoped cache rule; neither is configured here.
 

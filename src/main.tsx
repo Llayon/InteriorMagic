@@ -14,11 +14,17 @@ const bootstrap = async () => {
     const { installIthappyRegistryPrototype } = await import('@/app/local/ithappyRegistryPrototype');
     await installIthappyRegistryPrototype();
   }
-  if (import.meta.env.MODE === 'test' && query.get('registry') === 'ithappy-remote') {
-    const origin = import.meta.env.VITE_ITHAPPY_ASSET_ORIGIN;
-    if (!origin) throw new Error('VITE_ITHAPPY_ASSET_ORIGIN is required for the remote ITHappy registry');
-    const { installIthappyRemoteRegistryPrototype } = await import('@/app/local/ithappyRegistryPrototype');
-    await installIthappyRemoteRegistryPrototype(origin);
+  if (query.get('registry') === 'ithappy-remote') {
+    const { resolveIthappyRemotePreviewOrigin } = await import('@/app/local/ithappyRemotePreview');
+    const remotePreviewOrigin = resolveIthappyRemotePreviewOrigin(window.location.search, {
+      enabled: import.meta.env.VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED,
+      assetOrigin: import.meta.env.VITE_ITHAPPY_ASSET_ORIGIN,
+      placementMetadataUrl: import.meta.env.VITE_ITHAPPY_PREVIEW_PLACEMENT_URL,
+    });
+    if (remotePreviewOrigin) {
+      const { installIthappyRemoteRegistryPrototype } = await import('@/app/local/ithappyRegistryPrototype');
+      await installIthappyRemoteRegistryPrototype(remotePreviewOrigin.assetOrigin, remotePreviewOrigin.placementMetadataUrl);
+    }
   }
   const thumbnailAssetId = import.meta.env.MODE === 'test' && query.get('thumbnail') === 'ithappy' ? query.get('asset') : null;
   if (thumbnailAssetId) {

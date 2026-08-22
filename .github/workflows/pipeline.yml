@@ -91,6 +91,9 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: /InteriorMagic/
+          VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED: "true"
+          VITE_ITHAPPY_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev/catalog/v1/
+          VITE_ITHAPPY_PREVIEW_PLACEMENT_URL: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev/preview/v1/prototype-placement.json
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:

@@ -63,7 +63,7 @@ const validatePayload = async (manifest, payload, runtimeRoot, thumbnailRoot) =>
 
 export const cleanupIthappyLocalCatalog = () => rm(stagingRoot, { recursive: true, force: true });
 
-export const stageIthappyPrototypePlacement = async () => {
+export const buildIthappyPrototypePlacement = async () => {
   const manifestPath = path.join(pipelineRoot, 'manifests', 'runtime-catalog.json');
   const payloadPath = path.join(catalogBuildRoot, 'manifests', 'catalog-payload.json');
   const runtimeRoot = path.join(pipelineRoot, 'runtime-assets');
@@ -72,10 +72,15 @@ export const stageIthappyPrototypePlacement = async () => {
   const payload = JSON.parse(await readFile(payloadPath, 'utf8'));
   const placementIds = await validatePayload(manifest, payload, runtimeRoot, thumbnailRoot);
   if (placementIds.length !== 500) throw new Error(`Unexpected prototype placement scale: ${placementIds.length}`);
+  return { ...(await inspectBounds(runtimeRoot, placementIds)), purpose: 'remote-preview-only' };
+};
+
+export const stageIthappyPrototypePlacement = async () => {
+  const placement = await buildIthappyPrototypePlacement();
   await cleanupIthappyLocalCatalog();
   await mkdir(stagingRoot, { recursive: true });
-  await writeFile(path.join(stagingRoot, 'prototype-placement.json'), JSON.stringify(await inspectBounds(runtimeRoot, placementIds)));
-  console.log(`Staged local-only prototype placement metadata for ${placementIds.length} assets.`);
+  await writeFile(path.join(stagingRoot, 'prototype-placement.json'), JSON.stringify(placement));
+  console.log(`Staged local-only prototype placement metadata for ${Object.keys(placement.assets).length} assets.`);
 };
 
 export const stageIthappyLocalCatalog = async () => {

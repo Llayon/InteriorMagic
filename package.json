@@ -10,6 +10,8 @@
     "assets:r2:setup": "node scripts/setup-ithappy-r2.mjs interiormagic-assets",
     "assets:r2:deploy": "node scripts/ithappy-r2-delivery.mjs --release v1 --upload",
     "assets:r2:verify": "node scripts/ithappy-r2-delivery.mjs --release v1 --verify",
+    "assets:r2:preview-placement": "node scripts/ithappy-preview-placement.mjs",
+    "assets:r2:preview-placement:upload": "node scripts/ithappy-preview-placement.mjs --upload --verify",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "typecheck:e2e": "tsc -p tsconfig.e2e.json --pretty false",
@@ -23,6 +25,8 @@
     "test:registry:ithappy:local": "node scripts/run-ithappy-registry-local.mjs",
     "test:registry:ithappy:remote-local": "node scripts/run-ithappy-remote-local.mjs",
     "test:registry:ithappy:remote": "node scripts/run-ithappy-remote-local.mjs",
+    "test:registry:ithappy:preview-disabled": "node scripts/run-ithappy-preview-disabled.mjs",
+    "test:registry:ithappy:preview-production": "node scripts/run-ithappy-production-preview.mjs",
     "playwright:install": "playwright install chromium",
     "assets:generate": "node scripts/generate-fixture-glbs.mjs",
     "format": "prettier --write ."

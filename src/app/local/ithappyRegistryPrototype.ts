@@ -16,9 +16,19 @@ export const normalizeRemoteAssetOrigin = (value: string) => {
   return url.toString().replace(/\/+$/, '') + '/';
 };
 
+export const normalizeRemotePreviewMetadataUrl = (value: string) => {
+  const url = new URL(value);
+  const loopback = ['127.0.0.1', 'localhost'].includes(url.hostname);
+  if (url.protocol !== 'https:' && !(loopback && url.protocol === 'http:')) throw new Error('Remote preview metadata URL must use HTTPS outside loopback development');
+  if (!url.pathname.endsWith('/preview/v1/prototype-placement.json') && !loopback) throw new Error('Remote preview metadata must use the explicit preview/v1/prototype-placement.json path');
+  url.search = '';
+  url.hash = '';
+  return url.toString();
+};
+
 // Raw scene bounds exist only to exercise the local add flow and frame offline thumbnails.
 // They are not authoritative asset-contract dimensions, footprints, or production placement metadata.
-type PrototypePlacementDocument = { provenance: 'prototype-raw-scene-bounds-not-production-metadata'; assets: Record<string, { dimensions: { width: number; height: number; depth: number } }> };
+type PrototypePlacementDocument = { provenance: 'prototype-raw-scene-bounds-not-production-metadata'; purpose: 'remote-preview-only'; assets: Record<string, { dimensions: { width: number; height: number; depth: number } }> };
 const furnitureMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const decorMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const common = { placement: { anchor: 'floor' as const }, snapping: { grid: true, walls: true }, rotation: { enabled: true, stepDegrees: 45 } };
@@ -37,7 +47,7 @@ const behaviorFor = (item: CatalogItem): { category: FurnitureAssetDefinition['c
 const parsePlacementDocument = (value: unknown, requiredIds: readonly string[]): PrototypePlacementDocument => {
   if (!value || typeof value !== 'object') throw new Error('Invalid prototype placement metadata');
   const document = value as PrototypePlacementDocument;
-  if (document.provenance !== 'prototype-raw-scene-bounds-not-production-metadata' || !document.assets) throw new Error('Invalid prototype placement metadata provenance');
+  if (document.provenance !== 'prototype-raw-scene-bounds-not-production-metadata' || document.purpose !== 'remote-preview-only' || !document.assets) throw new Error('Invalid prototype placement metadata provenance');
   for (const id of requiredIds) {
     const dimensions = document.assets[id]?.dimensions;
     if (!dimensions || ![dimensions.width, dimensions.height, dimensions.depth].every((number) => Number.isFinite(number) && number > 0)) throw new Error(`Missing prototype placement metadata: ${id}`);
@@ -74,5 +84,5 @@ const installCatalog = async (assetOrigin: string, placementMetadataUrl: string)
 
 export const installIthappyRegistryPrototype = () => installCatalog(ITHAPPY_REGISTRY_BASE_URL, `${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`);
 
-export const installIthappyRemoteRegistryPrototype = (assetOrigin: string) =>
-  installCatalog(normalizeRemoteAssetOrigin(assetOrigin), `${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`);
+export const installIthappyRemoteRegistryPrototype = (assetOrigin: string, previewMetadataUrl: string) =>
+  installCatalog(normalizeRemoteAssetOrigin(assetOrigin), normalizeRemotePreviewMetadataUrl(previewMetadataUrl));

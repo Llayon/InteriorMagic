@@ -16,6 +16,7 @@ const playwrightCli = require.resolve('@playwright/test/cli');
 const configuredRemoteOrigin = process.env.ITHAPPY_TEST_ASSET_ORIGIN;
 const assetOrigin = configuredRemoteOrigin ? `${configuredRemoteOrigin.replace(/\/+$/, '')}/` : 'http://127.0.0.1:4174/catalog/v1/';
 const usesLocalAssetServer = assetOrigin.startsWith('http://127.0.0.1:4174/');
+const placementMetadataUrl = process.env.ITHAPPY_TEST_PREVIEW_PLACEMENT_URL || 'http://127.0.0.1:4173/.local-assets/ithappy-registry/prototype-placement.json';
 
 const resolveRequest = (pathname) => {
   const prefix = '/catalog/v1/';
@@ -73,7 +74,7 @@ try {
   await stageIthappyPrototypePlacement();
   if (usesLocalAssetServer) await new Promise((resolve, reject) => assetServer.once('error', reject).listen(4174, '127.0.0.1', resolve));
   vite = spawn(process.execPath, [viteCli, '--host', '127.0.0.1', '--port', '4173', '--strictPort', '--mode', 'test'], {
-    cwd: repositoryRoot, env: { ...process.env, VITE_ITHAPPY_ASSET_ORIGIN: assetOrigin }, stdio: 'inherit', shell: false, windowsHide: true,
+    cwd: repositoryRoot, env: { ...process.env, VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED: process.env.ITHAPPY_PREVIEW_ENABLED || 'true', VITE_ITHAPPY_ASSET_ORIGIN: assetOrigin, VITE_ITHAPPY_PREVIEW_PLACEMENT_URL: placementMetadataUrl }, stdio: 'inherit', shell: false, windowsHide: true,
   });
   await waitFor('http://127.0.0.1:4173', vite);
   const status = await runChild(process.execPath, [playwrightCli, 'test', '--config=playwright.ithappy-remote.config.ts'], { cwd: repositoryRoot, env: process.env, stdio: 'inherit', shell: false, windowsHide: true });
