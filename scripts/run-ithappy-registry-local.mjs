@@ -1,57 +1,120 @@
-import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { spawnSync } from 'node:child_process';
+import { access, cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { spawn, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 globalThis.self = globalThis;
 const repositoryRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const pipelineRoot = path.resolve(process.env.ITHAPPY_PIPELINE_ROOT || path.join(repositoryRoot, '..', '..', '.agent-data', 'ithappy-production-pipeline'));
+const dataRoot = path.resolve(repositoryRoot, '..', '..', '.agent-data');
+const pipelineRoot = path.resolve(process.env.ITHAPPY_PIPELINE_ROOT || path.join(dataRoot, 'ithappy-production-pipeline'));
+const catalogBuildRoot = path.resolve(process.env.ITHAPPY_CATALOG_BUILD_ROOT || path.join(dataRoot, 'ithappy-catalog-build'));
 const stagingRoot = path.resolve(repositoryRoot, 'public', '.local-assets', 'ithappy-registry');
 const permittedRoot = path.resolve(repositoryRoot, 'public', '.local-assets');
-const assetIds = ['sofa_026', 'sofa_037', 'sofa_041', 'chair_024', 'chair_036', 'chair_058', 'coffee_table', 'coffee_table_068', 'work_table_003', 'work_table_012', 'cupboard_003', 'dresser_085', 'shelf_071', 'entertainment_035', 'lamp_030', 'lamp_048', 'lamp_058', 'flower', 'flower_039', 'flower_043', 'carpet_017', 'carpet_022', 'ladder', 'ladder_008'];
+const placementEnabledCategories = new Set(['Seating', 'Tables', 'Storage', 'Lighting', 'Plants', 'Decor']);
+const expectedCategories = { Seating: 86, Tables: 38, Storage: 107, Bedroom: 23, Lighting: 19, Plants: 19, Decor: 231, 'Kitchen & Bath': 127, Architecture: 186 };
 
 if (!stagingRoot.startsWith(`${permittedRoot}${path.sep}`)) throw new Error(`Unsafe staging path: ${stagingRoot}`);
 
-const inspectBounds = async (runtimeRoot) => {
+const inspectBounds = async (runtimeRoot, assetIds) => {
   const THREE = await import('three');
   const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
   const loader = new GLTFLoader();
   const assets = {};
-  for (const id of assetIds) {
-    const bytes = await readFile(path.join(runtimeRoot, `${id}.glb`));
-    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    const gltf = await loader.parseAsync(buffer, '');
-    gltf.scene.updateMatrixWorld(true);
-    const size = new THREE.Box3().setFromObject(gltf.scene).getSize(new THREE.Vector3());
-    assets[id] = { dimensions: { width: size.x, height: size.y, depth: size.z } };
+  const originalWarn = console.warn;
+  const originalError = console.error;
+  console.warn = (...args) => { if (!String(args[0]).startsWith("THREE.GLTFLoader: Couldn't load texture")) originalWarn(...args); };
+  console.error = (...args) => { if (!String(args[0]).startsWith("THREE.GLTFLoader: Couldn't load texture")) originalError(...args); };
+  try {
+    for (const id of assetIds) {
+      const bytes = await readFile(path.join(runtimeRoot, `${id}.glb`));
+      const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      const gltf = await loader.parseAsync(buffer, '');
+      gltf.scene.updateMatrixWorld(true);
+      const size = new THREE.Box3().setFromObject(gltf.scene).getSize(new THREE.Vector3());
+      if (![size.x, size.y, size.z].every((value) => Number.isFinite(value) && value > 0)) throw new Error(`Invalid local prototype bounds: ${id}`);
+      assets[id] = { dimensions: { width: size.x, height: size.y, depth: size.z } };
+    }
+  } finally {
+    console.warn = originalWarn;
+    console.error = originalError;
   }
   return { provenance: 'prototype-raw-scene-bounds-not-production-metadata', assets };
 };
 
-const stage = async () => {
-  const manifestPath = path.join(pipelineRoot, 'manifests', 'runtime-catalog.json');
-  const runtimeRoot = path.join(pipelineRoot, 'runtime-assets');
-  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
-  if (!Array.isArray(manifest) || manifest.length !== 836) throw new Error(`Expected 836 runtime catalog entries, received ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
-  const manifestIds = new Set(manifest.map((entry) => entry.id));
-  const missing = assetIds.filter((id) => !manifestIds.has(id));
-  if (missing.length) throw new Error(`Prototype IDs missing from manifest: ${missing.join(', ')}`);
-  await mkdir(path.join(stagingRoot, 'runtime-assets'), { recursive: true });
-  await mkdir(path.join(stagingRoot, 'thumbnails'), { recursive: true });
-  await cp(manifestPath, path.join(stagingRoot, 'runtime-catalog.json'));
-  for (const id of assetIds) await cp(path.join(runtimeRoot, `${id}.glb`), path.join(stagingRoot, 'runtime-assets', `${id}.glb`));
-  await writeFile(path.join(stagingRoot, 'prototype-placement.json'), JSON.stringify(await inspectBounds(runtimeRoot), null, 2));
+const validatePayload = async (manifest, payload, runtimeRoot, thumbnailRoot) => {
+  if (!Array.isArray(manifest) || manifest.length !== 836) throw new Error(`Expected 836 runtime entries, received ${Array.isArray(manifest) ? manifest.length : 'invalid manifest'}`);
+  if (!Array.isArray(payload) || payload.length !== 836) throw new Error(`Expected 836 catalog entries, received ${Array.isArray(payload) ? payload.length : 'invalid payload'}`);
+  const manifestById = new Map(manifest.map((entry) => [entry.id, entry]));
+  const ids = new Set();
+  const counts = {};
+  for (const entry of payload) {
+    if (ids.has(entry.assetId)) throw new Error(`Duplicate catalog ID: ${entry.assetId}`);
+    ids.add(entry.assetId);
+    counts[entry.displayCategory] = (counts[entry.displayCategory] || 0) + 1;
+    const runtime = manifestById.get(entry.assetId);
+    if (!runtime || runtime.runtimeFilename !== entry.runtimeFilename || runtime.category !== entry.sourceCategory) throw new Error(`Catalog/runtime mismatch: ${entry.assetId}`);
+    if ([entry.runtimeFilename, entry.thumbnailFilename].some((filename) => typeof filename !== 'string' || filename.includes('\\') || filename.includes('..') || filename.includes('://') || /^[a-z]:/i.test(filename))) throw new Error(`Unsafe catalog path: ${entry.assetId}`);
+    await access(path.join(runtimeRoot, `${entry.assetId}.glb`));
+    await access(path.join(thumbnailRoot, `${entry.assetId}.webp`));
+  }
+  for (const [category, expected] of Object.entries(expectedCategories)) if (counts[category] !== expected) throw new Error(`Category count mismatch ${category}: ${counts[category]}/${expected}`);
+  return payload.filter((entry) => placementEnabledCategories.has(entry.displayCategory)).map((entry) => entry.assetId);
 };
 
-await stage();
+const stage = async () => {
+  const manifestPath = path.join(pipelineRoot, 'manifests', 'runtime-catalog.json');
+  const payloadPath = path.join(catalogBuildRoot, 'manifests', 'catalog-payload.json');
+  const runtimeRoot = path.join(pipelineRoot, 'runtime-assets');
+  const thumbnailRoot = path.join(catalogBuildRoot, 'thumbnails');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const payload = JSON.parse(await readFile(payloadPath, 'utf8'));
+  const placementIds = await validatePayload(manifest, payload, runtimeRoot, thumbnailRoot);
+  const runtimeFiles = (await readdir(runtimeRoot)).filter((filename) => filename.endsWith('.glb'));
+  const thumbnailFiles = (await readdir(thumbnailRoot)).filter((filename) => filename.endsWith('.webp'));
+  if (runtimeFiles.length !== 836 || thumbnailFiles.length !== 836 || placementIds.length !== 500) throw new Error(`Unexpected local payload scale: ${runtimeFiles.length} GLBs, ${thumbnailFiles.length} thumbnails, ${placementIds.length} placeable`);
+
+  await rm(stagingRoot, { recursive: true, force: true });
+  await mkdir(stagingRoot, { recursive: true });
+  await cp(manifestPath, path.join(stagingRoot, 'runtime-catalog.json'));
+  await cp(payloadPath, path.join(stagingRoot, 'catalog-payload.json'));
+  await cp(runtimeRoot, path.join(stagingRoot, 'runtime-assets'), { recursive: true });
+  await cp(thumbnailRoot, path.join(stagingRoot, 'thumbnails'), { recursive: true });
+  await writeFile(path.join(stagingRoot, 'prototype-placement.json'), JSON.stringify(await inspectBounds(runtimeRoot, placementIds)));
+  console.log(`Staged local catalog: ${payload.length} records, ${thumbnailFiles.length} thumbnails, ${runtimeFiles.length} lazy runtime GLBs, ${placementIds.length} prototype-placeable entries.`);
+};
+
+const require = createRequire(import.meta.url);
+const viteCli = path.join(path.dirname(require.resolve('vite/package.json')), 'bin', 'vite.js');
+const waitForServer = async (server) => {
+  const deadline = Date.now() + 120_000;
+  while (Date.now() < deadline) {
+    if (server.exitCode !== null) throw new Error(`Local Vite server exited with code ${server.exitCode}`);
+    try { const response = await fetch('http://127.0.0.1:4173'); if (response.ok) return; } catch { /* server is still starting */ }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error('Timed out waiting for local Vite server');
+};
+let server = null;
+let serverExit = null;
 try {
-  const playwrightCli = createRequire(import.meta.url).resolve('@playwright/test/cli');
+  await stage();
+  server = spawn(process.execPath, [viteCli, '--host', '127.0.0.1', '--port', '4173', '--strictPort', '--mode', 'test'], {
+    cwd: repositoryRoot, env: process.env, stdio: 'inherit', shell: false, windowsHide: true,
+  });
+  serverExit = new Promise((resolve) => server.once('exit', resolve));
+  await waitForServer(server);
+  const playwrightCli = require.resolve('@playwright/test/cli');
   const result = spawnSync(process.execPath, [playwrightCli, 'test', '--config=playwright.ithappy-catalog.config.ts'], {
-    cwd: repositoryRoot, env: process.env, stdio: 'inherit', shell: false, timeout: 360_000,
+    cwd: repositoryRoot, env: process.env, stdio: 'inherit', shell: false, timeout: 900_000,
   });
   if (result.error) throw result.error;
   if (result.status !== 0) process.exitCode = result.status ?? 1;
 } finally {
+  if (server) {
+    server.kill();
+    await Promise.race([serverExit, new Promise((resolve) => setTimeout(resolve, 5_000))]);
+    if (server.exitCode === null) server.kill('SIGKILL');
+  }
   await rm(stagingRoot, { recursive: true, force: true });
 }

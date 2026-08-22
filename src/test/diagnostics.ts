@@ -85,7 +85,7 @@ export interface InteriorMagicTestApi {
   getCameraState(): { position: Vec3; target: Vec3; direction: Vec3; controlsEnabled: boolean } | null;
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
   getWorkspaceGeometry(): WorkspaceGeometry | null;
-  getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[] } | null;
+  getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[]; placementEnabledCategories: string[] } | null;
 }
 
 const api: InteriorMagicTestApi = {
@@ -137,7 +137,9 @@ const api: InteriorMagicTestApi = {
   getWorkspaceGeometry: () => sceneContext ? structuredClone(sceneContext.getWorkspace()) : null,
   getCatalogStats: () => {
     const configuration = getCatalogConfiguration();
-    return configuration ? { totalEntries: configuration.repository.size, visibleEntries: configuration.visibleIds.size, categories: configuration.repository.counts(), visibleIds: [...configuration.visibleIds] } : null;
+    if (!configuration) return null;
+    const visibleIds = configuration.visibleIds ? [...configuration.visibleIds] : configuration.repository.list().map((item) => item.assetId);
+    return { totalEntries: configuration.repository.size, visibleEntries: visibleIds.length, categories: configuration.repository.counts(), visibleIds, placementEnabledCategories: [...configuration.placementEnabledCategories] };
   },
 };
 

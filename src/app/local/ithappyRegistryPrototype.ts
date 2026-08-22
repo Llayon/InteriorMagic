@@ -1,17 +1,11 @@
 import { CollisionGroup, type FurnitureAssetDefinition, type FurnitureSemanticRole } from '@/editor/model/types';
 import { registerEphemeralAssets } from '@/editor/assets/registry';
 import { parseRuntimeCatalog, RuntimeAssetRegistry } from '@/editor/assets/RuntimeAssetRegistry';
-import { CatalogRepository, configureCatalogRepository, type CatalogItem } from '@/editor/catalog/CatalogRepository';
+import { CatalogRepository, configureCatalogRepository, parseCatalogPayload, type CatalogItem, type DisplayCategory } from '@/editor/catalog/CatalogRepository';
 import { useEditorStore } from '@/editor/state/store';
 
 export const ITHAPPY_REGISTRY_BASE_URL = '/.local-assets/ithappy-registry/';
-export const ITHAPPY_PROTOTYPE_IDS = [
-  'sofa_026', 'sofa_037', 'sofa_041', 'chair_024', 'chair_036', 'chair_058',
-  'coffee_table', 'coffee_table_068', 'work_table_003', 'work_table_012',
-  'cupboard_003', 'dresser_085', 'shelf_071', 'entertainment_035',
-  'lamp_030', 'lamp_048', 'lamp_058', 'flower', 'flower_039', 'flower_043',
-  'carpet_017', 'carpet_022', 'ladder', 'ladder_008',
-] as const;
+export const ITHAPPY_PLACEMENT_ENABLED_CATEGORIES: DisplayCategory[] = ['seating', 'tables', 'storage', 'lighting', 'plants', 'decor'];
 
 // Raw scene bounds exist only to exercise the local add flow and frame offline thumbnails.
 // They are not authoritative asset-contract dimensions, footprints, or production placement metadata.
@@ -31,11 +25,11 @@ const behaviorFor = (item: CatalogItem): { category: FurnitureAssetDefinition['c
   return { category: 'plants', role: 'floorDecor', group: CollisionGroup.DECOR, mask: decorMask, fallback: 'plant', interaction: { paddingXZ: .1 } };
 };
 
-const parsePlacementDocument = (value: unknown): PrototypePlacementDocument => {
+const parsePlacementDocument = (value: unknown, requiredIds: readonly string[]): PrototypePlacementDocument => {
   if (!value || typeof value !== 'object') throw new Error('Invalid prototype placement metadata');
   const document = value as PrototypePlacementDocument;
   if (document.provenance !== 'prototype-raw-scene-bounds-not-production-metadata' || !document.assets) throw new Error('Invalid prototype placement metadata provenance');
-  for (const id of ITHAPPY_PROTOTYPE_IDS) {
+  for (const id of requiredIds) {
     const dimensions = document.assets[id]?.dimensions;
     if (!dimensions || ![dimensions.width, dimensions.height, dimensions.depth].every((number) => Number.isFinite(number) && number > 0)) throw new Error(`Missing prototype placement metadata: ${id}`);
   }
@@ -43,21 +37,28 @@ const parsePlacementDocument = (value: unknown): PrototypePlacementDocument => {
 };
 
 export const installIthappyRegistryPrototype = async () => {
-  const [catalogResponse, placementResponse] = await Promise.all([fetch(`${ITHAPPY_REGISTRY_BASE_URL}runtime-catalog.json`), fetch(`${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`)]);
-  if (!catalogResponse.ok) throw new Error(`Could not load ITHappy runtime catalog: ${catalogResponse.status}`);
+  const [runtimeResponse, payloadResponse, placementResponse] = await Promise.all([
+    fetch(`${ITHAPPY_REGISTRY_BASE_URL}runtime-catalog.json`),
+    fetch(`${ITHAPPY_REGISTRY_BASE_URL}catalog-payload.json`),
+    fetch(`${ITHAPPY_REGISTRY_BASE_URL}prototype-placement.json`),
+  ]);
+  if (!runtimeResponse.ok) throw new Error(`Could not load ITHappy runtime catalog: ${runtimeResponse.status}`);
+  if (!payloadResponse.ok) throw new Error(`Could not load ITHappy catalog payload: ${payloadResponse.status}`);
   if (!placementResponse.ok) throw new Error(`Could not load prototype placement metadata: ${placementResponse.status}`);
-  const registry = new RuntimeAssetRegistry(parseRuntimeCatalog(await catalogResponse.json()), ITHAPPY_REGISTRY_BASE_URL);
-  const catalog = new CatalogRepository(registry, `${ITHAPPY_REGISTRY_BASE_URL}thumbnails/`);
-  const placement = parsePlacementDocument(await placementResponse.json());
-  registerEphemeralAssets(ITHAPPY_PROTOTYPE_IDS.map((id): FurnitureAssetDefinition => {
+  const registry = new RuntimeAssetRegistry(parseRuntimeCatalog(await runtimeResponse.json()), ITHAPPY_REGISTRY_BASE_URL);
+  const catalog = new CatalogRepository(registry, parseCatalogPayload(await payloadResponse.json()), ITHAPPY_REGISTRY_BASE_URL);
+  const placementEnabled = new Set(ITHAPPY_PLACEMENT_ENABLED_CATEGORIES);
+  const placementIds = catalog.list().filter((item) => placementEnabled.has(item.displayCategory)).map((item) => item.assetId);
+  const placement = parsePlacementDocument(await placementResponse.json(), placementIds);
+  registerEphemeralAssets(placementIds.map((id): FurnitureAssetDefinition => {
     const item = catalog.get(id), behavior = behaviorFor(item), dimensions = placement.assets[id]!.dimensions;
     return {
       ...common, id, name: item.displayName, icon: '●', category: behavior.category, modelUrl: registry.resolveAssetUrl(id),
       dimensions, footprint: { width: dimensions.width, depth: dimensions.depth }, collision: { group: behavior.group, mask: behavior.mask }, interaction: behavior.interaction,
       normalization: { recenterToFootprint: true }, variants: [{ id: 'source', color: '#ffffff' }], tags: ['local-catalog-prototype', 'ithappy'], semantic: { role: behavior.role }, fallbackPrimitive: behavior.fallback,
     };
-  }));
-  configureCatalogRepository(catalog, ITHAPPY_PROTOTYPE_IDS);
+  }), { overrideExisting: true });
+  configureCatalogRepository(catalog, { placementEnabledCategories: ITHAPPY_PLACEMENT_ENABLED_CATEGORIES });
   useEditorStore.setState((state) => ({ session: { ...state.session, catalogCategory: 'seating' } }));
   return { registry, catalog };
 };
