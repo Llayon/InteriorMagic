@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { getAsset } from '@/editor/assets/registry';
-import { cloneProject, createDefaultProject, type Category, type FurnitureInstance, type RoomProject, type Vec3 } from '@/editor/model/types';
+import { cloneProject, createDefaultProject, type FurnitureInstance, type RoomProject, type Vec3 } from '@/editor/model/types';
+import type { CatalogCategoryId } from '@/editor/catalog/CatalogRepository';
 import { findPlacement, isPlacementValid } from '@/editor/placement/placement';
 import { loadInitialProject, storage, type ProjectStorage } from '@/editor/serialization/project';
 import { catalogRequestGate } from '@/editor/assets/requestGate';
@@ -12,7 +13,7 @@ export interface EditorSession {
   selectedId: string | null;
   mode: Mode;
   activeTool: 'select';
-  catalogCategory: Category;
+  catalogCategory: CatalogCategoryId;
   workspacePanel: WorkspacePanel;
   sheetState: SheetState;
   fitRoomRevision: number;
@@ -24,7 +25,7 @@ export interface EditorStore {
   session: EditorSession;
   select(id: string | null): void;
   setMode(mode: Mode): void;
-  setCatalogCategory(category: Category): void;
+  setCatalogCategory(category: CatalogCategoryId): void;
   setWorkspacePanel(panel: WorkspacePanel): void;
   setSheetState(state: SheetState): void;
   requestFitRoom(): void;

@@ -1,0 +1,152 @@
+import { describe, expect, it } from 'vitest';
+import type { PlanningGoal } from '../contracts/types';
+import { planTvViewing } from './planner';
+import type { PlanningEntity, PlanningScene } from './PlanningScene';
+
+const entity = (id: string, role: PlanningEntity['role'], x: number, z: number, rotationY: number, width: number, depth: number, fixed = false): PlanningEntity => ({
+  id, source: role === 'tv' ? { kind: 'derived' } : { kind: 'roomObject', instanceId: `source-${id}` }, role, fixed, placementType: role === 'tv' ? 'wall' : 'floor',
+  footprint: { width, depth }, transform: { position: { x, z }, rotationY },
+});
+
+const scene = (overrides: Partial<PlanningScene> = {}): PlanningScene => ({
+  room: { width: 6, depth: 6 }, immediateOpeningZones: [], circulationZones: [],
+  entities: [
+    entity('tv', 'tv', 0, 2.8, Math.PI, 1.2, .1, true),
+    entity('sofa', 'sofa', 0, -2.1, 0, 2, .9),
+    entity('chair', 'armchair', -1.6, -.5, Math.PI / 2, .8, .8),
+    entity('table', 'coffeeTable', 0, -.9, 0, 1, .6),
+  ],
+  ...overrides,
+});
+const goal: PlanningGoal = { activity: 'watchTv', focalPointId: 'tv' };
+
+describe('deterministic TV planner', () => {
+  it('repairs a badly oriented sofa and reports pure quality', () => {
+    const input = scene();
+    input.entities.find((item) => item.role === 'sofa')!.transform.rotationY = Math.PI;
+    const proposal = planTvViewing(input, goal);
+    expect(proposal.moves.some((move) => move.instanceId === 'source-sofa')).toBe(true);
+    expect(proposal.scoreAfter.total).toBeGreaterThan(proposal.scoreBefore.total);
+    expect(proposal.findings).toEqual(expect.arrayContaining([expect.objectContaining({ ruleId: 'tv-viewing.orientation', code: 'good-orientation' })]));
+  });
+
+  it('moves a circulation-obstructing table', () => {
+    const input = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
+    const proposal = planTvViewing(input, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] });
+    expect(proposal.moves.some((move) => move.instanceId === 'source-table')).toBe(true);
+    expect(proposal.findings).toEqual(expect.arrayContaining([expect.objectContaining({ ruleId: 'room.circulation', code: 'circulation-improved' })]));
+  });
+
+  it('improves a poorly positioned armchair conversation slot', () => {
+    const input = scene();
+    const chair = input.entities.find((item) => item.role === 'armchair')!;
+    chair.transform.position = { x: 2.5, z: 2.3 }; chair.transform.rotationY = 0;
+    const proposal = planTvViewing(input, { ...goal, priorities: ['conversation', 'viewing', 'circulation'] });
+    expect(proposal.moves.some((move) => move.instanceId === 'source-chair')).toBe(true);
+  });
+
+  it('gives an awkward open-room sofa wall support', () => {
+    const input = scene({ entities: [
+      entity('tv', 'tv', 0, .4, Math.PI, 1.2, .1, true),
+      entity('sofa', 'sofa', 0, 0, 0, 2, .9),
+    ] });
+    const sofa = input.entities.find((item) => item.role === 'sofa')!;
+    const proposal = planTvViewing(input, goal);
+    expect(proposal.moves.some((move) => move.instanceId === 'source-sofa')).toBe(true);
+    const moved = proposal.moves.find((move) => move.instanceId === 'source-sofa')!;
+    const movedEntity = { ...sofa, transform: moved };
+    const extent = Math.abs(Math.cos(moved.rotationY)) * movedEntity.footprint.width / 2 + Math.abs(Math.sin(moved.rotationY)) * movedEntity.footprint.depth / 2;
+    const xGap = input.room.width / 2 - Math.abs(moved.position.x) - extent;
+    expect(xGap < .101 || Math.abs(input.room.depth / 2 - Math.abs(moved.position.z) - (Math.abs(Math.sin(moved.rotationY)) * sofa.footprint.width / 2 + Math.abs(Math.cos(moved.rotationY)) * sofa.footprint.depth / 2)) < .101).toBe(true);
+  });
+
+  it('returns an already-good no-op when movement cannot earn four utility points', () => {
+    const input = scene({
+      room: { width: 6, depth: 4.1 },
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, 0, 2, .9)],
+    });
+    const proposal = planTvViewing(input, goal);
+    expect(proposal.moves).toEqual([]);
+    expect(proposal.scoreAfter).toEqual(proposal.scoreBefore);
+    expect(proposal.findings).toEqual([expect.objectContaining({ ruleId: 'layout.selection', code: 'layout-already-good' })]);
+  });
+
+  it('distinguishes a sub-threshold improvement from an already-good layout', () => {
+    const input = scene({
+      room: { width: 6, depth: 4.1 },
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, .03, 2, .9)],
+    });
+    const proposal = planTvViewing(input, goal);
+    expect(proposal.moves).toEqual([]);
+    expect(proposal.findings).toEqual([expect.objectContaining({ code: 'layout-improvement-too-small' })]);
+  });
+
+  it('excludes non-applicable conversation and circulation rules neutrally', () => {
+    const input = scene({ entities: [entity('tv', 'tv', 0, 2.8, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -2.1, 0, 2, .9)] });
+    const withoutRules = planTvViewing(input, goal).scoreBefore.total;
+    input.circulationZones = [];
+    expect(planTvViewing(input, goal).scoreBefore.total).toBeCloseTo(withoutRules);
+    expect(withoutRules).toBeGreaterThan(0);
+  });
+
+  it('uses priority order to reassign fixed weight slots', () => {
+    const input = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
+    const circulationFirst = planTvViewing(input, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] });
+    const viewingFirst = planTvViewing(input, goal);
+    expect(circulationFirst.scoreBefore.total).not.toBeCloseTo(viewingFirst.scoreBefore.total);
+  });
+
+  it('appends omitted default priorities after an explicit ordered subset', () => {
+    const input = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
+    expect(planTvViewing(input, { ...goal, priorities: ['circulation'] }))
+      .toEqual(planTvViewing(input, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] }));
+    expect(planTvViewing(input, { ...goal, priorities: ['conversation', 'viewing'] }))
+      .toEqual(planTvViewing(input, { ...goal, priorities: ['conversation', 'viewing', 'circulation'] }));
+  });
+
+  it('rejects an invalid current arrangement and incompatible placement candidates', () => {
+    const blocked = scene({ immediateOpeningZones: [{ id: 'door', center: { x: 0, z: 0 }, bounds: { width: 5.8, depth: 5.8 } }] });
+    expect(() => planTvViewing(blocked, goal)).toThrow('Current PlanningScene arrangement violates hard constraints');
+    const incompatible = scene();
+    incompatible.entities.find((item) => item.role === 'armchair')!.placementType = 'wall';
+    expect(() => planTvViewing(incompatible, goal)).toThrow('Unsupported placement type');
+  });
+
+  it('is deterministic, resolves focal identity only by planning ID, and does not mutate input', () => {
+    const input = scene();
+    const snapshot = structuredClone(input);
+    expect(planTvViewing(input, goal)).toEqual(planTvViewing(input, goal));
+    expect(input).toEqual(snapshot);
+    expect(() => planTvViewing(input, { ...goal, focalPointId: 'missing' })).toThrow('resolve unique TV focal');
+    expect(() => planTvViewing(input, { ...goal, focalPointId: 'source-tv' })).toThrow('resolve unique TV focal');
+  });
+
+  it('only rewards a wall behind canonical -Z, not a nearby side wall', () => {
+    const supported = scene({ room: { width: 6, depth: 4.1 }, entities: [
+      entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true),
+      entity('sofa', 'sofa', 0, -1.5, 0, 2, .9),
+    ] });
+    const sideOnly = structuredClone(supported);
+    sideOnly.entities[1]!.transform.position = { x: -1.9, z: 0 };
+    expect(planTvViewing(supported, goal).scoreBefore.total).toBeGreaterThan(planTvViewing(sideOnly, goal).scoreBefore.total);
+  });
+
+  it('uses neutral rear-boundary findings without misleading scoreImpact', () => {
+    const input = scene({ entities: [
+      entity('tv', 'tv', 0, .4, Math.PI, 1.2, .1, true),
+      entity('sofa', 'sofa', 0, 0, 0, 2, .9),
+    ] });
+    const proposal = planTvViewing(input, goal);
+    expect(proposal.findings).toEqual(expect.arrayContaining([expect.objectContaining({
+      ruleId: 'layout.rear-boundary-proximity', code: 'rear-boundary-proximity-improved',
+    })]));
+    expect(proposal.findings.every((finding) => finding.scoreImpact === undefined)).toBe(true);
+  });
+
+  it('returns only Contract v1 proposal fields and scalar finding parameters', () => {
+    const proposal = planTvViewing(scene(), goal);
+    expect(Object.keys(proposal).sort()).toEqual(['findings', 'moves', 'scoreAfter', 'scoreBefore']);
+    for (const finding of proposal.findings) for (const value of Object.values(finding.params ?? {}))
+      expect(['string', 'number', 'boolean']).toContain(typeof value);
+  });
+});

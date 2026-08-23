@@ -5,6 +5,7 @@ import type { FurnitureInstance, RoomProject, Vec3 } from '@/editor/model/types'
 import { useEditorStore } from '@/editor/state/store';
 import { assetCache } from '@/scene/assets/AssetCache';
 import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
+import { getCatalogConfiguration } from '@/editor/catalog/CatalogRepository';
 
 type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
@@ -84,6 +85,7 @@ export interface InteriorMagicTestApi {
   getCameraState(): { position: Vec3; target: Vec3; direction: Vec3; controlsEnabled: boolean } | null;
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
   getWorkspaceGeometry(): WorkspaceGeometry | null;
+  getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[]; placementEnabledCategories: string[] } | null;
 }
 
 const api: InteriorMagicTestApi = {
@@ -133,6 +135,12 @@ const api: InteriorMagicTestApi = {
   },
   getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
   getWorkspaceGeometry: () => sceneContext ? structuredClone(sceneContext.getWorkspace()) : null,
+  getCatalogStats: () => {
+    const configuration = getCatalogConfiguration();
+    if (!configuration) return null;
+    const visibleIds = configuration.visibleIds ? [...configuration.visibleIds] : configuration.repository.list().map((item) => item.assetId);
+    return { totalEntries: configuration.repository.size, visibleEntries: visibleIds.length, categories: configuration.repository.counts(), visibleIds, placementEnabledCategories: [...configuration.placementEnabledCategories] };
+  },
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }

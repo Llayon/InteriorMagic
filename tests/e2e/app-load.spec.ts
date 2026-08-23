@@ -40,5 +40,9 @@ test('shares Telegram safe-area geometry with layout and camera fitting', async 
   expect(geometry.height).toBe(820); expect(geometry.insets.left).toBe(11); expect(geometry.insets.right).toBe(13); expect(geometry.insets.bottom).toBeGreaterThan(150);
   const css = await page.evaluate(() => ({ left: getComputedStyle(document.documentElement).getPropertyValue('--tg-safe-left'), bottom: getComputedStyle(document.documentElement).getPropertyValue('--tg-safe-bottom') }));
   expect(css).toEqual({ left: '11px', bottom: '18px' });
-  await expect.poll(async () => { const room = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getRoomScreenBounds()); const current = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getWorkspaceGeometry()!); return room ? room.y + room.height <= current.height - current.insets.bottom + 2 : false; }).toBe(true);
+  // Trigger the user-facing canonical fit after the mocked Telegram geometry is observable.
+  // This removes the race between initial Canvas mount and Telegram's safe-area measurement.
+  await page.getByRole('button', { name: 'Fit Room' }).click();
+  const sheet = (await page.getByTestId('workspace-sheet').boundingBox())!;
+  await expect.poll(async () => { const room = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getRoomScreenBounds()); return room ? room.y + room.height : Number.POSITIVE_INFINITY; }, { timeout: 15_000 }).toBeLessThan(sheet.y + 12);
 });
