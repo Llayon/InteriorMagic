@@ -10,6 +10,7 @@ import { DeviceQaOverlay } from '@/deviceqa/DeviceQaOverlay';
 import { useEditorStore } from '@/editor/state/store';
 import { useWorkspaceGeometry } from './useWorkspaceGeometry';
 import { usePlannerStore, type PlannerOrchestrator } from '@/editor/planning/ui';
+import { resolveTvPlannerCapability } from '@/editor/planning/integration';
 
 export function App({
   plannerOrchestrator = null,
@@ -22,12 +23,18 @@ export function App({
 }) {
   const rootRef = useRef<HTMLElement>(null);
   const sheetState = useEditorStore((state) => state.session.sheetState);
+  const project = useEditorStore((state) => state.project);
   const geometry = useWorkspaceGeometry(rootRef, sheetState);
   // When planner preview is active, dim the project menu interaction so users
   // cannot accidentally start a destructive flow while the room is in a
   // read-only preview state.
   const isPreviewing = usePlannerStore((state) => state.isPreviewing);
   const plannerReady = useMemo(() => Boolean(plannerOrchestrator), [plannerOrchestrator]);
+  const plannerCapable = useMemo(
+    () => plannerSource === 'fixture' || (plannerSource === 'real' && resolveTvPlannerCapability(project).available),
+    [plannerSource, project],
+  );
+  const exposedPlanner = plannerReady && plannerCapable ? plannerOrchestrator : null;
 
   // Explicit planner exit: cancel any in-flight orchestrator work FIRST so a
   // stale receiveProposal() cannot resurrect a proposal after the panel
@@ -55,6 +62,7 @@ export function App({
       data-sheet-state={sheetState}
       data-planner-enabled={plannerReady ? 'on' : 'off'}
       data-planner-source={plannerSource ?? 'none'}
+      data-planner-capable={plannerCapable ? 'on' : 'off'}
       data-planner-previewing={isPreviewing ? 'on' : 'off'}
     >
       <div className="safe-area-probe" aria-hidden="true" />
@@ -65,12 +73,12 @@ export function App({
       <div className="scene" data-testid="scene">
         <SceneCanvas workspace={geometry} />
         <div className="hint">Перетаскивайте мебель одним пальцем</div>
-        <Toolbar orchestrator={plannerReady ? plannerOrchestrator : null} entryLabel={entryLabel} />
+        <Toolbar orchestrator={exposedPlanner} entryLabel={entryLabel} />
         {isDebugEnabled && <DebugOverlay />}
         {isDeviceQaEnabled && <DeviceQaOverlay />}
       </div>
       <WorkspaceSheet
-        plannerOrchestrator={plannerReady ? plannerOrchestrator : null}
+        plannerOrchestrator={exposedPlanner}
         onPlannerExit={onPlannerExit}
         onPlannerApplied={onPlannerApplied}
       />

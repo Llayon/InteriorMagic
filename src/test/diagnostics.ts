@@ -92,6 +92,7 @@ export interface InteriorMagicTestApi {
   getPlannerSnapshot(): { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null; applyFailure: PlannerApplyFailureReason | null; isPreviewing: boolean; outcome: ProposalOutcome | null };
   getPlannerPreviewTransform(instanceId: string): { position: Vec3; rotationY: number } | null;
   moveObjectForTest(instanceId: string, position: Vec3): void;
+  replaceProjectForTest(project: RoomProject): void;
 }
 
 const api: InteriorMagicTestApi = {
@@ -167,6 +168,7 @@ const api: InteriorMagicTestApi = {
     return { position: { x: move.position.x, y: 0, z: move.position.z }, rotationY: move.rotationY };
   },
   moveObjectForTest: (instanceId, position) => useEditorStore.getState().move(instanceId, position),
+  replaceProjectForTest: (project) => useEditorStore.setState({ project: structuredClone(project) }),
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }

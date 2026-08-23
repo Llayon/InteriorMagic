@@ -4,6 +4,8 @@ import type { PlanningEntity, PlanningEntityRole, PlanningPlacementType, Plannin
 
 export type AssetDefinitionResolver = (assetId: string) => FurnitureAssetDefinition;
 
+export const planningRoomObjectEntityId = (instanceId: string): string => `room-object:${instanceId}`;
+
 export class PlanningSceneBuildError extends Error {
   constructor(
     public readonly code: 'invalid-project' | 'unknown-asset' | 'unsupported-placement' | 'unsupported-layout' | 'no-tv' | 'ambiguous-tv',
@@ -50,7 +52,7 @@ export const buildPlanningScene = (
     assertFinitePositive([asset.footprint.width, asset.footprint.depth], `footprint for ${asset.id}`);
     const role = activeRole(asset.semantic?.role);
     return {
-      id: `room-object:${object.instanceId}`,
+      id: planningRoomObjectEntityId(object.instanceId),
       source: { kind: 'roomObject', instanceId: object.instanceId },
       role,
       placementType: planningPlacement(asset, role),

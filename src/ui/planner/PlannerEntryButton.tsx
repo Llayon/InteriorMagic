@@ -4,8 +4,8 @@ import { usePlannerStore, type PlannerOrchestrator } from '@/editor/planning/ui'
 /**
  * Top-right entry point for the planner UX.
  *
- * Renders whenever bootstrap supplies a planner capability. Bootstrap, not
- * this presentation component, decides between the real planner and fixtures.
+ * Renders whenever the application supplies a currently applicable planner.
+ * Capability derivation remains outside this presentation component.
  *
  * The orchestrator surface is generic — this component never knows which
  * implementation is driving analysis.

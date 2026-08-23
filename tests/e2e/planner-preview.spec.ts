@@ -34,7 +34,8 @@ test('default traffic uses the real planner rather than the fixture harness', as
   await openApp(page);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-enabled', 'on');
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-source', 'real');
-  await expect(page.getByTestId('planner-entry')).toBeVisible();
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-capable', 'off');
+  await expect(page.getByTestId('planner-entry')).toHaveCount(0);
   await expect(page.getByTestId('planner-panel')).toHaveCount(0);
 });
 
@@ -42,6 +43,7 @@ test('improved fixture opens the planner panel and renders findings', async ({ m
   await gotoWithFixture(page, 'improved');
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-enabled', 'on');
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-source', 'fixture');
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-capable', 'on');
   await expect(page.getByTestId('planner-entry')).toBeVisible();
   const baseline = await project(page);
   await page.getByTestId('planner-entry').click();
