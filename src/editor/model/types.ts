@@ -2,7 +2,7 @@ export type Vec2 = { x: number; z: number };
 export type Vec3 = { x: number; y: number; z: number };
 export type Category = 'sofas' | 'chairs' | 'tables' | 'plants' | 'lamps' | 'rugs';
 export type PlacementAnchor = 'floor' | 'wall' | 'surface' | 'ceiling';
-export type FurnitureSemanticRole = 'sofa' | 'armchair' | 'coffeeTable' | 'sideTable' | 'console' | 'rug' | 'floorLamp' | 'plant' | 'floorDecor';
+export type FurnitureSemanticRole = 'tv' | 'sofa' | 'armchair' | 'coffeeTable' | 'sideTable' | 'console' | 'rug' | 'floorLamp' | 'plant' | 'floorDecor';
 
 export const CollisionGroup = {
   FURNITURE: 1 << 0,

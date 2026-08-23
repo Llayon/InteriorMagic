@@ -1,52 +1,32 @@
 import { getAsset } from '@/editor/assets/registry';
 import type { FurnitureInstance, RoomProject, Vec2 } from '@/editor/model/types';
+import { orientedCorners, orientedRectsOverlap, rectContainedInRoom, rotatedHalfExtents } from '@/editor/spatial/geometry';
+import { collisionMasksOverlap } from './collisionPolicy';
 
-export const getRotatedHalfExtents = (width: number, depth: number, rotationY: number) => ({
-  x: Math.abs(Math.cos(rotationY)) * width / 2 + Math.abs(Math.sin(rotationY)) * depth / 2,
-  z: Math.abs(Math.sin(rotationY)) * width / 2 + Math.abs(Math.cos(rotationY)) * depth / 2,
-});
+export { collisionMasksOverlap } from './collisionPolicy';
 
-export const getObbCorners = (object: FurnitureInstance): Vec2[] => {
+export const getRotatedHalfExtents = (width: number, depth: number, rotationY: number) =>
+  rotatedHalfExtents({ width, depth }, rotationY);
+
+const objectRect = (object: FurnitureInstance) => {
   const footprint = getAsset(object.assetId).footprint;
-  const c = Math.cos(object.rotationY);
-  const s = Math.sin(object.rotationY);
-  return [
-    [-footprint.width / 2, -footprint.depth / 2],
-    [footprint.width / 2, -footprint.depth / 2],
-    [footprint.width / 2, footprint.depth / 2],
-    [-footprint.width / 2, footprint.depth / 2],
-  ].map(([x, z]) => ({
-    x: object.position.x + x! * c - z! * s,
-    z: object.position.z + x! * s + z! * c,
-  }));
+  return { center: { x: object.position.x, z: object.position.z }, ...footprint, rotationY: object.rotationY };
 };
 
-const axes = (points: Vec2[]) => points.slice(0, 2).map((point, index) => {
-  const next = points[(index + 1) % points.length]!;
-  const dx = next.x - point.x;
-  const dz = next.z - point.z;
-  const length = Math.hypot(dx, dz);
-  return { x: -dz / length, z: dx / length };
-});
+export const getObbCorners = (object: FurnitureInstance): Vec2[] => orientedCorners(objectRect(object));
 
-export const orientedRectsIntersect = (a: Vec2[], b: Vec2[]) =>
-  [...axes(a), ...axes(b)].every((axis) => {
-    const pa = a.map((point) => point.x * axis.x + point.z * axis.z);
-    const pb = b.map((point) => point.x * axis.x + point.z * axis.z);
-    return Math.max(...pa) > Math.min(...pb) + 0.005 && Math.max(...pb) > Math.min(...pa) + 0.005;
+export const orientedRectsIntersect = (a: Vec2[], b: Vec2[]) => {
+  const toRect = (corners: Vec2[]) => ({
+    center: { x: (corners[0]!.x + corners[2]!.x) / 2, z: (corners[0]!.z + corners[2]!.z) / 2 },
+    width: Math.hypot(corners[1]!.x - corners[0]!.x, corners[1]!.z - corners[0]!.z),
+    depth: Math.hypot(corners[2]!.x - corners[1]!.x, corners[2]!.z - corners[1]!.z),
+    rotationY: Math.atan2(corners[1]!.z - corners[0]!.z, corners[1]!.x - corners[0]!.x),
   });
-
-export const collisionMasksOverlap = (
-  a: { group: number; mask: number },
-  b: { group: number; mask: number },
-) => (a.mask & b.group) !== 0 && (b.mask & a.group) !== 0;
+  return orientedRectsOverlap(toRect(a), toRect(b));
+};
 
 export const isInsideRoom = (project: RoomProject, object: FurnitureInstance) => {
-  const halfWidth = project.room.width / 2;
-  const halfDepth = project.room.depth / 2;
-  return getObbCorners(object).every((point) =>
-    point.x >= -halfWidth - 1e-6 && point.x <= halfWidth + 1e-6 &&
-    point.z >= -halfDepth - 1e-6 && point.z <= halfDepth + 1e-6);
+  return rectContainedInRoom(project.room, objectRect(object));
 };
 
 export const isPlacementValid = (
