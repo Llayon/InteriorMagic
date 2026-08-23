@@ -10,6 +10,7 @@ import { useCameraGate } from '@/scene/interactions/CameraGate';
 import { ProceduralFurniture } from './ProceduralFurniture';
 import { beginTestInteraction, endTestInteraction, isTestMode, registerTestObject } from '@/test/diagnostics';
 import { FurnitureGrounding } from './FurnitureGrounding';
+import { selectPreviewOverride, usePlannerStore } from '@/editor/planning/ui';
 
 const ground = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
@@ -27,6 +28,21 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   const padding = asset.interaction?.paddingXZ ?? 0.08;
   const proxyHeight = Math.max(asset.dimensions.height, asset.interaction?.minHeight ?? 0.45);
   const proxySize: [number, number, number] = [asset.dimensions.width + padding * 2, proxyHeight, asset.dimensions.depth + padding * 2];
+
+  // Read planner preview override at render time only. The selector returns
+  // null whenever preview mode is inactive, in which case the persisted
+  // RoomProject transforms are used unchanged. This must NEVER call move(),
+  // never mutate the editor store, and never push to undo/redo. The override
+  // applies through `<group>` props below; cancelling preview simply flips
+  // isPreviewing=false and React reconciles the position back to the persisted
+  // values with zero side effects.
+  const previewOverride = usePlannerStore((state) => selectPreviewOverride(state, object.instanceId));
+  const previewActive = usePlannerStore((state) => state.isPreviewing);
+  const previewY = object.position.y;
+  const renderPosition: [number, number, number] = previewOverride
+    ? [previewOverride.position.x, previewY, previewOverride.position.z]
+    : [object.position.x, object.position.y, object.position.z];
+  const renderRotationY = previewOverride ? previewOverride.rotationY : object.rotationY;
   useEffect(() => {
     if (!isTestMode || !group.current || !proxy.current) return;
     registerTestObject(object.instanceId, { group: group.current, proxy: proxy.current });
@@ -53,6 +69,10 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   };
   const onPointerDown = (event: ThreeEvent<PointerEvent>) => {
     if (useEditorStore.getState().session.mode === 'dragging') return;
+    // Block drag while planner preview is active. Preview is a read-only visual
+    // overlay; user editing must not interfere with it and must not produce
+    // store mutations that the preview would then need to be reconciled with.
+    if (usePlannerStore.getState().isPreviewing) return;
     const floorHit = intersectFloor(event);
     if (!floorHit) return;
     event.stopPropagation();
@@ -91,7 +111,7 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   const onLostPointerCapture = (event: ThreeEvent<PointerEvent>) => finish(event.pointerId, true);
 
   const fallback = <ProceduralFurniture assetId={object.assetId} variantId={object.variantId} />;
-  return <group ref={group} position={[object.position.x, object.position.y, object.position.z]} rotation-y={object.rotationY}>
+  return <group ref={group} position={renderPosition} rotation-y={renderRotationY}>
     {asset.semantic?.role !== 'rug' && <FurnitureGrounding width={asset.footprint.width} depth={asset.footprint.depth} />}
     {asset.modelUrl ? <AssetModel assetId={object.assetId} variantId={object.variantId} fallback={fallback} /> : fallback}
     <mesh
@@ -111,9 +131,15 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
       <planeGeometry args={[asset.footprint.width, asset.footprint.depth]} />
       <meshBasicMaterial ref={feedbackMaterial} visible={false} transparent opacity={0.28} color="#d53636" depthWrite={false} />
     </mesh>
-    {selected && <mesh position={[0, .018, 0]} rotation-x={-Math.PI / 2} raycast={() => undefined}>
+    {selected && !previewActive && <mesh position={[0, .018, 0]} rotation-x={-Math.PI / 2} raycast={() => undefined}>
       <ringGeometry args={[Math.max(asset.footprint.width, asset.footprint.depth) * .56, Math.max(asset.footprint.width, asset.footprint.depth) * .61, 32]} />
       <meshBasicMaterial color="#f2a65a" toneMapped={false} />
     </mesh>}
+    {previewActive && previewOverride && (
+      <mesh position={[0, .02, 0]} rotation-x={-Math.PI / 2} raycast={() => undefined}>
+        <ringGeometry args={[Math.max(asset.footprint.width, asset.footprint.depth) * .62, Math.max(asset.footprint.width, asset.footprint.depth) * .66, 36]} />
+        <meshBasicMaterial color="#c69466" toneMapped={false} transparent opacity={0.55} />
+      </mesh>
+    )}
   </group>;
 }
