@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import type CameraControlsImpl from 'camera-controls';
+import type { PlanProposal } from '@/editor/planning/contracts';
 import { getAsset } from '@/editor/assets/registry';
 import type { FurnitureInstance, RoomProject, Vec3 } from '@/editor/model/types';
 import { useEditorStore } from '@/editor/state/store';
 import { assetCache } from '@/scene/assets/AssetCache';
 import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
 import { getCatalogConfiguration } from '@/editor/catalog/CatalogRepository';
+import { usePlannerStore, classifyProposalOutcome, type ProposalOutcome } from '@/editor/planning/ui';
 
 type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
@@ -86,6 +88,8 @@ export interface InteriorMagicTestApi {
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
   getWorkspaceGeometry(): WorkspaceGeometry | null;
   getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[]; placementEnabledCategories: string[] } | null;
+  getPlannerSnapshot(): { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null; isPreviewing: boolean; outcome: ProposalOutcome | null };
+  getPlannerPreviewTransform(instanceId: string): { position: Vec3; rotationY: number } | null;
 }
 
 const api: InteriorMagicTestApi = {
@@ -140,6 +144,24 @@ const api: InteriorMagicTestApi = {
     if (!configuration) return null;
     const visibleIds = configuration.visibleIds ? [...configuration.visibleIds] : configuration.repository.list().map((item) => item.assetId);
     return { totalEntries: configuration.repository.size, visibleEntries: visibleIds.length, categories: configuration.repository.counts(), visibleIds, placementEnabledCategories: [...configuration.placementEnabledCategories] };
+  },
+  getPlannerSnapshot: () => {
+    const state = usePlannerStore.getState();
+    const outcome = state.proposal ? classifyProposalOutcome(state.proposal).outcome : null;
+    return {
+      status: state.status,
+      proposal: state.proposal ? structuredClone(state.proposal) : null,
+      error: state.error,
+      isPreviewing: state.isPreviewing,
+      outcome,
+    };
+  },
+  getPlannerPreviewTransform: (instanceId) => {
+    const state = usePlannerStore.getState();
+    if (!state.isPreviewing || state.status !== 'ready' || !state.proposal) return null;
+    const move = state.proposal.moves.find((m) => m.instanceId === instanceId);
+    if (!move) return null;
+    return { position: { x: move.position.x, y: 0, z: move.position.z }, rotationY: move.rotationY };
   },
 };
 

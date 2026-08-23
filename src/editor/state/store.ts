@@ -7,7 +7,7 @@ import { loadInitialProject, storage, type ProjectStorage } from '@/editor/seria
 import { catalogRequestGate } from '@/editor/assets/requestGate';
 
 type Mode = 'idle' | 'dragging';
-export type WorkspacePanel = 'catalog' | 'materials' | null;
+export type WorkspacePanel = 'catalog' | 'materials' | 'planner' | null;
 export type SheetState = 'closed' | 'peek' | 'expanded';
 export interface EditorSession {
   selectedId: string | null;
