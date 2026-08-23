@@ -8,9 +8,11 @@ import type { PlannerOrchestrator } from '@/editor/planning/ui';
 export function WorkspaceSheet({
   plannerOrchestrator,
   onPlannerExit,
+  onPlannerApplied,
 }: {
   plannerOrchestrator: PlannerOrchestrator | null;
   onPlannerExit: () => void;
+  onPlannerApplied: () => void;
 }) {
   const panel = useEditorStore((state) => state.session.workspacePanel);
   const sheetState = useEditorStore((state) => state.session.sheetState);
@@ -39,7 +41,7 @@ export function WorkspaceSheet({
       )}
       <div className="sheet-content">
         {plannerActive && plannerOrchestrator ? (
-          <PlannerPanel orchestrator={plannerOrchestrator} onExit={onPlannerExit} />
+          <PlannerPanel orchestrator={plannerOrchestrator} onExit={onPlannerExit} onApplied={onPlannerApplied} />
         ) : panel === 'materials' ? (
           <Finishes />
         ) : (

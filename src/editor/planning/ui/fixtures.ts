@@ -1,5 +1,6 @@
 import type { PlanProposal } from '../contracts';
 import type { PlannerFixtureId } from './types';
+import type { PlannerOrchestrator } from '@/editor/planning/application/types';
 
 /**
  * Dev/test fixture harness for the planner UX.
@@ -75,15 +76,10 @@ export const loadCanonicalProposalFixture = async (
  * invalidates any in-flight operation synchronously. The orchestrator owns
  * its own generation token; the UI does NOT need to track one.
  */
-export interface PlannerOrchestrator {
-  beginAnalysis(): Promise<void>;
-  cancelPending(): void;
-}
-
 /**
  * Function the orchestrator calls to validate that every ProposedMove
  * target exists in the live editor scene. The integration / bootstrap
- * layer (Track A real planner, fixture harness) supplies this; the
+ * layer (real planner or fixture harness) supplies this; the
  * presentation layer never does.
  */
 export type ResolvePlannerTargets = (ids: readonly string[]) => Set<string>;

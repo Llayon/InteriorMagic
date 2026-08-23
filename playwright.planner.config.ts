@@ -11,8 +11,8 @@ import { defineConfig, devices } from '@playwright/test';
  * Run with:
  *   npx playwright test --config=playwright.planner.config.ts tests/e2e/planner-preview.spec.ts
  *
- * The global playwright.config.ts is unchanged and continues to serve the
- * rest of the test suite on port 4173.
+ * The global playwright.config.ts excludes both dedicated planner suites and
+ * continues to serve the rest of the tests on port 4173.
  */
 
 const baseURL = 'http://127.0.0.1:4175';

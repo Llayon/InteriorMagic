@@ -4,12 +4,11 @@ import { usePlannerStore, type PlannerOrchestrator } from '@/editor/planning/ui'
 /**
  * Top-right entry point for the planner UX.
  *
- * Only renders when a fixture URL flag is active AND the build-time
- * harness flag is enabled. Hidden in normal mode so end users never see a
- * fake "Improve layout" affordance.
+ * Renders whenever bootstrap supplies a planner capability. Bootstrap, not
+ * this presentation component, decides between the real planner and fixtures.
  *
  * The orchestrator surface is generic — this component never knows which
- * fixture (or real planner) is driving analysis.
+ * implementation is driving analysis.
  */
 export function PlannerEntryButton({
   orchestrator,

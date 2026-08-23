@@ -5,6 +5,9 @@ import type { CatalogCategoryId } from '@/editor/catalog/CatalogRepository';
 import { findPlacement, isPlacementValid } from '@/editor/placement/placement';
 import { loadInitialProject, storage, type ProjectStorage } from '@/editor/serialization/project';
 import { catalogRequestGate } from '@/editor/assets/requestGate';
+import type { ProposedMove } from '@/editor/planning/contracts';
+import { planningProjectFingerprint } from '@/editor/planning/integration/projectFingerprint';
+import type { PlannerApplyResult } from '@/editor/planning/application/types';
 
 type Mode = 'idle' | 'dragging';
 export type WorkspacePanel = 'catalog' | 'materials' | 'planner' | null;
@@ -36,6 +39,7 @@ export interface EditorStore {
   duplicate(id: string): void;
   changeVariant(id: string, variantId: string): void;
   changeFinish(kind: 'floorMaterialId' | 'wallMaterialId', id: string): void;
+  applyPlanningMovesAtomic(moves: readonly ProposedMove[], analyzedFingerprint: string): PlannerApplyResult;
   undo(): void;
   redo(): void;
   save(): void;
@@ -121,6 +125,40 @@ export const createEditorStore = (
   changeFinish(kind, id) {
     const state = get();
     set(commit(state, { ...state.project, finishes: { ...state.project.finishes, [kind]: id } }));
+  },
+  applyPlanningMovesAtomic(moves, analyzedFingerprint) {
+    const state = get();
+    if (moves.length === 0) return { ok: false, reason: 'invalid-proposal' };
+    const ids = new Set(moves.map((move) => move.instanceId));
+    if (ids.size !== moves.length || moves.some((move) =>
+      !Number.isFinite(move.position.x) || !Number.isFinite(move.position.z) || !Number.isFinite(move.rotationY))) {
+      return { ok: false, reason: 'invalid-proposal' };
+    }
+    if (planningProjectFingerprint(state.project) !== analyzedFingerprint) return { ok: false, reason: 'stale' };
+    const currentById = new Map(state.project.objects.map((object) => [object.instanceId, object]));
+    if (moves.some((move) => !currentById.has(move.instanceId))) return { ok: false, reason: 'missing-target' };
+    const moveById = new Map(moves.map((move) => [move.instanceId, move]));
+    const nextProject: RoomProject = {
+      ...state.project,
+      objects: state.project.objects.map((object) => {
+        const move = moveById.get(object.instanceId);
+        return move ? {
+          ...object,
+          position: { ...object.position, x: move.position.x, z: move.position.z },
+          rotationY: move.rotationY,
+        } : object;
+      }),
+    };
+    try {
+      const valid = nextProject.objects
+        .filter((object) => ids.has(object.instanceId))
+        .every((object) => isPlacementValid(nextProject, object));
+      if (!valid) return { ok: false, reason: 'invalid-final-layout' };
+    } catch {
+      return { ok: false, reason: 'invalid-final-layout' };
+    }
+    set(commit(state, nextProject));
+    return { ok: true };
   },
   undo() {
     const state = get();

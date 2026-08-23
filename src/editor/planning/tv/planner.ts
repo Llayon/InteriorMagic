@@ -1,6 +1,7 @@
 import type { PlanProposal, PlanningFinding, PlanningGoal, PlanningPriority } from '../contracts/types';
 import { angularDifference, orientedRectsOverlap, pointDistance, rectContainedInRoom, rotatedHalfExtents, xzHeading, type OrientedRect } from '@/editor/spatial/geometry';
 import type { PlanningEntity, PlanningScene, PlanningTransform } from './PlanningScene';
+import { collisionMasksOverlap } from '@/editor/placement/collisionPolicy';
 
 const SCORE_EPSILON = 1e-9;
 const ACCEPTANCE_THRESHOLD = 4;
@@ -182,8 +183,8 @@ const hardConstraintsPass = (scene: PlanningScene, arrangement: Arrangement): bo
   for (let first = 0; first < scene.entities.length; first++) for (let second = first + 1; second < scene.entities.length; second++) {
     const a = scene.entities[first]!;
     const b = scene.entities[second]!;
-    if (a.role === 'tv' || b.role === 'tv') continue;
-    if (orientedRectsOverlap(rectFor(a, activeTransform(a, arrangement)), rectFor(b, activeTransform(b, arrangement)))) return false;
+    if (collisionMasksOverlap(a.collision, b.collision)
+      && orientedRectsOverlap(rectFor(a, activeTransform(a, arrangement)), rectFor(b, activeTransform(b, arrangement)))) return false;
   }
   return true;
 };

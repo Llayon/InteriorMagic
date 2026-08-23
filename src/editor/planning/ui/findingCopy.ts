@@ -76,7 +76,7 @@ const FORMATTERS: Record<string, (finding: PlanningFinding) => FindingCopy> = {
   }),
   'layout-improved': () => ({
     title: 'Расстановка стала удачнее',
-    detail: 'Учтены ориентация, проходы и положение относительно границ комнаты.',
+    detail: 'Учтены ориентация мебели и положение относительно границ комнаты.',
   }),
   'layout-improvement-too-small': () => ({
     title: 'Улучшения слишком незначительны',

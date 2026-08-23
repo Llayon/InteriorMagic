@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { ProposedMove, PlanProposal } from '../contracts';
+import type { PlannerApplyFailureReason } from '@/editor/planning/integration';
 
 /**
  * Generic Planner UI state — orchestrator-agnostic.
@@ -19,6 +20,7 @@ export interface PlannerUiStore {
   status: PlannerUiStatus;
   proposal: PlanProposal | null;
   error: string | null;
+  applyFailure: PlannerApplyFailureReason | null;
   /**
    * Read-only preview is a separate boolean state — NOT a status. Preview is
    * a render-time visual overlay that requires `status === 'ready'` AND an
@@ -35,6 +37,7 @@ export interface PlannerUiStore {
   receiveProposal(proposal: PlanProposal): void;
   /** Receive an error from the orchestrator. UI → `error`. */
   failAnalysis(error: string): void;
+  failApply(reason: PlannerApplyFailureReason): void;
   /** Enter the temporary 3D preview rendering mode. No editor mutation. */
   enterPreview(): void;
   /** Exit preview and restore normal rendering. No editor mutation. */
@@ -47,15 +50,19 @@ export const usePlannerStore = create<PlannerUiStore>((set, get) => ({
   status: 'idle',
   proposal: null,
   error: null,
+  applyFailure: null,
   isPreviewing: false,
   beginAnalysis() {
-    set({ status: 'loading', proposal: null, error: null, isPreviewing: false });
+    set({ status: 'loading', proposal: null, error: null, applyFailure: null, isPreviewing: false });
   },
   receiveProposal(proposal) {
-    set({ status: 'ready', proposal, error: null, isPreviewing: false });
+    set({ status: 'ready', proposal, error: null, applyFailure: null, isPreviewing: false });
   },
   failAnalysis(error) {
-    set({ status: 'error', error, proposal: null, isPreviewing: false });
+    set({ status: 'error', error, applyFailure: null, proposal: null, isPreviewing: false });
+  },
+  failApply(reason) {
+    set({ status: 'error', error: null, applyFailure: reason, proposal: null, isPreviewing: false });
   },
   enterPreview() {
     if (get().status !== 'ready') return;
@@ -65,7 +72,7 @@ export const usePlannerStore = create<PlannerUiStore>((set, get) => ({
     set({ isPreviewing: false });
   },
   reset() {
-    set({ status: 'idle', proposal: null, error: null, isPreviewing: false });
+    set({ status: 'idle', proposal: null, error: null, applyFailure: null, isPreviewing: false });
   },
 }));
 

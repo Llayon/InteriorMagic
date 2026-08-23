@@ -1,6 +1,9 @@
 import { getAsset } from '@/editor/assets/registry';
 import type { FurnitureInstance, RoomProject, Vec2 } from '@/editor/model/types';
 import { orientedCorners, orientedRectsOverlap, rectContainedInRoom, rotatedHalfExtents } from '@/editor/spatial/geometry';
+import { collisionMasksOverlap } from './collisionPolicy';
+
+export { collisionMasksOverlap } from './collisionPolicy';
 
 export const getRotatedHalfExtents = (width: number, depth: number, rotationY: number) =>
   rotatedHalfExtents({ width, depth }, rotationY);
@@ -21,11 +24,6 @@ export const orientedRectsIntersect = (a: Vec2[], b: Vec2[]) => {
   });
   return orientedRectsOverlap(toRect(a), toRect(b));
 };
-
-export const collisionMasksOverlap = (
-  a: { group: number; mask: number },
-  b: { group: number; mask: number },
-) => (a.mask & b.group) !== 0 && (b.mask & a.group) !== 0;
 
 export const isInsideRoom = (project: RoomProject, object: FurnitureInstance) => {
   return rectContainedInRoom(project.room, objectRect(object));

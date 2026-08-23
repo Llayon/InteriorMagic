@@ -13,9 +13,11 @@ import { usePlannerStore, type PlannerOrchestrator } from '@/editor/planning/ui'
 
 export function App({
   plannerOrchestrator = null,
+  plannerSource = null,
   entryLabel = 'Улучшить расстановку',
 }: {
   plannerOrchestrator?: PlannerOrchestrator | null;
+  plannerSource?: 'real' | 'fixture' | null;
   entryLabel?: string;
 }) {
   const rootRef = useRef<HTMLElement>(null);
@@ -39,12 +41,20 @@ export function App({
     store.setSheetState('peek');
   }, [plannerOrchestrator]);
 
+  const onPlannerApplied = useCallback(() => {
+    usePlannerStore.getState().reset();
+    const store = useEditorStore.getState();
+    store.setWorkspacePanel('catalog');
+    store.setSheetState('peek');
+  }, []);
+
   return (
     <main
       ref={rootRef}
       data-testid="app-root"
       data-sheet-state={sheetState}
-      data-planner-harness={plannerReady ? 'on' : 'off'}
+      data-planner-enabled={plannerReady ? 'on' : 'off'}
+      data-planner-source={plannerSource ?? 'none'}
       data-planner-previewing={isPreviewing ? 'on' : 'off'}
     >
       <div className="safe-area-probe" aria-hidden="true" />
@@ -62,6 +72,7 @@ export function App({
       <WorkspaceSheet
         plannerOrchestrator={plannerReady ? plannerOrchestrator : null}
         onPlannerExit={onPlannerExit}
+        onPlannerApplied={onPlannerApplied}
       />
     </main>
   );

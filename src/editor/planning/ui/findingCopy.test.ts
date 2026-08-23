@@ -126,6 +126,13 @@ describe('presentFinding covers real Track A codes', () => {
     expect(presentFinding({ ruleId: 'r', code: 'good-orientation', severity: 'positive' }).isImprovement).toBe(true);
   });
 
+  it('does not claim circulation unless the circulation finding is present', () => {
+    const layout = presentFinding({ ruleId: 'layout.selection', code: 'layout-improved', severity: 'positive' });
+    const circulation = presentFinding({ ruleId: 'room.circulation', code: 'circulation-improved', severity: 'positive' });
+    expect(layout.copy.detail).not.toMatch(/проход/i);
+    expect(circulation.copy.title).toMatch(/проход/i);
+  });
+
   it('falls back gracefully for unknown codes', () => {
     const out = presentFinding({ ruleId: 'r', code: 'brand-new-future-code', severity: 'warning' });
     expect(out.severity).toBe('warning');

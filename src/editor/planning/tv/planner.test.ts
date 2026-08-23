@@ -5,7 +5,7 @@ import type { PlanningEntity, PlanningScene } from './PlanningScene';
 
 const entity = (id: string, role: PlanningEntity['role'], x: number, z: number, rotationY: number, width: number, depth: number, fixed = false): PlanningEntity => ({
   id, source: role === 'tv' ? { kind: 'derived' } : { kind: 'roomObject', instanceId: `source-${id}` }, role, fixed, placementType: role === 'tv' ? 'wall' : 'floor',
-  footprint: { width, depth }, transform: { position: { x, z }, rotationY },
+  footprint: { width, depth }, collision: role === 'tv' ? { group: 0, mask: 0 } : { group: 1, mask: 1 }, transform: { position: { x, z }, rotationY },
 });
 
 const scene = (overrides: Partial<PlanningScene> = {}): PlanningScene => ({

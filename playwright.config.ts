@@ -4,6 +4,7 @@ const baseURL = 'http://127.0.0.1:4173';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testIgnore: /planner-(?:preview|integration)\.spec\.ts/,
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -34,7 +35,7 @@ export default defineConfig({
     },
     {
       name: 'desktop',
-      testIgnore: /interactions-touch\.spec\.ts/,
+      testIgnore: /(?:interactions-touch|planner-(?:preview|integration))\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],

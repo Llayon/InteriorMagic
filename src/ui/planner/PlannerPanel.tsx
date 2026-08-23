@@ -13,26 +13,29 @@ import type { PlanProposal } from '@/editor/planning/contracts';
  * when `workspacePanel === 'planner'`.
  *
  * Pure presentation; never touches the editor store. Analysis is driven by
- * a generic orchestrator (dev harness or future real planner) which already
+ * a generic orchestrator (fixture or real planner) which already
  * owns the supersession token and the target-existence resolver.
  */
 export function PlannerPanel({
   orchestrator,
   onExit,
+  onApplied,
 }: {
   orchestrator: PlannerOrchestrator;
   onExit: () => void;
+  onApplied: () => void;
 }) {
   const status = usePlannerStore((state) => state.status);
   const proposal = usePlannerStore((state) => state.proposal);
   const error = usePlannerStore((state) => state.error);
+  const applyFailure = usePlannerStore((state) => state.applyFailure);
   const isPreviewing = usePlannerStore((state) => state.isPreviewing);
   return (
     <div className="planner-panel" data-testid="planner-panel" data-planner-status={status} data-planner-preview={isPreviewing ? 'on' : 'off'}>
       <div className="sheet-title">
         <div>
           <small>ПЛАНИРОВЩИК</small>
-          <strong>{titleFor(status, proposal)}</strong>
+          <strong>{titleFor(status, proposal, applyFailure !== null)}</strong>
         </div>
         <button className="planner-exit" type="button" data-testid="planner-exit" aria-label="Закрыть планировщик" onClick={onExit}>×</button>
       </div>
@@ -42,13 +45,15 @@ export function PlannerPanel({
         <PlannerReady
           proposal={proposal}
           orchestrator={orchestrator}
+          onApplied={onApplied}
         />
       )}
       {status === 'error' && (
         <PlannerError
-          message={error ?? 'Не удалось проанализировать расстановку.'}
+          message={applyFailure ? applyFailureCopy(applyFailure) : error ?? 'Не удалось проанализировать расстановку.'}
           orchestrator={orchestrator}
           onExit={onExit}
+          applyError={applyFailure !== null}
         />
       )}
     </div>
@@ -58,10 +63,11 @@ export function PlannerPanel({
 const titleFor = (
   status: ReturnType<typeof usePlannerStore.getState>['status'],
   proposal: PlanProposal | null,
+  applyError: boolean,
 ): string => {
   if (status === 'loading') return 'Анализируем расстановку…';
   if (status === 'ready' && proposal) return classifyProposalOutcome(proposal).title;
-  if (status === 'error') return 'Не удалось проанализировать';
+  if (status === 'error') return applyError ? 'Не удалось применить' : 'Не удалось проанализировать';
   return 'Планировщик';
 };
 
@@ -69,14 +75,15 @@ function PlannerLoading() {
   return (
     <div className="planner-loading" data-testid="planner-loading">
       <div className="planner-spinner" aria-hidden="true" />
-      <p>Оцениваем расстановку мебели и проходы…</p>
+      <p>Оцениваем расстановку мебели…</p>
     </div>
   );
 }
 
-function PlannerReady({ proposal, orchestrator }: {
+function PlannerReady({ proposal, orchestrator, onApplied }: {
   proposal: PlanProposal;
   orchestrator: PlannerOrchestrator;
+  onApplied: () => void;
 }) {
   const outcome = classifyProposalOutcome(proposal);
   const isPreviewing = usePlannerStore((state) => state.isPreviewing);
@@ -122,14 +129,28 @@ function PlannerReady({ proposal, orchestrator }: {
           </button>
         )}
         {outcome.hasPreview && isPreviewing && (
-          <button
-            className="planner-secondary"
-            data-testid="planner-cancel-preview"
-            aria-label="Закрыть просмотр"
-            onClick={exitPreview}
-          >
-            Закрыть просмотр
-          </button>
+          <>
+            {orchestrator.applyCurrentProposal && proposal.moves.length > 0 && (
+              <button
+                className="planner-primary"
+                data-testid="planner-apply"
+                aria-label="Применить"
+                onClick={() => {
+                  const result = orchestrator.applyCurrentProposal!();
+                  if (result.ok) onApplied();
+                  else usePlannerStore.getState().failApply(result.reason);
+                }}
+              >Применить</button>
+            )}
+            <button
+              className="planner-secondary"
+              data-testid="planner-cancel-preview"
+              aria-label="Закрыть просмотр"
+              onClick={exitPreview}
+            >
+              Закрыть просмотр
+            </button>
+          </>
         )}
         <button
           className="planner-tertiary"
@@ -173,17 +194,25 @@ function ScoreDelta({ before, after }: { before: number; after: number }) {
   );
 }
 
-function PlannerError({ message, orchestrator, onExit }: {
+const applyFailureCopy = (reason: NonNullable<ReturnType<typeof usePlannerStore.getState>['applyFailure']>): string => {
+  if (reason === 'stale') return 'Комната изменилась. Пересчитайте вариант.';
+  if (reason === 'missing-target') return 'Один из предметов больше недоступен. Пересчитайте вариант.';
+  if (reason === 'invalid-final-layout') return 'Вариант больше нельзя безопасно разместить. Пересчитайте расстановку.';
+  return 'Не удалось применить вариант. Пересчитайте расстановку.';
+};
+
+function PlannerError({ message, orchestrator, onExit, applyError }: {
   message: string;
   orchestrator: PlannerOrchestrator;
   onExit: () => void;
+  applyError: boolean;
 }) {
   const retry = () => {
     void orchestrator.beginAnalysis();
   };
   return (
     <div className="planner-error" data-testid="planner-error">
-      <strong>Не удалось проанализировать расстановку</strong>
+      <strong>{applyError ? 'Не удалось применить вариант' : 'Не удалось проанализировать расстановку'}</strong>
       <p>{message}</p>
       <div className="planner-actions">
         <button className="planner-primary" data-testid="planner-retry" aria-label="Попробовать снова" onClick={retry}>Попробовать снова</button>

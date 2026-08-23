@@ -20,6 +20,7 @@
     "test:watch": "vitest src",
     "test:e2e": "playwright test",
     "test:e2e:planner": "playwright test --config=playwright.planner.config.ts tests/e2e/planner-preview.spec.ts",
+    "test:e2e:planner-real": "playwright test --config=playwright.planner-integration.config.ts tests/e2e/planner-integration.spec.ts",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:update": "playwright test --update-snapshots",

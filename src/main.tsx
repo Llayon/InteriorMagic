@@ -17,6 +17,7 @@ import {
   createLiveProjectTargetResolver,
 } from '@/editor/planning/ui';
 import type { PlanProposal } from '@/editor/planning/contracts';
+import { createRealPlannerOrchestrator } from '@/editor/planning/integration';
 
 initTelegram();
 installTestDiagnostics();
@@ -47,37 +48,50 @@ const bootstrap = async () => {
   }
   if (query.get('demo') === '1') useEditorStore.setState({ project: createBeautifulRoomProject() });
 
-  // Planner harness is explicit opt-in via build-time env flag. Without
-  // VITE_PLANNER_FIXTURE_HARNESS_ENABLED=true the planner UX is dormant:
-  // no entry button, no fixture room, no override of RoomProject. The
-  // ?planning-fixture=… query parameter is silently ignored so production
-  // traffic cannot accidentally trip the harness.
+  // Fixture mode remains explicit and build-gated. The real deterministic
+  // planner is the normal application path and never depends on this flag.
   const requestedFixture = PLANNER_FIXTURE_HARNESS_ENABLED
     ? parsePlannerFixture(window.location.search)
     : null;
-  let plannerOrchestrator: PlannerOrchestrator | null = null;
+  const storeShim = {
+    beginAnalysis: () => usePlannerStore.getState().beginAnalysis(),
+    receiveProposal: (p: PlanProposal) => usePlannerStore.getState().receiveProposal(p),
+    failAnalysis: (e: string) => usePlannerStore.getState().failAnalysis(e),
+  };
+  let plannerOrchestrator: PlannerOrchestrator;
+  let plannerSource: 'real' | 'fixture';
   if (requestedFixture) {
-    const storeShim = {
-      beginAnalysis: () => usePlannerStore.getState().beginAnalysis(),
-      receiveProposal: (p: PlanProposal) => usePlannerStore.getState().receiveProposal(p),
-      failAnalysis: (e: string) => usePlannerStore.getState().failAnalysis(e),
-    };
-    // Resolver hoisted to the bootstrap / integration boundary. The real
-    // planner integration will supply its own resolver reading from the live
-    // editor scene. The presentation layer (PlannerEntryButton,
-    // PlannerPanel) never imports useEditorStore for validation.
     const resolvePlannerTargets = createLiveProjectTargetResolver(() => useEditorStore.getState().project);
     plannerOrchestrator = requestedFixture === 'error'
       ? createErrorOrchestrator(storeShim)
       : createFixtureOrchestrator(requestedFixture, storeShim, resolvePlannerTargets);
+    plannerSource = 'fixture';
     useEditorStore.setState({ project: createPlannerFixtureProject() });
     usePlannerStore.getState().reset();
+  } else {
+    if (import.meta.env.MODE === 'test') {
+      const requestedRoom = query.get('planning-test-room');
+      if (requestedRoom === 'improved' || requestedRoom === 'already-good' || requestedRoom === 'no-tv') {
+        const { createPlannerIntegrationProject, installPlannerIntegrationTestAssets } = await import('@/app/demo/plannerIntegrationRoom');
+        installPlannerIntegrationTestAssets();
+        useEditorStore.setState({ project: createPlannerIntegrationProject(requestedRoom) });
+      }
+    }
+    plannerOrchestrator = createRealPlannerOrchestrator({
+      readProject: () => useEditorStore.getState().project,
+      store: storeShim,
+      applyMoves: (moves, fingerprint) => useEditorStore.getState().applyPlanningMovesAtomic(moves, fingerprint),
+      beforeAnalysis: import.meta.env.MODE === 'test' && query.get('planning-delay') === '1'
+        ? () => new Promise((resolve) => window.setTimeout(resolve, 320))
+        : undefined,
+    });
+    plannerSource = 'real';
   }
 
   const root = createRoot(document.getElementById('root')!);
   root.render(
     <StrictMode>
-      <App plannerOrchestrator={plannerOrchestrator} />
+      <App plannerOrchestrator={plannerOrchestrator} plannerSource={plannerSource} />
     </StrictMode>
   );
 };

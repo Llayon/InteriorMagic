@@ -8,6 +8,7 @@ import { assetCache } from '@/scene/assets/AssetCache';
 import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
 import { getCatalogConfiguration } from '@/editor/catalog/CatalogRepository';
 import { usePlannerStore, classifyProposalOutcome, type ProposalOutcome } from '@/editor/planning/ui';
+import type { PlannerApplyFailureReason } from '@/editor/planning/integration';
 
 type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
@@ -88,8 +89,9 @@ export interface InteriorMagicTestApi {
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
   getWorkspaceGeometry(): WorkspaceGeometry | null;
   getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[]; placementEnabledCategories: string[] } | null;
-  getPlannerSnapshot(): { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null; isPreviewing: boolean; outcome: ProposalOutcome | null };
+  getPlannerSnapshot(): { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null; applyFailure: PlannerApplyFailureReason | null; isPreviewing: boolean; outcome: ProposalOutcome | null };
   getPlannerPreviewTransform(instanceId: string): { position: Vec3; rotationY: number } | null;
+  moveObjectForTest(instanceId: string, position: Vec3): void;
 }
 
 const api: InteriorMagicTestApi = {
@@ -152,6 +154,7 @@ const api: InteriorMagicTestApi = {
       status: state.status,
       proposal: state.proposal ? structuredClone(state.proposal) : null,
       error: state.error,
+      applyFailure: state.applyFailure,
       isPreviewing: state.isPreviewing,
       outcome,
     };
@@ -163,6 +166,7 @@ const api: InteriorMagicTestApi = {
     if (!move) return null;
     return { position: { x: move.position.x, y: 0, z: move.position.z }, rotationY: move.rotationY };
   },
+  moveObjectForTest: (instanceId, position) => useEditorStore.getState().move(instanceId, position),
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }

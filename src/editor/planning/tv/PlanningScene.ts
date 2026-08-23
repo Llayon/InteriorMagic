@@ -2,7 +2,7 @@ import type { Vec2 } from '@/editor/model/types';
 import type { RectBounds } from '@/editor/spatial/geometry';
 
 export type PlanningPlacementType = 'floor' | 'wall';
-export type PlanningEntityRole = 'tv' | 'sofa' | 'armchair' | 'coffeeTable' | 'floorLamp';
+export type PlanningEntityRole = 'tv' | 'sofa' | 'armchair' | 'coffeeTable' | 'floorLamp' | 'obstacle';
 
 export type PlanningTransform = {
   position: Vec2;
@@ -21,6 +21,7 @@ export type PlanningEntity = {
   placementType: PlanningPlacementType;
   fixed: boolean;
   footprint: RectBounds;
+  collision: { group: number; mask: number };
   transform: PlanningTransform;
 };
 

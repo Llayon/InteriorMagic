@@ -31,9 +31,9 @@ export {
   __resetOrchestratorForTests,
 } from './fixtures';
 export type {
-  PlannerOrchestrator,
   ResolvePlannerTargets,
   LoadPlannerProposal,
 } from './fixtures';
+export type { PlannerOrchestrator } from '@/editor/planning/application/types';
 export { createLiveProjectTargetResolver } from './targetResolver';
 export type { PlannerFixtureId } from './types';

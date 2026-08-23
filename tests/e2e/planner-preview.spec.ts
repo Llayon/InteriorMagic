@@ -5,10 +5,9 @@ import { openApp, project } from './helpers';
  * Track C — Planner Preview UX (hardened).
  *
  * Coverage:
- * 1. production-disabled harness: default traffic has no planner UI;
+ * 1. default traffic uses the real planner; fixture isolation stays gated;
  *    `?planning-fixture=…` alone does NOT activate the harness (covered in
- *    Vitest `harness.test.ts`; the runtime gate is also exercised here via
- *    `data-planner-harness="off"` on the default-traffic test).
+ *    Vitest `harness.test.ts`).
  * 2. improved fixture flag activates the entry point and the workspace panel;
  * 3. loading state appears and resolves into the ready summary;
  * 4. findings render with severity-aware copy;
@@ -31,16 +30,18 @@ const gotoWithFixture = async (page: import('@playwright/test').Page, fixture: s
   await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady()), { timeout: 15_000 }).toBe(true);
 };
 
-test('planner feature is hidden from default traffic', async ({ monitoredPage: page }) => {
+test('default traffic uses the real planner rather than the fixture harness', async ({ monitoredPage: page }) => {
   await openApp(page);
-  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-harness', 'off');
-  await expect(page.getByTestId('planner-entry')).toHaveCount(0);
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-enabled', 'on');
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-source', 'real');
+  await expect(page.getByTestId('planner-entry')).toBeVisible();
   await expect(page.getByTestId('planner-panel')).toHaveCount(0);
 });
 
 test('improved fixture opens the planner panel and renders findings', async ({ monitoredPage: page }) => {
   await gotoWithFixture(page, 'improved');
-  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-harness', 'on');
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-enabled', 'on');
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-source', 'fixture');
   await expect(page.getByTestId('planner-entry')).toBeVisible();
   const baseline = await project(page);
   await page.getByTestId('planner-entry').click();
@@ -63,6 +64,7 @@ test('preview does not mutate RoomProject and undo stack stays empty', async ({ 
   const baseline = await project(page);
   const undoBefore = (await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getSessionSummary())).undoCount;
   await page.getByTestId('planner-preview-button').click();
+  await expect(page.getByTestId('planner-apply')).toHaveCount(0);
   await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-previewing', 'on');
   await expect(page.getByTestId('planner-preview-banner')).toBeVisible();
   const transform = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getPlannerPreviewTransform('sofa-main'));
