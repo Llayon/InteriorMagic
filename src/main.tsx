@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
 import { initTelegram } from '@/telegram/telegram';
 import '@/app/styles.css';
-import { installTestDiagnostics } from '@/test/diagnostics';
+import { installTestDiagnostics, registerPlanningIntentAnalysisPort } from '@/test/diagnostics';
 import { createBeautifulRoomProject } from '@/app/demo/beautifulRoom';
 import { createPlannerFixtureProject } from '@/app/demo/plannerFixtureRoom';
 import { useEditorStore } from '@/editor/state/store';
@@ -17,7 +17,11 @@ import {
   createLiveProjectTargetResolver,
 } from '@/editor/planning/ui';
 import type { PlanProposal } from '@/editor/planning/contracts';
-import { createRealPlannerOrchestrator } from '@/editor/planning/integration';
+import {
+  createRealPlannerOrchestrator,
+  createRemotePlanningIntentProvider,
+  type PlanningIntentAnalysisPort,
+} from '@/editor/planning/integration';
 
 initTelegram();
 installTestDiagnostics();
@@ -59,6 +63,7 @@ const bootstrap = async () => {
     failAnalysis: (e: string) => usePlannerStore.getState().failAnalysis(e),
   };
   let plannerOrchestrator: PlannerOrchestrator;
+  let planningIntentAnalysisPort: PlanningIntentAnalysisPort | null = null;
   let plannerSource: 'real' | 'fixture';
   if (requestedFixture) {
     const resolvePlannerTargets = createLiveProjectTargetResolver(() => useEditorStore.getState().project);
@@ -77,16 +82,24 @@ const bootstrap = async () => {
         useEditorStore.setState({ project: createPlannerIntegrationProject(requestedRoom) });
       }
     }
-    plannerOrchestrator = createRealPlannerOrchestrator({
+    const intentEndpoint = import.meta.env.VITE_PLANNING_INTENT_ENDPOINT?.trim();
+    const realOrchestrator = createRealPlannerOrchestrator({
       readProject: () => useEditorStore.getState().project,
       store: storeShim,
       applyMoves: (moves, fingerprint) => useEditorStore.getState().applyPlanningMovesAtomic(moves, fingerprint),
       beforeAnalysis: import.meta.env.MODE === 'test' && query.get('planning-delay') === '1'
         ? () => new Promise((resolve) => window.setTimeout(resolve, 320))
         : undefined,
+      createIntentProvider: intentEndpoint
+        ? (signal) => createRemotePlanningIntentProvider({ endpoint: intentEndpoint, signal })
+        : undefined,
     });
+    plannerOrchestrator = realOrchestrator;
+    planningIntentAnalysisPort = intentEndpoint ? realOrchestrator : null;
     plannerSource = 'real';
   }
+
+  registerPlanningIntentAnalysisPort(planningIntentAnalysisPort);
 
   const root = createRoot(document.getElementById('root')!);
   root.render(

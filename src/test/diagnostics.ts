@@ -9,6 +9,7 @@ import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
 import { getCatalogConfiguration } from '@/editor/catalog/CatalogRepository';
 import { usePlannerStore, classifyProposalOutcome, type ProposalOutcome } from '@/editor/planning/ui';
 import type { PlannerApplyFailureReason } from '@/editor/planning/integration';
+import type { PlanningIntentAnalysisPort } from '@/editor/planning/integration';
 
 type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
@@ -21,6 +22,12 @@ let activePointerType: string | null = null;
 let activePointerId: number | null = null;
 let lastPointerType: string | null = null;
 let lastEndReason: 'commit' | 'cancel' | null = null;
+let planningIntentAnalysisPort: PlanningIntentAnalysisPort | null = null;
+
+export const registerPlanningIntentAnalysisPort = (port: PlanningIntentAnalysisPort | null) => {
+  if (!isTestMode) return;
+  planningIntentAnalysisPort = port;
+};
 
 export const isTestMode = import.meta.env.MODE === 'test';
 export const registerTestScene = (value: SceneContext | null) => { sceneContext = value; };
@@ -93,6 +100,8 @@ export interface InteriorMagicTestApi {
   getPlannerPreviewTransform(instanceId: string): { position: Vec3; rotationY: number } | null;
   moveObjectForTest(instanceId: string, position: Vec3): void;
   replaceProjectForTest(project: RoomProject): void;
+  hasPlanningIntentAnalysis(): boolean;
+  beginPlanningIntentAnalysis(text: string): Promise<void>;
 }
 
 const api: InteriorMagicTestApi = {
@@ -169,6 +178,11 @@ const api: InteriorMagicTestApi = {
   },
   moveObjectForTest: (instanceId, position) => useEditorStore.getState().move(instanceId, position),
   replaceProjectForTest: (project) => useEditorStore.setState({ project: structuredClone(project) }),
+  hasPlanningIntentAnalysis: () => planningIntentAnalysisPort !== null,
+  beginPlanningIntentAnalysis: async (text) => {
+    if (!planningIntentAnalysisPort) throw new Error('Planning intent analysis is not configured');
+    await planningIntentAnalysisPort.beginAnalysisFromText(text);
+  },
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }
