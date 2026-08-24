@@ -78,3 +78,43 @@ All accessed 2026-08-24 unless otherwise noted. Retrieved via `webfetch`/`websea
 ---
 
 *This ledger is the audit trail for F0. Keep quotes short; full page text is not reproduced. For any claim not listed here, treat it as UNKNOWN.*
+
+---
+
+## F2 benchmark sources (appended 2026-08-24)
+
+Storefront evidence used for candidate retrieval in `retail-benchmark-v1-candidates.csv`.
+All accessed 2026-08-24 via websearch/webfetch (public pages only; no scraping, no internal JSON,
+no bulk downloads). Kind: storefront. Region context: Moscow.
+
+| ID | Retailer | Page/URL | Supports |
+|---|---|---|---|
+| S49 | Divan.ru | `https://www.divan.ru/category/velyurovye-kresla` | 15+ armchair models with ДxШxВ dims + prices (Витио, Маркфул, Венето, Коренс, Ларни, Мисл, Арклоу, Брера, Пайл, Ансил, Носта, Рибс, Мона, Льери Мини) |
+| S50 | Divan.ru | `https://www.divan.ru/category/magkie-stulay` | ~30 dining chairs with ДxШxВ (Мейси, Никсон, Берри, Меган, Хироки, Торвалль, Флекс-1, Тиана, Биван, Джаспер, Вайлер, Эрберт, Гвен, Дейзи, Лион-1, Элиза-1, Фишер, Лидс, Крит, Валенсия, Колинс, Киана, Айвин, Корнер, Алекс, Крит-1, Мелон, Джуди, Шейн, Марти-2) |
+| S51 | Kalibroom.ru | product URLs under `kalibroom.ru/product/...` (Тинэль KR-001229, Смуф KR-002784/KR-001759, Штейген KR-001422/KR-003873, Борген KR-011559/KR-002765/KR-017854, Нирвана KR-006035, Мэллоу KR-068036, Грона KR-001413) + catalog `kalibroom.ru/catalog/divany/model-divan-ronny`, `/model-divan-smooth` | sofas with WxDxH in title + price + article; Ронни length-only |
+| S52 | Kalibroom.ru | `https://kalibroom.ru/product/kreslo-pall--velutto-71--71x75x101--20002` | armchair Палл dims in title |
+| S53 | InMyRoom.ru | `https://www.inmyroom.ru/products/mebel/stoly/zhurnalnye-stoliki/m-steklo` | glass coffee/side tables with explicit Ш/Г/В per item (Kumar Ø40×50, Гонконг 80×80×45, Тайлер, Рилле 58×58×46, Флумс 50×30×30 & 44×37×37, CT1-adjacent listings) |
+| S54 | InMyRoom.ru | `https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki` | floor lamps with H/W/D or H (Palma тренога 160×50×50, Sortino 150×40×40, Yokon 155×44×35, Velante 155×27, Офелия H165, Jihana H148, Bergamo H170, Bluet 160×45, Lussole LSP-0506 H178, Arco 178×98×98, Nevada 210×140×40, Birds Origami 175×42×25, Asheswood 152.9×29×23) |
+| S55 | InMyRoom.ru | `https://www.inmyroom.ru/products/kuhnya-i-stolovaya/stulya/obedennye-stulya/con-myagkie` | dining chairs with per-item dims (Louis 87.5×46×55, K416, K373, Monti, K585, Servio, Диана, Brandy-X, DikLine series, Ruth, Brevis, Coastal, Логан, Enid, Modern, Fabian, Cindy Soft, MARY) |
+| S56 | Steklostol.ru | `http://steklostol.ru/index.php?categoryID=155` | made-to-order glass coffee tables with ШхГхВ mm (ЖС-1 1100×560×530, ЖС-3, ЖС-22 800×450×450, ЖС-15 600×400×530, СХ-01 1100×650×420, ЖС-19 600×600×530, ЖС-5 800×800×530, С-05 700×700×520, Волна 750×450) |
+| S57 | Stolline.ru | `https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/` | TV units with ШxВxГ + prices (Онтарио 180.8×54×44.9, Богемия 137×51.8×39.3, Алекс 100×43.7×40.3, Венето 147×50.5×45, Филадельфия 120/180×34×44, Тоскана 120×52.1×41.6, Теви 90×40.4×30.3, Рио 87.5×37×51, Киото 117.5×50×41, Спайс 180×45×45, Альянс 119/190×45.2×59.3, Норден 149×39.5×40, Хармони 136.4/151.4, Тифани 126×54.5×48, Честерфилд 135×47×40, ТВМ-9 220×39.3×36.8) |
+| S58 | Good-mebel.com | `https://good-mebel.com/category/stoly/obedennye-140h80-sm/` + `.../tumby/pod-tv/` + `.../shkafy-kupe/vysotoj-270/` | Торонто-140 140×80×75; TV-unit model range; шкафы-купе H270 configurable W120-360 D40-70 (Борнео/Монако/Бакс series) |
+| S59 | Lifemebel.ru | Max table product URL + `.../steklyannye_zhurnalnye_stoliki/pryamougolnye/` | Стол Макс 140×80×75 20 720 ₽; CT1-052 110×60×45 4 840 ₽ "Много"; Альта-Арт sofa 188×84×85 47 840 ₽ |
+| S60 | Maytoni network shops | tk-konstruktor.ru / homeadore.ru / thefields.ru / mebel169.ru / ulight.ru — Kyoto MOD178FL pages | floor lamp 22×22×145 cm, 23 990–28 990 ₽, stock 50 pcs |
+| S61 | Bestmebelik.ru | `https://bestmebelik.ru/kuhonnye-stoly.html` | Стол Герцог раскладной керамогранит 200×80×74 36 330 ₽ |
+| S62 | Market.yandex.ru (search-index snippets) | `https://market.yandex.ru/category/stoly-140-na-80-sm-obedennyye` and `.../divany-200-sm` | dining-table card titles with dims (Стол №9 дуб 140×80×78, Князь 140/190×80×74, Хилтон 140(200)×80, STROGANINI 140×80×75, Daller D140 140×80×75); category pages expose filter metadata only — no per-card dims retrievable through this channel |
+| S63 | Dyatkovo.ru | `https://dyatkovo.ru/catalogue/tumby/pod_tv/` | Napoli 100×32×40, Teramo 120.2×40.6×40.4, Savona/Este 192×38.4×40.9 |
+| S64 | Mebelvia.ru | Кресло Лион Maxx product URL + TV-tumba category | кресло-кровать 108×90×107 spec table; Норден/Рио/Тифани TV units |
+| S65 | Stoolgroup.ru | `https://stoolgroup.ru/stul-valensiya-sn-pechvork-ru/` + soft-chair categories | Валенсия SN В86.5 Ш44 Г54 full spec table |
+| S66 | Giulia Novars stores | store/city/rigamoll.giulianovars.ru Industrial/Nika/San Remo/Modern | premium dining tables 2000×900×760 etc. |
+| S67 | BestMebelShop.ru / shkaf-kupe.ru | wardrobe height/category pages | Мила 4А W1700-2400 H2200-2600 D400-600; Борден-2-5/3-5/4-4 W ranges H190-270 D40-70 |
+| S68 | Dimobile.md | Каролина 3 product page | oak chest 480×650×400 mm |
+| S69 | IB Gallery | Minotti Yoko page | luxury dining chair 62×58×81 (outlier reference, unused in Top-3) |
+
+Access limitations recorded: hoff.ru direct fetch → HTTP 401 (anti-bot); Hoff search-index snippets
+surface mostly `/upload/iblock/*.pdf` assembly instructions rather than product specs;
+market.yandex.ru category pages render filter JSON without per-card dimensions;
+wildberries.ru product data did not surface via permitted search at all.
+
+F2 methodology corrections logged mid-run: wardrobe pool added after cupboard_003 no-match
+(S67–S68) — result reported as-is; see results doc §7.
