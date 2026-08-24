@@ -55,7 +55,10 @@ export interface EnvironmentReport {
     platform?: string;
     version?: string;
     isActive?: boolean;
+    isExpanded?: boolean;
+    viewportHeight?: number;
     viewportStableHeight?: number;
+    isFullscreen?: boolean;
     safeAreaInset?: TelegramInsets;
     contentSafeAreaInset?: TelegramInsets;
   };

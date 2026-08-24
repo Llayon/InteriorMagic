@@ -29,6 +29,65 @@ describe('getTelegramSnapshot', () => {
     expect(events.size).toBe(0);
     expect(getTelegramSnapshot()).toMatchObject({ insideTelegram: true, platform: 'ios' });
   });
+
+  it('exposes fullscreen and expansion diagnostics when present', () => {
+    const events = new Map<string, Listener>();
+    vi.stubGlobal('window', {
+      Telegram: {
+        WebApp: {
+          ready: () => undefined,
+          expand: () => undefined,
+          platform: 'ios',
+          version: '8.0',
+          isActive: true,
+          isExpanded: true,
+          viewportHeight: 800,
+          viewportStableHeight: 820,
+          isFullscreen: false,
+          safeAreaInset: { top: 10, bottom: 20 },
+          contentSafeAreaInset: { top: 24, bottom: 18 },
+          onEvent: (name: string, listener: Listener) => events.set(name, listener),
+          offEvent: (name: string) => events.delete(name),
+        },
+      },
+    });
+    expect(getTelegramSnapshot()).toMatchObject({
+      insideTelegram: true,
+      platform: 'ios',
+      version: '8.0',
+      isActive: true,
+      isExpanded: true,
+      viewportHeight: 800,
+      viewportStableHeight: 820,
+      isFullscreen: false,
+      safeAreaInset: { top: 10, bottom: 20 },
+      contentSafeAreaInset: { top: 24, bottom: 18 },
+    });
+  });
+
+  it('accepts payload-aware listeners (fullscreen events)', () => {
+    const events = new Map<string, (payload?: unknown) => void>();
+    vi.stubGlobal('window', {
+      Telegram: {
+        WebApp: {
+          ready: () => undefined,
+          expand: () => undefined,
+          platform: 'ios',
+          onEvent: (name: string, listener: (payload?: unknown) => void) => events.set(name, listener),
+          offEvent: (name: string) => events.delete(name),
+        },
+      },
+    });
+    // Listener with optional payload should be accepted.
+    const snapshot = getTelegramSnapshot();
+    expect(snapshot.insideTelegram).toBe(true);
+    expect(events.size).toBe(0);
+    // Verify host subscription accepts payload
+    events.set('fullscreenFailed', (payload?: unknown) => {
+      expect(payload).toEqual({ error: 'UNSUPPORTED' });
+    });
+    events.get('fullscreenFailed')?.({ error: 'UNSUPPORTED' });
+  });
 });
 
 describe('subscribeTelegramLifecycle', () => {

@@ -3,7 +3,9 @@ import type { TelegramInsets } from './types';
 /** Single typed access point to the official Telegram WebApp host object.
  *  Field/event names follow https://core.telegram.org/bots/webapps:
  *  platform/version (Bot API 6.4+), isActive/safeAreaInset/contentSafeAreaInset
- *  and the activated/deactivated events (Bot API 8.0+). */
+ *  and the activated/deactivated/fullscreen events (Bot API 8.0+).
+ *  Fullscreen (isFullscreen/requestFullscreen/fullscreenChanged/fullscreenFailed)
+ *  is distinct from expand/isExpanded and is best-effort. */
 
 export interface TelegramWebAppHost {
   ready(): void;
@@ -14,11 +16,17 @@ export interface TelegramWebAppHost {
   platform?: string;
   version?: string;
   isActive?: boolean;
+  isExpanded?: boolean;
+  viewportHeight?: number;
   viewportStableHeight?: number;
+  isFullscreen?: boolean;
   safeAreaInset?: TelegramInsets;
   contentSafeAreaInset?: TelegramInsets;
-  onEvent?(event: string, listener: () => void): void;
-  offEvent?(event: string, listener: () => void): void;
+  isVersionAtLeast?(version: string): boolean;
+  requestFullscreen?(): void;
+  exitFullscreen?(): void;
+  onEvent?(event: string, listener: (payload?: unknown) => void): void;
+  offEvent?(event: string, listener: (payload?: unknown) => void): void;
 }
 
 declare global { interface Window { Telegram?: { WebApp?: TelegramWebAppHost } } }
@@ -35,7 +43,10 @@ export interface TelegramSnapshot {
   platform?: string;
   version?: string;
   isActive?: boolean;
+  isExpanded?: boolean;
+  viewportHeight?: number;
   viewportStableHeight?: number;
+  isFullscreen?: boolean;
   safeAreaInset?: TelegramInsets;
   contentSafeAreaInset?: TelegramInsets;
 }
@@ -49,7 +60,10 @@ export const getTelegramSnapshot = (): TelegramSnapshot => {
     platform: app.platform,
     version: app.version,
     isActive: app.isActive,
+    isExpanded: app.isExpanded,
+    viewportHeight: app.viewportHeight,
     viewportStableHeight: app.viewportStableHeight,
+    isFullscreen: app.isFullscreen,
     safeAreaInset: app.safeAreaInset,
     contentSafeAreaInset: app.contentSafeAreaInset,
   };
