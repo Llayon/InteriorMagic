@@ -149,4 +149,54 @@ describe('deterministic TV planner', () => {
     for (const finding of proposal.findings) for (const value of Object.values(finding.params ?? {}))
       expect(['string', 'number', 'boolean']).toContain(typeof value);
   });
+
+  it('freezes representative TV proposals before layout extraction', () => {
+    const orientation = scene();
+    orientation.entities.find((item) => item.role === 'sofa')!.transform.rotationY = Math.PI;
+    const circulation = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
+    const alreadyGood = scene({
+      room: { width: 6, depth: 4.1 },
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, 0, 2, .9)],
+    });
+
+    const representative = {
+      orientation: planTvViewing(orientation, goal),
+      circulation: planTvViewing(circulation, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] }),
+      alreadyGood: planTvViewing(alreadyGood, goal),
+    };
+    expect(representative).toEqual({
+      orientation: {
+        moves: [
+          { instanceId: 'source-sofa', position: { x: 0, z: -2.4499999999999997 }, rotationY: 0 },
+          { instanceId: 'source-chair', position: { x: -1.55, z: -1.0999999999999996 }, rotationY: 2.2873380008913005 },
+        ],
+        scoreBefore: { total: 13.69959803680203 },
+        scoreAfter: { total: 79.70278314762797 },
+        findings: [
+          { ruleId: 'tv-viewing.orientation', code: 'good-orientation', severity: 'positive', objectIds: ['source-sofa'], params: { before: 0.009999999999999953, after: 0.75 } },
+          { ruleId: 'layout.rear-boundary-proximity', code: 'rear-boundary-proximity-improved', severity: 'positive', objectIds: ['source-sofa'], params: { before: 0, after: 0.7999999999999998 } },
+          { ruleId: 'layout.selection', code: 'layout-improved', severity: 'positive', params: { improvement: 66.00318511082594 } },
+        ],
+      },
+      circulation: {
+        moves: [
+          { instanceId: 'source-sofa', position: { x: -1.2, z: -2.4499999999999997 }, rotationY: 0 },
+          { instanceId: 'source-table', position: { x: -1.2, z: -1.1999999999999997 }, rotationY: 0 },
+        ],
+        scoreBefore: { total: 62.93971862576143 },
+        scoreAfter: { total: 79.37910472535066 },
+        findings: [
+          { ruleId: 'room.circulation', code: 'circulation-improved', severity: 'positive', params: { before: 0.6666666666666666, after: 1 } },
+          { ruleId: 'layout.rear-boundary-proximity', code: 'rear-boundary-proximity-improved', severity: 'positive', objectIds: ['source-sofa'], params: { before: 0.10000000000000053, after: 0.7999999999999998 } },
+          { ruleId: 'layout.selection', code: 'layout-improved', severity: 'positive', params: { improvement: 16.43938609958923 } },
+        ],
+      },
+      alreadyGood: {
+        moves: [],
+        scoreBefore: { total: 96.36363636363636 },
+        scoreAfter: { total: 96.36363636363636 },
+        findings: [{ ruleId: 'layout.selection', code: 'layout-already-good', severity: 'info', params: { score: 96.36363636363636 } }],
+      },
+    });
+  });
 });
