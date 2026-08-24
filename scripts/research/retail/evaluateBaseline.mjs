@@ -20,7 +20,7 @@ for (const asset of gold.assets) {
   const top3 = ranked.slice(0, 3);
   const labels = top3.map((r) => r.gold);
 
-  if (ranked.length && !ranked[0].gated && isCatViolation(asset, ranked[0])) catErrors++;
+  if (ranked.length && !ranked[0].gated && isCatViolation(ranked[0].categoryToken)) catErrors++;
 
   const firstA = ranked.findIndex((r) => r.gold === 'A');
   const firstAB = ranked.findIndex((r) => r.gold === 'A' || r.gold === 'B');
@@ -48,8 +48,8 @@ for (const asset of gold.assets) {
   });
 }
 
-function isCatViolation(asset, r) {
-  return false; // gate makes violations structurally impossible; kept for clarity
+function isCatViolation(token) {
+  return token === undefined || token === 'unknown'; // gate makes real violations impossible; unknown tokens would be the only leak
 }
 
 const withPos = rows.filter((r) => r.hasGold);
@@ -85,6 +85,8 @@ console.log('\n--- per-asset detail ---');
 for (const r of rows) {
   console.log(`${r.id.padEnd(17)} ${r.difficulty.padEnd(6)} gold=${r.hasGold ? 'Y' : 'N'} top1=${String(r.top1).padEnd(2)} top3=${r.top3.padEnd(3)} max=${r.maxScore.toFixed(2)} :: ${r.top1Why}`);
 }
+
+
 
 
 

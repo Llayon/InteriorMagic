@@ -131,9 +131,6 @@ export function dimError(assetDims, candAxes) {
   return sum / k;
 }
 
-function dimTolerance(assetId) {
-  return String(assetId).startsWith('lamp') ? 0.30 : 0.20; // lamps relaxed (see results doc)
-}
 export function dimCompatible(assetId, err) {
   if (err == null) return false;
   return assetId.startsWith('lamp') ? err <= 0.30 : err <= 0.20;
@@ -249,6 +246,7 @@ export function rankCandidates(asset, candidates) {
     .map((c) => ({ ...c, ...scoreCandidate(asset, c) }))
     .sort((a, b) => b.score - a.score);
 }
+
 
 
 
