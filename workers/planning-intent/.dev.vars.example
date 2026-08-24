@@ -1,2 +1,4 @@
 # Copy to .dev.vars and provide a local-only value. Never commit the real key.
 GROQ_API_KEY=
+# Non-secret exact browser origin used for local controlled testing.
+ALLOWED_ORIGIN=http://localhost:4173

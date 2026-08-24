@@ -12,10 +12,20 @@ const groqResponse = (content: string, status = 200): Response => Response.json(
   choices: [{ message: { content } }],
 }, { status });
 
-const call = async (payload: unknown, upstream: typeof fetch, env = { GROQ_API_KEY: 'test-secret' }) => {
+const allowedOrigin = 'https://example.invalid' as const;
+const defaultEnv = { GROQ_API_KEY: 'test-secret', ALLOWED_ORIGIN: allowedOrigin };
+
+const call = async (
+  payload: unknown,
+  upstream: typeof fetch,
+  env = defaultEnv,
+  origin?: string,
+) => {
   const handler = createPlanningIntentHandler(upstream);
   return handler(new Request('https://worker.example/planning-intent', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...(origin === undefined ? {} : { Origin: origin }) },
+    body: JSON.stringify(payload),
   }), env);
 };
 
@@ -117,10 +127,60 @@ describe('planning intent Worker', () => {
   });
 
   it('fails closed without the server secret and never echoes it', async () => {
-    const response = await call(wire(), vi.fn(), { GROQ_API_KEY: '' });
+    const response = await call(wire(), vi.fn(), { ...defaultEnv, GROQ_API_KEY: '' });
     const text = await response.text();
     expect(response.status).toBe(503);
     expect(text).toContain('server_misconfigured');
     expect(text).not.toContain('test-secret');
+  });
+
+  it('allows the exact configured browser origin', async () => {
+    const upstream = vi.fn(async () => groqResponse('{"intent":"unsupported_intent"}'));
+    const response = await call(wire(), upstream, defaultEnv, allowedOrigin);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('access-control-allow-origin')).toBe(allowedOrigin);
+    expect(response.headers.get('vary')).toBe('Origin');
+    expect(upstream).toHaveBeenCalledOnce();
+  });
+
+  it('rejects a foreign browser origin before reading from Groq', async () => {
+    const upstream = vi.fn(async () => groqResponse('{}'));
+    const response = await call(wire(), upstream, defaultEnv, 'https://foreign.example');
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ ok: false, error: { code: 'origin_forbidden' } });
+    expect(response.headers.get('access-control-allow-origin')).toBeNull();
+    expect(upstream).not.toHaveBeenCalled();
+  });
+
+  it('allows preflight only from the exact configured origin', async () => {
+    const handler = createPlanningIntentHandler(vi.fn());
+    const preflight = (origin?: string) => handler(new Request('https://worker.example/planning-intent', {
+      method: 'OPTIONS',
+      headers: origin === undefined ? {} : { Origin: origin },
+    }), defaultEnv);
+    const allowed = await preflight(allowedOrigin);
+    expect(allowed.status).toBe(204);
+    expect(allowed.headers.get('access-control-allow-origin')).toBe(allowedOrigin);
+    expect((await preflight('https://foreign.example')).status).toBe(403);
+    expect((await preflight()).status).toBe(403);
+  });
+
+  it('does not log user text or provider output', async () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const response = await call(
+        wire('private user prompt'),
+        vi.fn(async () => groqResponse('{"private":"provider output"}')),
+        defaultEnv,
+        allowedOrigin,
+      );
+      expect(response.status).toBe(200);
+      expect(log).not.toHaveBeenCalled();
+      expect(error).not.toHaveBeenCalled();
+    } finally {
+      log.mockRestore();
+      error.mockRestore();
+    }
   });
 });
