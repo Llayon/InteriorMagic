@@ -6,6 +6,7 @@ import {
   type Candidate,
   type CandidateDimension,
   type LayoutPlanRequest,
+  type LayoutSelectionPolicy,
 } from './engine';
 import { PlanningError } from './errors';
 
@@ -45,6 +46,7 @@ const request = (
     movable,
     fixedContext: input.entities.filter((item) => !movable.some((active) => active.id === item.id)),
   },
+  selectionPolicy: testSelectionPolicy,
   dimensions,
   evaluateRules,
   ruleWeights: [{ id: 'quality', weight: 1 }],
@@ -56,6 +58,12 @@ const candidate = (entity: PlanningEntity, key: string, x: number, z: number): C
   position: { x, z },
   rotationY: entity.transform.rotationY,
 });
+
+const testSelectionPolicy: LayoutSelectionPolicy = {
+  acceptanceThreshold: 4,
+  movementCost: ({ movedCount, translation, rotation }) =>
+    Math.min(20, movedCount * 2 + translation * 2 + rotation / (Math.PI / 4)),
+};
 
 const quality = (arrangement: Arrangement) => [{
   id: 'quality',
@@ -105,6 +113,24 @@ describe('scenario-neutral living-room layout engine', () => {
     expect(result.proposal.moves).toEqual([]);
     expect(result.selection.outcome).toBe('improvement-too-small');
     expect(result.proposal.scoreAfter).toEqual(result.proposal.scoreBefore);
+  });
+
+  it('uses the caller selection policy for acceptance and movement cost', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    const input = scene([movable]);
+    const dimensions: CandidateDimension[] = [{
+      entity: movable,
+      provide: () => [candidate(movable, 'current', 0, 0), candidate(movable, 'improve', .1, 0)],
+    }];
+    const result = runLivingRoomLayout({
+      ...request(input, [movable], dimensions, (arrangement) => [{
+        id: 'quality', quality: arrangement.get('movable')?.key === 'improve' ? .51 : .5,
+      }]),
+      selectionPolicy: { acceptanceThreshold: 0, movementCost: () => 0 },
+    });
+
+    expect(result.selection.outcome).toBe('improved');
+    expect(result.proposal.moves).toEqual([{ instanceId: 'movable', position: { x: .1, z: 0 }, rotationY: 0 }]);
   });
 
   it('keeps fixed context outside candidate dimensions and rejects context collisions', () => {

@@ -7,7 +7,7 @@ import {
   type PlanningIntentResult,
 } from '@/editor/planning/intent';
 import { planTvViewing } from '@/editor/planning/tv';
-import { buildPlanningScene, PlanningSceneBuildError, resolveSingleTvFocalId, type AssetDefinitionResolver } from './buildPlanningScene';
+import { buildPlanningScene, resolveSingleTvFocalId, type AssetDefinitionResolver } from './buildPlanningScene';
 import { planningProjectFingerprint } from './projectFingerprint';
 import type { PlanningIntentAnalysisPort } from './planningIntentAnalysisPort';
 import { PlanningError, type PlanningScene } from '@/editor/planning/livingRoom';
@@ -32,15 +32,18 @@ export interface RealPlannerDependencies {
 export type RealPlannerOrchestrator = PlannerOrchestrator & PlanningIntentAnalysisPort;
 
 const controlledAnalysisMessage = (cause: unknown): string => {
-  if (cause instanceof PlanningSceneBuildError) {
-    if (cause.code === 'no-tv') return 'В комнате не найден поддерживаемый телевизор.';
-    if (cause.code === 'ambiguous-tv') return 'Найдено несколько телевизоров. Выбор цели пока не поддерживается.';
-    return 'Текущая комната пока не поддерживается планировщиком.';
-  }
   if (cause instanceof PlanningError) {
     switch (cause.code) {
+      case 'FOCAL_NOT_FOUND':
+        return 'В комнате не найден поддерживаемый телевизор.';
+      case 'FOCAL_AMBIGUOUS':
+        return 'Найдено несколько телевизоров. Выбор цели пока не поддерживается.';
       case 'CURRENT_LAYOUT_INVALID':
         return 'Текущая расстановка нарушает обязательные ограничения планировщика.';
+      case 'INVALID_PROJECT':
+      case 'UNKNOWN_ASSET':
+      case 'UNSUPPORTED_PLACEMENT':
+      case 'UNSUPPORTED_LAYOUT':
       case 'INVALID_SCENE':
       case 'INVALID_ACTIVE_GROUP':
         return 'Текущая комната пока не поддерживается планировщиком.';
@@ -99,17 +102,17 @@ export const createRealPlannerOrchestrator = ({
   ): void => {
     if (ownGeneration !== generation) return;
     if (planningProjectFingerprint(readProject()) !== fingerprint) {
-      throw new PlanningSceneBuildError('invalid-project', 'Project changed during analysis');
+      throw new PlanningError('INVALID_PROJECT', 'Project changed during analysis');
     }
     const proposal = plan(scene, goal);
     if (ownGeneration !== generation) return;
     const currentProject = readProject();
     if (planningProjectFingerprint(currentProject) !== fingerprint) {
-      throw new PlanningSceneBuildError('invalid-project', 'Project changed during analysis');
+      throw new PlanningError('INVALID_PROJECT', 'Project changed during analysis');
     }
     const currentIds = new Set(currentProject.objects.map((object) => object.instanceId));
     if (proposal.moves.some((move) => !currentIds.has(move.instanceId))) {
-      throw new PlanningSceneBuildError('invalid-project', 'Proposal contains missing targets');
+      throw new PlanningError('INVALID_PROJECT', 'Proposal contains missing targets');
     }
     analyzed = { proposal, fingerprint };
     store.receiveProposal(proposal);
@@ -146,7 +149,7 @@ export const createRealPlannerOrchestrator = ({
         if (activeIntentRequest === controller) activeIntentRequest = null;
         if (ownGeneration !== generation) return;
         if (planningProjectFingerprint(readProject()) !== prepared.fingerprint) {
-          throw new PlanningSceneBuildError('invalid-project', 'Project changed during intent analysis');
+          throw new PlanningError('INVALID_PROJECT', 'Project changed during intent analysis');
         }
         if (result.outcome !== 'success') {
           analyzed = null;

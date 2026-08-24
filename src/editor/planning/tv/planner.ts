@@ -1,4 +1,4 @@
-import type { PlanningFinding, PlanningGoal, PlanningPriority, PlanProposal } from '../contracts/types';
+import type { PlanningFinding, PlanningGoal, PlanProposal } from '../contracts/types';
 import {
   angularDifference,
   orientedRectsOverlap,
@@ -18,13 +18,12 @@ import {
   type RuleEvaluation,
   type SelectionOutcome,
 } from '@/editor/planning/livingRoom';
+import { PlanningError } from '@/editor/planning/livingRoom';
 import type { PlanningEntity, PlanningScene, PlanningTransform } from '@/editor/planning/livingRoom';
+import { TV_DEFAULT_PRIORITIES, TV_LAYOUT_HEURISTICS, TV_SELECTION_POLICY } from './constants';
 
 const SCORE_EPSILON = 1e-9;
 const compareLexical = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
-const DEFAULT_PRIORITIES: PlanningPriority[] = ['viewing', 'circulation', 'conversation'];
-const PRIORITY_SLOTS = [45, 30, 15] as const;
-
 const rectFor = (entity: PlanningEntity, transform: PlanningTransform): OrientedRect => ({
   center: transform.position,
   rotationY: transform.rotationY,
@@ -50,7 +49,7 @@ const rearBoundaryProximity = (scene: PlanningScene, entity: PlanningEntity, tra
     distances.push((wallZ - backEdge.z) / backward.z);
   }
   const gapBehind = Math.min(...distances.filter((distance) => distance >= 0));
-  return Math.max(0, 1 - gapBehind / .5);
+  return Math.max(0, 1 - gapBehind / TV_LAYOUT_HEURISTICS.rearBoundary.referenceGap);
 };
 
 const uniqueCandidates = (candidates: Candidate[]): Candidate[] => {
@@ -76,9 +75,9 @@ const sofaCandidates = (scene: PlanningScene, sofa: PlanningEntity, focal: Plann
     const extent = rotatedHalfExtents(sofa.footprint, wall.heading);
     const alongLimit = wall.axis === 'x' ? scene.room.depth / 2 - extent.z : scene.room.width / 2 - extent.x;
     const normal = wall.axis === 'x'
-      ? wall.sign * (scene.room.width / 2 - extent.x - .1)
-      : wall.sign * (scene.room.depth / 2 - extent.z - .1);
-    for (const [index, along] of [-.6, 0, .6].entries()) {
+      ? wall.sign * (scene.room.width / 2 - extent.x - TV_LAYOUT_HEURISTICS.sofa.wallClearance)
+      : wall.sign * (scene.room.depth / 2 - extent.z - TV_LAYOUT_HEURISTICS.sofa.wallClearance);
+    for (const [index, along] of TV_LAYOUT_HEURISTICS.sofa.wallAlongFactors.entries()) {
       const value = along * alongLimit;
       candidates.push({
         position: wall.axis === 'x' ? { x: normal, z: value } : { x: value, z: normal },
@@ -94,8 +93,7 @@ const chairCandidates = (chair: PlanningEntity, sofaTransform: PlanningTransform
   const candidates: Candidate[] = [{ ...chair.transform, key: 'current' }];
   const cosine = Math.cos(sofaTransform.rotationY);
   const sine = Math.sin(sofaTransform.rotationY);
-  const slots = [[-1.35, .65], [1.35, .65], [-1.55, 1.35], [1.55, 1.35], [-1.25, 2], [1.25, 2]];
-  slots.forEach(([lateral, forward], index) => {
+  TV_LAYOUT_HEURISTICS.armchair.slots.forEach(([lateral, forward], index) => {
     const position = {
       x: sofaTransform.position.x + lateral! * cosine + forward! * sine,
       z: sofaTransform.position.z - lateral! * sine + forward! * cosine,
@@ -111,7 +109,7 @@ const tableCandidates = (table: PlanningEntity, sofa: PlanningEntity, sofaTransf
   const sine = Math.sin(sofaTransform.rotationY);
   const sofaHalfDepth = sofa.footprint.depth / 2;
   const tableHalfDepth = table.footprint.depth / 2;
-  for (const gap of [.35, .5, .65]) for (const lateral of [-.25, 0, .25]) {
+  for (const gap of TV_LAYOUT_HEURISTICS.coffeeTable.gaps) for (const lateral of TV_LAYOUT_HEURISTICS.coffeeTable.lateralOffsets) {
     const forward = sofaHalfDepth + tableHalfDepth + gap;
     candidates.push({
       position: {
@@ -137,8 +135,9 @@ const tvRuleEvaluations = (scene: PlanningScene, arrangement: Arrangement, focal
       const transform = activeTransform(sofa, arrangement);
       const orientation = facing(transform, focal.transform);
       const distance = pointDistance(transform.position, focal.transform.position);
-      const distanceScore = Math.max(0, 1 - Math.abs(distance - 2.5) / 2.5);
-      return .75 * orientation + .25 * distanceScore;
+      const distanceScore = Math.max(0, 1 - Math.abs(distance - TV_LAYOUT_HEURISTICS.viewing.idealDistance) / TV_LAYOUT_HEURISTICS.viewing.idealDistance);
+      return TV_LAYOUT_HEURISTICS.viewing.orientationWeight * orientation
+        + TV_LAYOUT_HEURISTICS.viewing.distanceWeight * distanceScore;
     });
     samples.rearBoundaryProximity = sofas.map((sofa) => rearBoundaryProximity(scene, sofa, activeTransform(sofa, arrangement)));
   }
@@ -154,8 +153,9 @@ const tvRuleEvaluations = (scene: PlanningScene, arrangement: Arrangement, focal
     samples.conversation = chairs.map((chair) => {
       const chairTransform = activeTransform(chair, arrangement);
       const distance = pointDistance(chairTransform.position, sofaTransform.position);
-      const distanceScore = Math.max(0, 1 - Math.abs(distance - 1.8) / 1.8);
-      return .55 * facing(chairTransform, sofaTransform) + .45 * distanceScore;
+      const distanceScore = Math.max(0, 1 - Math.abs(distance - TV_LAYOUT_HEURISTICS.conversation.idealDistance) / TV_LAYOUT_HEURISTICS.conversation.idealDistance);
+      return TV_LAYOUT_HEURISTICS.conversation.facingWeight * facing(chairTransform, sofaTransform)
+        + TV_LAYOUT_HEURISTICS.conversation.distanceWeight * distanceScore;
     });
   }
   return (Object.entries(samples) as [string, number[]][]).flatMap(([id, values]) => values.length
@@ -186,18 +186,24 @@ const findings = (before: LayoutQuality, after: LayoutQuality, outcome: Selectio
 
 export const planTvViewing = (scene: PlanningScene, goal: PlanningGoal): PlanProposal => {
   const requestedPriorities = goal.priorities ?? [];
-  const priorities = [...requestedPriorities, ...DEFAULT_PRIORITIES.filter((priority) => !requestedPriorities.includes(priority))];
+  const priorities = [...requestedPriorities, ...TV_DEFAULT_PRIORITIES.filter((priority) => !requestedPriorities.includes(priority))];
   const focalMatches = scene.entities.filter((entity) => entity.id === goal.focalPointId);
-  if (focalMatches.length !== 1 || focalMatches[0]!.role !== 'tv') throw new Error(`Unable to resolve unique TV focal entity: ${goal.focalPointId}`);
+  if (focalMatches.length !== 1 || focalMatches[0]!.role !== 'tv') {
+    throw new PlanningError('FOCAL_NOT_FOUND', `Unable to resolve unique TV focal entity: ${goal.focalPointId}`);
+  }
   const focal = focalMatches[0]!;
   const sofas = scene.entities.filter((entity) => entity.role === 'sofa').sort((a, b) => compareLexical(a.id, b.id));
-  if (sofas.length !== 1) throw new Error('TV planning requires exactly one movable sofa');
+  if (sofas.length !== 1) throw new PlanningError('UNSUPPORTED_LAYOUT', 'TV planning requires exactly one movable sofa');
   const roleOrder = { sofa: 0, armchair: 1, coffeeTable: 2 } as const;
   const movable = scene.entities.filter((entity): entity is PlanningEntity & { role: keyof typeof roleOrder } =>
     entity.role in roleOrder).sort((a, b) => roleOrder[a.role] - roleOrder[b.role] || compareLexical(a.id, b.id));
   for (const entity of movable) {
-    if (entity.placementType !== 'floor') throw new Error(`Unsupported placement type for movable entity ${entity.id}: ${entity.placementType}`);
-    if (entity.source.kind !== 'roomObject') throw new Error(`Movable entity ${entity.id} must originate from a room object`);
+    if (entity.placementType !== 'floor') {
+      throw new PlanningError('UNSUPPORTED_PLACEMENT', `Unsupported placement type for movable entity ${entity.id}: ${entity.placementType}`);
+    }
+    if (entity.source.kind !== 'roomObject') {
+      throw new PlanningError('INVALID_ACTIVE_GROUP', `Movable entity ${entity.id} must originate from a room object`);
+    }
   }
   const fixedContext = scene.entities.filter((entity) => !movable.some((active) => active.id === entity.id));
   const dimensions: CandidateDimension[] = movable.map((entity) => ({
@@ -212,9 +218,10 @@ export const planTvViewing = (scene: PlanningScene, goal: PlanningGoal): PlanPro
   const result = runLivingRoomLayout({
     scene,
     activeGroup: { participants: [focal, ...movable], movable, fixedContext },
+    selectionPolicy: TV_SELECTION_POLICY,
     dimensions,
     evaluateRules: (arrangement) => tvRuleEvaluations(scene, arrangement, focal),
-    ruleWeights: [...priorities.map((priority, index) => ({ id: priority, weight: PRIORITY_SLOTS[index] ?? 0 })), { id: 'rearBoundaryProximity', weight: 10 }],
+    ruleWeights: [...priorities.map((priority, index) => ({ id: priority, weight: TV_LAYOUT_HEURISTICS.prioritySlots[index] ?? 0 })), { id: 'rearBoundaryProximity', weight: TV_LAYOUT_HEURISTICS.rearBoundaryRuleWeight }],
     buildFindings: (before, after, outcome) => findings(before, after, outcome, sofas.map(roomObjectInstanceId)),
     openingZoneExempt: (entity) => entity.role === 'tv',
   });

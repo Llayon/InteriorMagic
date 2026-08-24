@@ -2,16 +2,18 @@ import { describe, expect, it } from 'vitest';
 import type { PlanningGoal } from '../contracts/types';
 import { planTvViewing } from './planner';
 import type { PlanningEntity, PlanningScene } from './PlanningScene';
+import { PlanningError } from '@/editor/planning/errors';
+import { TV_SELECTION_POLICY } from './constants';
 
-const entity = (id: string, role: PlanningEntity['role'], x: number, z: number, rotationY: number, width: number, depth: number, fixed = false): PlanningEntity => ({
-  id, source: role === 'tv' ? { kind: 'derived' } : { kind: 'roomObject', instanceId: `source-${id}` }, role, fixed, placementType: role === 'tv' ? 'wall' : 'floor',
+const entity = (id: string, role: PlanningEntity['role'], x: number, z: number, rotationY: number, width: number, depth: number): PlanningEntity => ({
+  id, source: role === 'tv' ? { kind: 'derived' } : { kind: 'roomObject', instanceId: `source-${id}` }, role, placementType: role === 'tv' ? 'wall' : 'floor',
   footprint: { width, depth }, collision: role === 'tv' ? { group: 0, mask: 0 } : { group: 1, mask: 1 }, transform: { position: { x, z }, rotationY },
 });
 
 const scene = (overrides: Partial<PlanningScene> = {}): PlanningScene => ({
   room: { width: 6, depth: 6 }, immediateOpeningZones: [], circulationZones: [],
   entities: [
-    entity('tv', 'tv', 0, 2.8, Math.PI, 1.2, .1, true),
+    entity('tv', 'tv', 0, 2.8, Math.PI, 1.2, .1),
     entity('sofa', 'sofa', 0, -2.1, 0, 2, .9),
     entity('chair', 'armchair', -1.6, -.5, Math.PI / 2, .8, .8),
     entity('table', 'coffeeTable', 0, -.9, 0, 1, .6),
@@ -21,6 +23,12 @@ const scene = (overrides: Partial<PlanningScene> = {}): PlanningScene => ({
 const goal: PlanningGoal = { activity: 'watchTv', focalPointId: 'tv' };
 
 describe('deterministic TV planner', () => {
+  it('keeps the characterized TV selection policy values', () => {
+    expect(TV_SELECTION_POLICY.acceptanceThreshold).toBe(4);
+    expect(TV_SELECTION_POLICY.movementCost({ movedCount: 1, translation: .5, rotation: Math.PI / 4 })).toBe(4);
+    expect(TV_SELECTION_POLICY.movementCost({ movedCount: 10, translation: 10, rotation: Math.PI * 4 })).toBe(20);
+  });
+
   it('repairs a badly oriented sofa and reports pure quality', () => {
     const input = scene();
     input.entities.find((item) => item.role === 'sofa')!.transform.rotationY = Math.PI;
@@ -47,7 +55,7 @@ describe('deterministic TV planner', () => {
 
   it('gives an awkward open-room sofa wall support', () => {
     const input = scene({ entities: [
-      entity('tv', 'tv', 0, .4, Math.PI, 1.2, .1, true),
+      entity('tv', 'tv', 0, .4, Math.PI, 1.2, .1),
       entity('sofa', 'sofa', 0, 0, 0, 2, .9),
     ] });
     const sofa = input.entities.find((item) => item.role === 'sofa')!;
@@ -63,7 +71,7 @@ describe('deterministic TV planner', () => {
   it('returns an already-good no-op when movement cannot earn four utility points', () => {
     const input = scene({
       room: { width: 6, depth: 4.1 },
-      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, 0, 2, .9)],
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1), entity('sofa', 'sofa', 0, -1.5, 0, 2, .9)],
     });
     const proposal = planTvViewing(input, goal);
     expect(proposal.moves).toEqual([]);
@@ -74,7 +82,7 @@ describe('deterministic TV planner', () => {
   it('distinguishes a sub-threshold improvement from an already-good layout', () => {
     const input = scene({
       room: { width: 6, depth: 4.1 },
-      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, .03, 2, .9)],
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1), entity('sofa', 'sofa', 0, -1.5, .03, 2, .9)],
     });
     const proposal = planTvViewing(input, goal);
     expect(proposal.moves).toEqual([]);
@@ -82,7 +90,7 @@ describe('deterministic TV planner', () => {
   });
 
   it('excludes non-applicable conversation and circulation rules neutrally', () => {
-    const input = scene({ entities: [entity('tv', 'tv', 0, 2.8, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -2.1, 0, 2, .9)] });
+    const input = scene({ entities: [entity('tv', 'tv', 0, 2.8, Math.PI, 1.2, .1), entity('sofa', 'sofa', 0, -2.1, 0, 2, .9)] });
     const withoutRules = planTvViewing(input, goal).scoreBefore.total;
     input.circulationZones = [];
     expect(planTvViewing(input, goal).scoreBefore.total).toBeCloseTo(withoutRules);
@@ -112,6 +120,25 @@ describe('deterministic TV planner', () => {
     expect(() => planTvViewing(incompatible, goal)).toThrow('Unsupported placement type');
   });
 
+  it('normalizes TV precondition failures to PlanningError codes', () => {
+    expect(() => planTvViewing(scene(), { ...goal, focalPointId: 'missing' }))
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'FOCAL_NOT_FOUND' }));
+
+    const noSofa = scene({ entities: [scene().entities[0]!] });
+    expect(() => planTvViewing(noSofa, goal))
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'UNSUPPORTED_LAYOUT' }));
+
+    const incompatible = scene();
+    incompatible.entities.find((item) => item.role === 'armchair')!.placementType = 'wall';
+    expect(() => planTvViewing(incompatible, goal))
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'UNSUPPORTED_PLACEMENT' }));
+
+    const unsupportedSource = scene();
+    unsupportedSource.entities.find((item) => item.role === 'sofa')!.source = { kind: 'derived' };
+    expect(() => planTvViewing(unsupportedSource, goal))
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'INVALID_ACTIVE_GROUP' }));
+  });
+
   it('is deterministic, resolves focal identity only by planning ID, and does not mutate input', () => {
     const input = scene();
     const snapshot = structuredClone(input);
@@ -123,7 +150,7 @@ describe('deterministic TV planner', () => {
 
   it('only rewards a wall behind canonical -Z, not a nearby side wall', () => {
     const supported = scene({ room: { width: 6, depth: 4.1 }, entities: [
-      entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true),
+      entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1),
       entity('sofa', 'sofa', 0, -1.5, 0, 2, .9),
     ] });
     const sideOnly = structuredClone(supported);
@@ -133,7 +160,7 @@ describe('deterministic TV planner', () => {
 
   it('uses neutral rear-boundary findings without misleading scoreImpact', () => {
     const input = scene({ entities: [
-      entity('tv', 'tv', 0, .4, Math.PI, 1.2, .1, true),
+      entity('tv', 'tv', 0, .4, Math.PI, 1.2, .1),
       entity('sofa', 'sofa', 0, 0, 0, 2, .9),
     ] });
     const proposal = planTvViewing(input, goal);
@@ -156,7 +183,7 @@ describe('deterministic TV planner', () => {
     const circulation = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
     const alreadyGood = scene({
       room: { width: 6, depth: 4.1 },
-      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, 0, 2, .9)],
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1), entity('sofa', 'sofa', 0, -1.5, 0, 2, .9)],
     });
 
     const representative = {
@@ -203,7 +230,7 @@ describe('deterministic TV planner', () => {
   it('freezes the TV improvement-too-small proposal', () => {
     const input = scene({
       room: { width: 6, depth: 4.1 },
-      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, .03, 2, .9)],
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1), entity('sofa', 'sofa', 0, -1.5, .03, 2, .9)],
     });
     const first = planTvViewing(input, goal);
     const second = planTvViewing(input, goal);
