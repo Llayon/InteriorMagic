@@ -1,0 +1,555 @@
+﻿{
+  "version": "golden-matching-v1",
+  "created": "2026-08-24",
+  "base": "e043f07c8b71d1ab08158c40fc84ac254c99e41b",
+  "provenance": "Researcher labels (proxy ground truth) built on F2 benchmark evidence (commit e043f07) plus new targeted storefront retrieval. No invented matches: every candidate carries retailer URL and dimension evidence. Grades: A strong analogue, B acceptable substitute, C not suitable.",
+  "reasonsEnum": ["dimension mismatch","wrong category","wrong silhouette","wrong material","wrong style","wrong usage"],
+  "regionBaseline": "Moscow",
+  "assets": [
+{
+  "assetId": "sofa", "source": "registry", "category": "sofas", "semanticRole": null,
+  "dimensions": {"width": 2.05, "height": 0.96, "depth": 0.85},
+  "renderRef": "public/thumbnails/sofa.svg + models/ugly_sofa.glb (local, not committed)",
+  "difficulty": "easy", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "https://kalibroom.ru/product/pryamoy-divan-tinel--velutto-01--210x105x84--00057--wm", "product": "Диван прямой Тинэль белый велюр 210x105x84", "grade": "A", "reason": "straight velvet sofa, W err 2%, same form family"},
+    {"url": "https://kalibroom.ru/product/divan-steigen--premier-22--220x105x85--00009--wm", "product": "Диван Штейген синий велюр 220x105x85", "grade": "A", "reason": "tight dims, velvet, straight modern"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/product/divan-mellow--velutto-75--180x110x70--00037--wm", "product": "Мэллоу 180x110x70", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divano.ru/catalog/uglovye-divany/velyur/", "product": "Угловой диван Атланта 400x200x82", "grade": "C", "reason": "wrong silhouette"}
+  ]
+},
+{
+  "assetId": "nordicSofa", "source": "registry", "category": "sofas", "semanticRole": "sofa",
+  "dimensions": {"width": 2.02, "height": 0.72, "depth": 0.74},
+  "renderRef": "thumbnails/kenney/loungeDesignSofa.png + models/kenney/loungeDesignSofa.glb",
+  "difficulty": "easy", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "https://kalibroom.ru/product/divan-smooth--velutto-01--200x95x67--00023--wm", "product": "Смуф белый велюр 200x95x67", "grade": "A", "reason": "low straight scandi-form, W err 1%"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/product/pryamoy-divan-tinel--velutto-01--210x105x84--00057--wm", "product": "Тинэль 210x105x84", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://kalibroom.ru/product/divan-nirvana--velutto-02--245x95x74--00041--ek", "product": "Нирвана 245x95x74", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "sofa_033", "source": "ithappy", "category": "sofas", "semanticRole": "sofa",
+  "dimensions": {"width": 3.95, "height": 1.26, "depth": 1.29},
+  "renderRef": ".agent-data ithappy thumbnails/sofa_033.webp + runtime-assets/sofa_033.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/catalog/divany/model-divan-ronny", "product": "Ронни 264 велюр", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://kalibroom.ru/product/divan-borgen--velutto-23--258x111x92--00016--wm", "product": "Борген 258x111x92", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divano.ru/catalog/uglovye-divany/velyur/", "product": "Атланта угловой 400x200x82", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "negative gold: no 3.9m STRAIGHT sofa found in mass RU market; corners exist at 4.0m but different class"
+},
+{
+  "assetId": "sofa_037", "source": "ithappy", "category": "sofas", "semanticRole": "sofa",
+  "dimensions": {"width": 2.30, "height": 1.08, "depth": 1.36},
+  "renderRef": ".agent-data ithappy thumbnails/sofa_037.webp + runtime-assets/sofa_037.glb",
+  "difficulty": "hard", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://kalibroom.ru/product/divan-borgen--novus-998--248x111x92--00016--ek", "product": "Борген 248x111x92 еврокнижка", "grade": "B", "reason": "closest deep model; classic vs lounge silhouette differs"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/product/divan-smooth--velutto-34--200x95x67--00023--wm", "product": "Смуф 230x95x67", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://kalibroom.ru/product/pallmer-uglovoy--velutto-01--300x170x95--00050--tt", "product": "Паллмер угловой 300x170x95", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "deep-lounge 1.36m depth has no true straight analogue; B is a courtesy substitute"
+},
+{
+  "assetId": "sofa_039", "source": "ithappy", "category": "sofas", "semanticRole": "sofa",
+  "dimensions": {"width": 3.93, "height": 1.09, "depth": 1.37},
+  "renderRef": ".agent-data ithappy runtime-assets/sofa_039.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/product/divan-borgen--novus-998--248x111x92--00016--ek", "product": "Борген 258 вариант", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divano.ru/catalog/uglovye-divany/velyur/", "product": "Атланта со столиком 380x200", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "negative gold: extra-long straight sofas absent from mass market"
+},
+{
+  "assetId": "sofa_042", "source": "ithappy", "category": "sofas", "semanticRole": "sofa",
+  "dimensions": {"width": 2.77, "height": 1.23, "depth": 1.50},
+  "renderRef": ".agent-data ithappy runtime-assets/sofa_042.glb",
+  "difficulty": "hard", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://kalibroom.ru/catalog/divany/model-divan-ronny", "product": "Ронни 264 велюр", "grade": "B", "reason": "W err 5%; depth/back unverifiable from listing - capped at B"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/product/divan-borgen--novus-998--248x111x92--00016--ek", "product": "Борген 248x111x92", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://kalibroom.ru/product/divan-nirvana--velutto-02--245x95x74--00041--ek", "product": "Нирвана 245x95x74", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "1.50m depth extreme; only width-verifiable candidate accepted as B"
+},
+{
+  "assetId": "sofa_044", "source": "ithappy", "category": "sofas", "semanticRole": "sofa",
+  "dimensions": {"width": 5.20, "height": 1.12, "depth": 3.07},
+  "renderRef": ".agent-data ithappy runtime-assets/sofa_044.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [
+    {"url": "https://www.divano.ru/catalog/uglovye-divany/velyur/", "product": "Угловой диван Атланта Дельфин 400x200x82", "grade": "B", "reason": "corner modular class matches; footprint smaller than asset but same physical class"},
+    {"url": "https://kalibroom.ru/product/divan-lamas--velutto-02--300x170x74--00042--tt", "product": "Ламас угловой 300x170x74 велюр", "grade": "B", "reason": "corner sofa, velvet; W/D err ~23% mean - acceptable modular substitute"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://kalibroom.ru/product/divan-borgen--novus-998--248x111x92--00016--ek", "product": "Борген 258", "grade": "C", "reason": "wrong silhouette"},
+    {"url": "https://kalibroom.ru/product/pryamoy-divan-tinel--velutto-01--210x105x84--00057--wm", "product": "Тинэль 210x105x84", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "F2 retrieval gap fixed: corner sofas exist; asset bounds likely P/ U-shaped set"
+},
+{
+  "assetId": "chair", "source": "registry", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.72, "height": 1.08, "depth": 0.76},
+  "renderRef": "thumbnails/chair.svg + models/chair.glb",
+  "difficulty": "easy", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Ларни Велюр 72x70x92", "grade": "A", "reason": "near-exact dims, velvet accent armchair"},
+    {"url": "https://kalibroom.ru/product/kreslo-pall--velutto-71--71x75x101--20002", "product": "Кресло Палл 71x75x101", "grade": "B", "reason": "taller back than asset but same compact accent class"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Мисл 112x92x90", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "sheenChair", "source": "registry", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.83, "height": 0.69, "depth": 0.57},
+  "renderRef": "thumbnails/sheen_chair.jpg + models/sheen_chair.glb",
+  "difficulty": "medium", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Мона Велюр 85x74x77", "grade": "B", "reason": "low velvet accent; D axis off 29%"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Венето 93x79x74", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stokdivanov.ru/kresla/velyur-kreslo.html", "product": "Кресло Велюр клик-кляк 140x105x103", "grade": "C", "reason": "wrong usage"}
+  ],
+  "note": "sheen velvet lounge is visually distinctive; text evidence caps at B"
+},
+{
+  "assetId": "nordicArmchair", "source": "registry", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.91, "height": 0.50, "depth": 0.51},
+  "renderRef": "thumbnails/kenney/loungeDesignChair.png + models/kenney/loungeDesignChair.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Мона 85x74x77", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://pushe.ru/catalog/kresla-s-vysokoy-spinkoy/", "product": "Кресло с высокой спинкой 95x130", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "negative gold: H=0.50 armchair-class lounger absent in retrieved mass-market pools (ottomans exist but were not verifiable with dims)"
+},
+{
+  "assetId": "relaxArmchair", "source": "registry", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.61, "height": 0.79, "depth": 0.84},
+  "renderRef": "thumbnails/kenney/loungeChairRelax.png + models/kenney/loungeChairRelax.glb",
+  "difficulty": "easy", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Мона Велюр 85x74x77", "grade": "B", "reason": "mean err 8%, velvet, compact"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Брера 132x88x75", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "chair_024", "source": "ithappy", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.73, "height": 1.14, "depth": 0.71},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_024.glb",
+  "difficulty": "medium", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/kresla-s-vysokoj-spinkoj", "product": "Кресло Носта Велюр 79x90x107 (высокая спинка)", "grade": "B", "reason": "tall-back class match, W wider 23%"},
+    {"url": "https://kalibroom.ru/product/kreslo-pall--velutto-71--71x75x101--20002", "product": "Кресло Палл 71x75x101 высокая спинка", "grade": "B", "reason": "high-back designer chair, tight W"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Коренс Велюр 87x88x76", "grade": "C", "reason": "wrong silhouette"}
+  ]
+},
+{
+  "assetId": "chair_026", "source": "ithappy", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.65, "height": 1.20, "depth": 0.75},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_026.glb",
+  "difficulty": "medium", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Ларни Велюр 72x70x92", "grade": "B", "reason": "narrow tall accent"},
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Ансил Велюр 85x90x78", "grade": "B", "reason": "compatible mean err"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Носта Велюр 79x90x107", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "chair_162", "source": "ithappy", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.64, "height": 1.25, "depth": 0.61},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_162.glb",
+  "difficulty": "medium", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Носта Велюр 79x90x107", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Ларни Велюр 72x70x92", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://kalibroom.ru/product/kreslo-pall--velutto-71--71x75x101--20002", "product": "Кресло Палл 71x75x101", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "H=1.25 narrow: between classes (accent vs high-back); nothing within tolerance"
+},
+{
+  "assetId": "chair_058", "source": "ithappy", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 1.14, "height": 0.62, "depth": 0.47},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_058.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Брера Велюр 132x88x75", "grade": "C", "reason": "wrong silhouette"},
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Мисл 112x92x90", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stokdivanov.ru/kresla/velyur-kreslo.html", "product": "Кресло-кровать клик-кляк 140x105x103", "grade": "C", "reason": "wrong usage"}
+  ],
+  "note": "negative gold: double-wide low lounger (daybed-class) not present as armchair SKU"
+},
+{
+  "assetId": "chair_066", "source": "ithappy", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.84, "height": 0.54, "depth": 0.47},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_066.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Мона Велюр 85x74x77", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Брера Велюр 132x88x75", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "negative gold: H=0.54 lounge absent"
+},
+{
+  "assetId": "chair_041", "source": "ithappy", "category": "chairs", "semanticRole": "armchair",
+  "dimensions": {"width": 0.58, "height": 1.38, "depth": 0.60},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_041.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/kresla-s-vysokoj-spinkoj", "product": "Кресло с высокой спинкой 95x130 (pushe)", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://kalibroom.ru/product/kreslo-pall--velutto-71--71x75x101--20002", "product": "Кресло Палл 71x75x101", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divan.ru/category/velyurovye-kresla", "product": "Кресло Носта Велюр 79x90x107", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "negative gold: H=1.38 armchair (throne/reception class) not verifiable with dims in mass pools"
+},
+{
+  "assetId": "chair_016", "source": "ithappy", "category": "chairs", "semanticRole": null,
+  "dimensions": {"width": 0.43, "height": 1.06, "depth": 0.43},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_016.glb",
+  "difficulty": "easy", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Крит Велюр 46x48x82", "grade": "B", "reason": "slim dining chair, tight dims"},
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Гвен Рогожка 44x54x87", "grade": "B", "reason": "slim upright"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://stoolgroup.ru/stul-valensiya-sn-pechvork-ru/", "product": "Валенсия SN 44x54x86.5", "grade": "C", "reason": "wrong style"}
+  ]
+},
+{
+  "assetId": "chair_019", "source": "ithappy", "category": "chairs", "semanticRole": null,
+  "dimensions": {"width": 0.56, "height": 1.03, "depth": 0.56},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_019.glb",
+  "difficulty": "easy", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Мейси Вельвет 58x59x85", "grade": "B", "reason": "upright dining, mean err 8%"},
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Никсон Рогожка 57x59x81", "grade": "B", "reason": "tight dims"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.ib-gallery.ru/goods/2415401.html", "product": "Minotti Yoko 62x58x81", "grade": "C", "reason": "wrong style"}
+  ]
+},
+{
+  "assetId": "chair_025", "source": "ithappy", "category": "chairs", "semanticRole": null,
+  "dimensions": {"width": 0.60, "height": 0.71, "depth": 0.60},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_025.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Крит Велюр 46x48x82", "grade": "C", "reason": "wrong silhouette"},
+    {"url": "https://jukovskiy.mebelimart.ru/product/a273159e66a2beb753196214095739e1-polubarnyy-stul-valensiya-sn-stool-group", "product": "Полубарный Валенсия SN 42x46x91.5", "grade": "C", "reason": "wrong usage"}
+  ],
+  "note": "stool-height chair; kitchen stools exist without backs - posture class differs"
+},
+{
+  "assetId": "chair_027", "source": "ithappy", "category": "chairs", "semanticRole": null,
+  "dimensions": {"width": 0.70, "height": 1.23, "depth": 0.76},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_027.glb",
+  "difficulty": "medium", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Эрберт Рогожка 74x91x83", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Джуди 59x59x84", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "wide carver-style dining chair; mass market carvers lack published dims"
+},
+{
+  "assetId": "chair_035", "source": "ithappy", "category": "chairs", "semanticRole": null,
+  "dimensions": {"width": 0.60, "height": 1.41, "depth": 0.62},
+  "renderRef": ".agent-data ithappy runtime-assets/chair_035.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [
+    {"url": "https://kalibroom.ru/product/stul-barnyy-vorman--velutto-01--62x60x114--30034", "product": "Барный стул Ворман велюр 62x60x114", "grade": "B", "reason": "tall narrow seat with backrest; mean err 8%; usage context bar vs dining noted"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.divan.ru/category/magkie-stulay", "product": "Стул Мейси Вельвет 58x59x85", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.inmyroom.ru/products/mebel/stulya/barnye-stulya/nze-polubarnye", "product": "Полубарные стулья h сиденья 61-67", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "F2 X upgraded: bar-height chair class exists (Ворман H114); gold B with usage caveat"
+},
+{
+  "assetId": "glassCoffeeTable", "source": "registry", "category": "tables", "semanticRole": "coffeeTable",
+  "dimensions": {"width": 1.19, "height": 0.41, "depth": 0.72},
+  "renderRef": "thumbnails/kenney/tableCoffeeGlass.png + models/kenney/tableCoffeeGlass.glb",
+  "difficulty": "medium", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "Журнальный стол СХ-01 стекло 1100x650x420", "grade": "A", "reason": "glass rectangle, mean err 7%"},
+    {"url": "https://lifemebel.ru/catalog/stoly/dlya_komnat/steklyannye_zhurnalnye_stoliki/pryamougolnye/", "product": "CT1-052 110x60x45", "grade": "B", "reason": "glass rect, in stock"}
+  ],
+  "rejectedExamples": [
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "ЖС-25 круглый", "grade": "C", "reason": "wrong silhouette"}
+  ]
+},
+{
+  "assetId": "drawerSideTable", "source": "registry", "category": "tables", "semanticRole": "sideTable",
+  "dimensions": {"width": 0.75, "height": 0.54, "depth": 0.31},
+  "renderRef": "thumbnails/kenney/sideTableDrawers.png + models/kenney/sideTableDrawers.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.inmyroom.ru/products/mebel/stoly/zhurnalnye-stoliki/m-steklo", "product": "Приставной столик Флумс 50x30x30", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.inmyroom.ru/products/mebel/stoly/zhurnalnye-stoliki/m-steklo", "product": "Kumar придиванный Ø40x50", "grade": "C", "reason": "wrong silhouette"},
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "Журнальный стол ЖС-15 стекло 600x400x530", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "negative gold: shallow 31cm drawer side tables scarce with published dims"
+},
+{
+  "assetId": "coffee_table", "source": "ithappy", "category": "tables", "semanticRole": "coffeeTable",
+  "dimensions": {"width": 1.08, "height": 0.66, "depth": 1.08},
+  "renderRef": ".agent-data ithappy runtime-assets/coffee_table.glb",
+  "difficulty": "medium", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "Журнальный столик ЖС-5 стекло 800x800x530", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.inmyroom.ru/products/mebel/stoly/zhurnalnye-stoliki/m-steklo", "product": "Журнальный столик Гонконг круглый 80x80x45", "grade": "C", "reason": "wrong silhouette"}
+  ],
+  "note": "1.08m square coffee table above mass-market size band"
+},
+{
+  "assetId": "coffee_table_030", "source": "ithappy", "category": "tables", "semanticRole": "coffeeTable",
+  "dimensions": {"width": 1.24, "height": 0.60, "depth": 1.24},
+  "renderRef": ".agent-data ithappy runtime-assets/coffee_table_030.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "Журнальный столик С-05 стекло 700x700x520", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "Журнальный столик ЖС-5 стекло 800x800x530", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "oversized square confirmed absent"
+},
+{
+  "assetId": "coffee_table_028", "source": "ithappy", "category": "tables", "semanticRole": "coffeeTable",
+  "dimensions": {"width": 0.90, "height": 0.54, "depth": 1.53},
+  "renderRef": ".agent-data ithappy runtime-assets/coffee_table_028.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "http://steklostol.ru/index.php?categoryID=155", "product": "Журнальный стол ЖС-1 стекло 1100x560x530", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://lifemebel.ru/catalog/stoly/dlya_komnat/steklyannye_zhurnalnye_stoliki/pryamougolnye/", "product": "CT1-052 110x60x45", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "D=1.53 bench-form: no coffee table exists at this depth; likely mis-scaled asset"
+},
+{
+  "assetId": "table", "source": "registry", "category": "tables", "semanticRole": null,
+  "dimensions": {"width": 1.35, "height": 0.76, "depth": 0.78},
+  "renderRef": "thumbnails/table.svg + models/table.glb",
+  "difficulty": "easy", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "https://market.yandex.ru/category/stoly-140-na-80-sm-obedennyye", "product": "Стол №9 массив дуба 140x80x78", "grade": "A", "reason": "solid oak dining, near-exact dims"},
+    {"url": "https://good-mebel.com/category/stoly/obedennye-140h80-sm/", "product": "Торонто-140 140x80x75", "grade": "A", "reason": "rect dining, dims err 3%"},
+    {"url": "https://lifemebel.ru/catalog/stoly/dlya_kuhni/derevyannye/model/stol_obedennyy_max_140_kh_80_kh_75_sm_belyy_korichnevyy/", "product": "Макс 140x80x75", "grade": "A", "reason": "wood dining 140"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://bestmebelik.ru/kuhonnye-stoly.html", "product": "Герцог раскладной 200x80x74", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "work_table_002", "source": "ithappy", "category": "tables", "semanticRole": null,
+  "dimensions": {"width": 1.65, "height": 0.92, "depth": 0.83},
+  "renderRef": ".agent-data ithappy runtime-assets/work_table_002.glb",
+  "difficulty": "easy", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://bestmebelik.ru/kuhonnye-stoly.html", "product": "Герцог раздвижной 200(140)x80x74", "grade": "B", "reason": "extending covers asset span; ceramic top vs wood"},
+    {"url": "https://market.yandex.ru/category/stoly-140-na-80-sm-obedennyye", "product": "Хилтон 140(200)x80 керамика", "grade": "B", "reason": "extendable, H unverified"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://market.yandex.ru/category/stoly-140-na-80-sm-obedennyye", "product": "Daller D140 лофт", "grade": "C", "reason": "wrong style"}
+  ]
+},
+{
+  "assetId": "work_table_017", "source": "ithappy", "category": "tables", "semanticRole": null,
+  "dimensions": {"width": 1.85, "height": 0.92, "depth": 0.82},
+  "renderRef": ".agent-data ithappy runtime-assets/work_table_017.glb",
+  "difficulty": "medium", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://store.giulianovars.ru/product/stol_industrial/", "product": "Giulia Novars Industrial 2000x900x760", "grade": "B", "reason": "long loft table, mean err 11%"},
+    {"url": "https://skladnoystol.com/product/skladnye-prjamougolnye-banketnye-stoly-delta/", "product": "Дельта складной 1800x900x750", "grade": "C", "reason": "dimension mismatch (kept as hard distractor)"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.stulya-stoly.ru/type-stoly/kuhonnye-stoly", "product": "TET_10465 140x80x75", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "Дельта listed as candidate distractor with C: dims close but folding HoReCa form"
+},
+{
+  "assetId": "work_table_005", "source": "ithappy", "category": "tables", "semanticRole": null,
+  "dimensions": {"width": 2.09, "height": 0.98, "depth": 1.26},
+  "renderRef": ".agent-data ithappy runtime-assets/work_table_005.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://skladnoystol.com/product/skladnye-prjamougolnye-banketnye-stoly-delta/", "product": "Дельта 2000x900x750 складной", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://proffbar.ru/catalog/stoly/banketnye", "product": "18ДМ 2000x800/900 складной", "grade": "C", "reason": "wrong usage"},
+    {"url": "https://store.giulianovars.ru/product/stol_san_remo/", "product": "San Remo 2000(+800)x1000", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "D=1.26 banquet depth: home-market tables max ~1.0-1.1m depth; folding banquet tables are wrong usage class"
+},
+{
+  "assetId": "work_table_007", "source": "ithappy", "category": "tables", "semanticRole": null,
+  "dimensions": {"width": 2.09, "height": 0.98, "depth": 1.26},
+  "renderRef": ".agent-data ithappy runtime-assets/work_table_007.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://skladnoystol.com/product/skladnye-prjamougolnye-banketnye-stoly-delta/", "product": "Дельта 2400x900x750", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://proffbar.ru/catalog/stoly/banketnye", "product": "Складной 18ДМ 2000x900", "grade": "C", "reason": "wrong usage"}
+  ],
+  "note": "duplicate geometry of work_table_005 - gold expects identical failure"
+},
+{
+  "assetId": "lowBookcase", "source": "registry", "category": "tables", "semanticRole": "console",
+  "dimensions": {"width": 0.88, "height": 0.88, "depth": 0.55},
+  "renderRef": "thumbnails/kenney/bookcaseOpenLow.png + models/kenney/bookcaseOpenLow.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Рио СТЛ.135.23М 87.5x37x51", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Алекс 100x43.7x40.3", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://furama.ru/", "product": "Стеллаж СТФ 2000x700x400 металлический", "grade": "C", "reason": "wrong usage"}
+  ],
+  "note": "0.88-high OPEN console sits between TV-units (H<=0.55) and shelving (H>=1.8): gap class"
+},
+{
+  "assetId": "cupboard_022", "source": "ithappy", "category": "storage", "semanticRole": null,
+  "dimensions": {"width": 2.65, "height": 2.39, "depth": 0.45},
+  "renderRef": ".agent-data ithappy runtime-assets/cupboard_022.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [
+    {"url": "https://www.shkaf-kupe.ru/category/shkafy-kupe-vysotoj-270-sm/", "product": "Шкаф-купе Борден-4-4 Премиум W180-360 H190-270 D40-70", "grade": "B", "reason": "configurable size covers 265x239x45; sliding doors unverified; made-to-order"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "ТВМ-9 220x39.3x36.8", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Онтарио 180.8x54x44.9", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "dresser_001", "source": "ithappy", "category": "storage", "semanticRole": null,
+  "dimensions": {"width": 2.28, "height": 0.75, "depth": 0.77},
+  "renderRef": ".agent-data ithappy runtime-assets/dresser_001.glb",
+  "difficulty": "medium", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "ТВМ-9 220x39.3x36.8", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Альянс-190 190x45.2x59.3", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Онтарио 180.8x54x44.9", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "long low dresser H=0.75: between TV-units and commodes; no verified analogue"
+},
+{
+  "assetId": "cupboard_003", "source": "ithappy", "category": "storage", "semanticRole": null,
+  "dimensions": {"width": 1.38, "height": 2.71, "depth": 0.72},
+  "renderRef": ".agent-data ithappy runtime-assets/cupboard_003.glb",
+  "difficulty": "medium", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "https://good-mebel.com/category/shkafy-kupe/vysotoj-270/", "product": "Шкаф-купе Борнео-М-3-2 W140-270 H270 D40-70", "grade": "A", "reason": "configurable dims cover asset nearly exactly"},
+    {"url": "https://www.bestmebelshop.ru/catalog/shkafy-kupe/category-shkaf-kupe-2700/", "product": "Мила 4А W170-240 H220-260 D40-60", "grade": "B", "reason": "same tall-storage class, slightly smaller"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Честерфилд 135x47x40", "grade": "C", "reason": "wrong category"}
+  ]
+},
+{
+  "assetId": "dresser", "source": "ithappy", "category": "storage", "semanticRole": null,
+  "dimensions": {"width": 0.71, "height": 0.76, "depth": 0.61},
+  "renderRef": ".agent-data ithappy runtime-assets/dresser.glb",
+  "difficulty": "easy", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://dimobile.md/ru/35-komody-i-tumby/tumba-karolina-3-16437", "product": "Каролина-3 дуб 48x65x40", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Рио 87.5x37x51", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.stolline.ru/catalog/gostinie/tumby/tumby_dlya_tv/", "product": "Теви 90x40.4x30.3", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "small chest: candidates exist but all ~25-45% off on some axis; kept negative to test abstention"
+},
+{
+  "assetId": "lamp", "source": "registry", "category": "lamps", "semanticRole": "floorLamp",
+  "dimensions": {"width": 0.48, "height": 1.65, "depth": 0.48},
+  "renderRef": "thumbnails/lamp? registry lamp has no modelUrl (fallbackPrimitive lamp)",
+  "difficulty": "easy", "f2Top1": "A",
+  "acceptedMatches": [
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Palma тренога 160x50x50", "grade": "A", "reason": "classic shade floor lamp, mean err 4%"},
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Sortino классический 150x40x40", "grade": "A", "reason": "shade floor lamp, tight"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://tk-konstruktor.ru/catalog/osveshchenie/svetilniki-i-lyustry/torshery-i-napolnye-svetilniki/napolnyy-svetilnik-torsher-maytoni-mod178fl-l11w3k-845342585/", "product": "Maytoni Kyoto LED 22x22x145", "grade": "C", "reason": "wrong silhouette"}
+  ]
+},
+{
+  "assetId": "roundFloorLamp", "source": "registry", "category": "lamps", "semanticRole": "floorLamp",
+  "dimensions": {"width": 0.29, "height": 1.63, "depth": 0.33},
+  "renderRef": "thumbnails/kenney/lampRoundFloor.png + models/kenney/lampRoundFloor.glb",
+  "difficulty": "easy", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Velante цилиндр 155x27", "grade": "B", "reason": "slim cylinder, D unknown"},
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Офелия белый H165", "grade": "B", "reason": "height exact; footprint unverified"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://maytoni.am/catalog/decorative/torshery/mod463fl-l24b3k/", "product": "Икебана MOD463 H125", "grade": "C", "reason": "dimension mismatch"}
+  ]
+},
+{
+  "assetId": "lamp_028", "source": "ithappy", "category": "lamps", "semanticRole": "floorLamp",
+  "dimensions": {"width": 0.38, "height": 1.74, "depth": 0.38},
+  "renderRef": ".agent-data ithappy runtime-assets/lamp_028.glb",
+  "difficulty": "easy", "f2Top1": "B",
+  "acceptedMatches": [
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Bergamo H170", "grade": "B", "reason": "tall shade lamp"},
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Bluet конус 160x45", "grade": "B", "reason": "tall cone"}
+  ],
+  "rejectedExamples": [
+    {"url": "https://3000k.ru/catalog/torshery-i-napolnye-svetilniki/556-62c74c46-tooy-molly-pt-s-led-napolnyy-svetilnik-s-reguliruemym-rasseivatelem-chyernyy-pesochno-s/", "product": "Tooy Molly H130 купол", "grade": "C", "reason": "wrong style"}
+  ]
+},
+{
+  "assetId": "lamp_036", "source": "ithappy", "category": "lamps", "semanticRole": "floorLamp",
+  "dimensions": {"width": 0.78, "height": 1.98, "depth": 0.58},
+  "renderRef": ".agent-data ithappy runtime-assets/lamp_036.glb",
+  "difficulty": "hard", "f2Top1": "C",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Arco дуга мрамор 178x98x98", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Nevada кронштейн 210x140x40", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Birds Origami 175x42x25", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "arc-form family exists but footprints are 2x the asset; H=1.98 also above market"
+},
+{
+  "assetId": "lamp_048", "source": "ithappy", "category": "lamps", "semanticRole": "floorLamp",
+  "dimensions": {"width": 0.51, "height": 0.79, "depth": 0.61},
+  "renderRef": ".agent-data ithappy runtime-assets/lamp_048.glb",
+  "difficulty": "hard", "f2Top1": "X",
+  "acceptedMatches": [],
+  "rejectedExamples": [
+    {"url": "https://www.inmyroom.ru/osveschenie/torshery-i-napolnye-svetilniki", "product": "Palma тренога 160x50x50", "grade": "C", "reason": "dimension mismatch"},
+    {"url": "https://tk-konstruktor.ru/catalog/osveshchenie/svetilniki-i-lyustry/torshery-i-napolnye-svetilniki/napolnyy-svetilnik-torsher-maytoni-mod178fl-l11w3k-845342585/", "product": "Kyoto 22x22x145", "grade": "C", "reason": "dimension mismatch"}
+  ],
+  "note": "negative gold: H=0.79 is TABLE-lamp scale labeled floorLamp; likely mislabeled role - correct matcher behavior is abstention"
+}
+  ]
+}
+
