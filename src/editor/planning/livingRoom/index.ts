@@ -8,10 +8,9 @@ export type {
   PlanningTransform,
   PlanningZone,
 } from './PlanningScene';
-export { PlanningError } from './errors';
-export type { PlanningErrorCode } from './errors';
+export { PlanningError } from '../errors';
+export type { PlanningErrorCode } from '../errors';
 export {
-  ACCEPTANCE_THRESHOLD,
   activeTransform,
   roomObjectInstanceId,
   runLivingRoomLayout,
@@ -25,6 +24,8 @@ export type {
   LayoutPlanRequest,
   LayoutPlanResult,
   LayoutQuality,
+  LayoutMovementMetrics,
+  LayoutSelectionPolicy,
   LayoutSelection,
   LayoutSearchLimits,
   RuleEvaluation,

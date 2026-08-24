@@ -1,4 +1,4 @@
-export { buildPlanningScene, resolveSingleTvFocalId, planningRoomObjectEntityId, PlanningSceneBuildError } from './buildPlanningScene';
+export { buildPlanningScene, resolveSingleTvFocalId, planningRoomObjectEntityId } from './buildPlanningScene';
 export type { AssetDefinitionResolver } from './buildPlanningScene';
 export { planningProjectFingerprint } from './projectFingerprint';
 export type { PlannerApplyFailureReason, PlannerApplyResult } from '@/editor/planning/application/types';

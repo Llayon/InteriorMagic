@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildPlanningScene, PlanningSceneBuildError, resolveSingleTvFocalId } from './buildPlanningScene';
+import { PlanningError } from '@/editor/planning/errors';
+import { buildPlanningScene, resolveSingleTvFocalId } from './buildPlanningScene';
 import { createIntegrationProject, integrationAssetDefinitions, resolveIntegrationAsset, roomObject } from './testFixtures';
 
 describe('buildPlanningScene', () => {
@@ -26,15 +27,15 @@ describe('buildPlanningScene', () => {
 
   it('reports zero and ambiguous authoritative TVs without guessing', () => {
     expect(() => resolveSingleTvFocalId(buildPlanningScene(createIntegrationProject({ tv: false }), resolveIntegrationAsset)))
-      .toThrowError(expect.objectContaining({ code: 'no-tv' }));
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'FOCAL_NOT_FOUND' }));
     expect(() => resolveSingleTvFocalId(buildPlanningScene(createIntegrationProject({ secondTv: true }), resolveIntegrationAsset)))
-      .toThrowError(expect.objectContaining({ code: 'ambiguous-tv' }));
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'FOCAL_AMBIGUOUS' }));
   });
 
   it('rejects unsupported placement semantics safely', () => {
     const project = createIntegrationProject();
     const bad = { ...integrationAssetDefinitions.sofaMeta!, placement: { anchor: 'ceiling' as const } };
     expect(() => buildPlanningScene(project, (id) => id === 'sofaMeta' ? bad : resolveIntegrationAsset(id)))
-      .toThrowError(expect.objectContaining<Partial<PlanningSceneBuildError>>({ code: 'unsupported-placement' }));
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'UNSUPPORTED_PLACEMENT' }));
   });
 });

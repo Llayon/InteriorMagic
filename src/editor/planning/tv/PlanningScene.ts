@@ -12,5 +12,5 @@ export type {
 export type PlanningEntityRole = 'tv' | 'sofa' | 'armchair' | 'coffeeTable' | 'floorLamp' | 'obstacle';
 export type TvRole = PlanningEntityRole;
 /** Compatibility shape for existing TV fixtures and imports. */
-export type PlanningEntity = Omit<LivingRoomPlanningEntity, 'role'> & { role: TvRole; fixed?: boolean };
+export type PlanningEntity = Omit<LivingRoomPlanningEntity, 'role'> & { role: TvRole };
 export type PlanningScene = Omit<LivingRoomPlanningScene, 'entities'> & { entities: PlanningEntity[] };

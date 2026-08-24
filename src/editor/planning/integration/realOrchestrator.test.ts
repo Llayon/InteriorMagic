@@ -91,6 +91,12 @@ describe('real planner orchestrator', () => {
     ['CURRENT_LAYOUT_INVALID', 'Текущая расстановка нарушает обязательные ограничения планировщика.'],
     ['NO_VALID_PLAN', 'Не удалось найти допустимую расстановку.'],
     ['SEARCH_LIMIT_EXCEEDED', 'Не удалось безопасно завершить планирование расстановки.'],
+    ['INVALID_PROJECT', 'Текущая комната пока не поддерживается планировщиком.'],
+    ['UNKNOWN_ASSET', 'Текущая комната пока не поддерживается планировщиком.'],
+    ['UNSUPPORTED_PLACEMENT', 'Текущая комната пока не поддерживается планировщиком.'],
+    ['UNSUPPORTED_LAYOUT', 'Текущая комната пока не поддерживается планировщиком.'],
+    ['FOCAL_NOT_FOUND', 'В комнате не найден поддерживаемый телевизор.'],
+    ['FOCAL_AMBIGUOUS', 'Найдено несколько телевизоров. Выбор цели пока не поддерживается.'],
   ] as const)('maps PlanningError %s to a controlled message', async (code: PlanningErrorCode, expected: string) => {
     const ui = uiPort();
     const orchestrator = createRealPlannerOrchestrator({

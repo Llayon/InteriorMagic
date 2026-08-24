@@ -41,3 +41,19 @@ TV planning keeps its public `planTvViewing()` behavior while sharing the
 layout machinery. Conversation, Auto, and Free Space remain deferred; no
 scenario registry, plugin system, or alternative search strategy is part of
 this decision.
+
+## G1.5 Hardening Amendment
+
+The engine now receives a scenario-owned `LayoutSelectionPolicy` containing
+the acceptance threshold and movement-cost function. The engine measures
+movement and applies the supplied policy; TV retains the characterized legacy
+values in `planning/tv/constants.ts`. These values are compatibility
+heuristics, not universal design standards.
+
+`PlanningError` is the single typed boundary for scene projection, scenario
+preconditions, and engine failures. Existing controlled UX messages remain
+unchanged. `NO_VALID_PLAN` continues to be a normal no-op proposal outcome.
+
+The exhaustive search algorithm, Contract v1, `RoomProject`, Preview, atomic
+Apply, and Undo/Redo are unchanged. The obsolete TV `fixed` field was removed;
+effective movability remains represented only by `ActiveGroup`.

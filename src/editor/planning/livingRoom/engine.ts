@@ -5,7 +5,6 @@ import type { PlanningEntity, PlanningScene, PlanningTransform } from './Plannin
 import { PlanningError } from './errors';
 
 const SCORE_EPSILON = 1e-9;
-export const ACCEPTANCE_THRESHOLD = 4;
 
 export type Candidate = PlanningTransform & { key: string };
 export type Arrangement = Map<string, Candidate>;
@@ -43,6 +42,17 @@ export type LayoutEvaluation = {
   key: string;
 };
 
+export type LayoutMovementMetrics = {
+  movedCount: number;
+  translation: number;
+  rotation: number;
+};
+
+export type LayoutSelectionPolicy = {
+  acceptanceThreshold: number;
+  movementCost: (metrics: LayoutMovementMetrics) => number;
+};
+
 export type LayoutSelection = LayoutEvaluation & { outcome: SelectionOutcome };
 
 export type LayoutDiagnostics = {
@@ -62,6 +72,8 @@ export type LayoutSearchLimits = {
 export type LayoutPlanRequest = {
   scene: PlanningScene;
   activeGroup: ActiveGroup;
+  /** Scenario-owned acceptance and movement-cost policy; the engine supplies only measured movement metrics. */
+  selectionPolicy: LayoutSelectionPolicy;
   /** One candidate provider per active movable entity; provider order is part of deterministic search behavior. */
   dimensions: readonly CandidateDimension[];
   /** Returns applicable rule evaluations for an arrangement; return null for a non-applicable rule. */
@@ -214,7 +226,7 @@ const evaluate = (request: LayoutPlanRequest, arrangement: Arrangement): LayoutE
     }
   }
   const quality = aggregateQuality(request.evaluateRules(arrangement), request.ruleWeights);
-  const movementCost = Math.min(20, movedCount * 2 + translation * 2 + rotation / (Math.PI / 4));
+  const movementCost = request.selectionPolicy.movementCost({ movedCount, translation, rotation });
   return {
     arrangement: new Map(arrangement),
     quality,
@@ -302,7 +314,7 @@ export const runLivingRoomLayout = (request: LayoutPlanRequest): LayoutPlanResul
 
   visit(0, new Map());
   const accepted = best !== undefined && best.movedCount > 0
-    && best.utility - currentEvaluation.utility >= ACCEPTANCE_THRESHOLD - SCORE_EPSILON;
+    && best.utility - currentEvaluation.utility >= request.selectionPolicy.acceptanceThreshold - SCORE_EPSILON;
   const selected = accepted ? best! : currentEvaluation;
   const outcome: SelectionOutcome = accepted ? 'improved'
     : !best ? 'no-valid-plan'
