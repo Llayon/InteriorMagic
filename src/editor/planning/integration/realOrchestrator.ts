@@ -7,7 +7,8 @@ import {
   type PlanningIntentResult,
 } from '@/editor/planning/intent';
 import { planTvViewing } from '@/editor/planning/tv';
-import { buildPlanningScene, resolveSingleTvFocalId, type AssetDefinitionResolver } from './buildPlanningScene';
+import { projectPlanningScene, type AssetDefinitionResolver } from './projectPlanningScene';
+import { resolveSingleTvFocalId } from '@/editor/planning/tv';
 import { planningProjectFingerprint } from './projectFingerprint';
 import type { PlanningIntentAnalysisPort } from './planningIntentAnalysisPort';
 import { PlanningError, type PlanningScene } from '@/editor/planning/livingRoom';
@@ -90,7 +91,7 @@ export const createRealPlannerOrchestrator = ({
   const prepare = (): { scene: PlanningScene; fingerprint: string; focalPointId: string } => {
     const project = readProject();
     const fingerprint = planningProjectFingerprint(project);
-    const scene = buildPlanningScene(project, resolveAsset);
+    const scene = projectPlanningScene(project, resolveAsset);
     return { scene, fingerprint, focalPointId: resolveSingleTvFocalId(scene) };
   };
 

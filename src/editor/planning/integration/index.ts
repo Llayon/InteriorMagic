@@ -1,5 +1,6 @@
-export { buildPlanningScene, resolveSingleTvFocalId, planningRoomObjectEntityId } from './buildPlanningScene';
-export type { AssetDefinitionResolver } from './buildPlanningScene';
+export { projectPlanningScene, planningRoomObjectEntityId } from './projectPlanningScene';
+export type { AssetDefinitionResolver } from './projectPlanningScene';
+export { resolveSingleTvFocalId } from '@/editor/planning/tv';
 export { planningProjectFingerprint } from './projectFingerprint';
 export type { PlannerApplyFailureReason, PlannerApplyResult } from '@/editor/planning/application/types';
 export { createRealPlannerOrchestrator } from './realOrchestrator';

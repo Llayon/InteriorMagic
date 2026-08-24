@@ -21,6 +21,7 @@ import {
 import { PlanningError } from '@/editor/planning/livingRoom';
 import type { PlanningEntity, PlanningScene, PlanningTransform } from '@/editor/planning/livingRoom';
 import { TV_DEFAULT_PRIORITIES, TV_LAYOUT_HEURISTICS, TV_SELECTION_POLICY } from './constants';
+import { validateTvTopology } from './applicability';
 
 const SCORE_EPSILON = 1e-9;
 const compareLexical = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
@@ -192,8 +193,8 @@ export const planTvViewing = (scene: PlanningScene, goal: PlanningGoal): PlanPro
     throw new PlanningError('FOCAL_NOT_FOUND', `Unable to resolve unique TV focal entity: ${goal.focalPointId}`);
   }
   const focal = focalMatches[0]!;
+  validateTvTopology(scene);
   const sofas = scene.entities.filter((entity) => entity.role === 'sofa').sort((a, b) => compareLexical(a.id, b.id));
-  if (sofas.length !== 1) throw new PlanningError('UNSUPPORTED_LAYOUT', 'TV planning requires exactly one movable sofa');
   const roleOrder = { sofa: 0, armchair: 1, coffeeTable: 2 } as const;
   const movable = scene.entities.filter((entity): entity is PlanningEntity & { role: keyof typeof roleOrder } =>
     entity.role in roleOrder).sort((a, b) => roleOrder[a.role] - roleOrder[b.role] || compareLexical(a.id, b.id));
