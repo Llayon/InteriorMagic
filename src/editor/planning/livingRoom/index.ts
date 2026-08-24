@@ -3,10 +3,13 @@ export type {
   PlanningEntityRole,
   PlanningEntitySource,
   PlanningPlacementType,
+  PlanningRole,
   PlanningScene,
   PlanningTransform,
   PlanningZone,
 } from './PlanningScene';
+export { PlanningError } from './errors';
+export type { PlanningErrorCode } from './errors';
 export {
   ACCEPTANCE_THRESHOLD,
   activeTransform,
@@ -23,6 +26,7 @@ export type {
   LayoutPlanResult,
   LayoutQuality,
   LayoutSelection,
+  LayoutSearchLimits,
   RuleEvaluation,
   SelectionOutcome,
 } from './engine';

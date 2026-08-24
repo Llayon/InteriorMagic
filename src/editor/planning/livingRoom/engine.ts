@@ -2,6 +2,7 @@ import type { PlanProposal, PlanningFinding } from '../contracts/types';
 import { angularDifference, orientedRectsOverlap, pointDistance, rectContainedInRoom, type OrientedRect } from '@/editor/spatial/geometry';
 import { collisionMasksOverlap } from '@/editor/placement/collisionPolicy';
 import type { PlanningEntity, PlanningScene, PlanningTransform } from './PlanningScene';
+import { PlanningError } from './errors';
 
 const SCORE_EPSILON = 1e-9;
 export const ACCEPTANCE_THRESHOLD = 4;
@@ -50,17 +51,29 @@ export type LayoutDiagnostics = {
   candidateDimensionCount: number;
   arrangementsEvaluated: number;
   branchesPruned: number;
+  stoppedByBudget: boolean;
   maxCandidateCountByEntity: Record<string, number>;
+};
+
+export type LayoutSearchLimits = {
+  maxEvaluations?: number;
 };
 
 export type LayoutPlanRequest = {
   scene: PlanningScene;
   activeGroup: ActiveGroup;
+  /** One candidate provider per active movable entity; provider order is part of deterministic search behavior. */
   dimensions: readonly CandidateDimension[];
+  /** Returns applicable rule evaluations for an arrangement; return null for a non-applicable rule. */
   evaluateRules: (arrangement: Arrangement) => readonly (RuleEvaluation | null)[];
+  /** Flat weights keyed by the rule evaluation ids; only positive weights participate. */
   ruleWeights: readonly { id: string; weight: number }[];
+  /** Builds ordered findings from the before/after quality and final selection outcome. */
   buildFindings: (before: LayoutQuality, after: LayoutQuality, outcome: SelectionOutcome) => PlanningFinding[];
+  /** Optional scenario policy for entities that may overlap an immediate opening zone. */
   openingZoneExempt?: (entity: PlanningEntity) => boolean;
+  /** Optional cap on valid arrangements evaluated by the exhaustive search. */
+  searchLimits?: LayoutSearchLimits;
 };
 
 export type LayoutPlanResult = {
@@ -83,24 +96,24 @@ export const activeTransform = (entity: PlanningEntity, arrangement: Arrangement
 
 const validateActiveGroup = (scene: PlanningScene, activeGroup: ActiveGroup): void => {
   const sceneIds = new Set(scene.entities.map((entity) => entity.id));
-  if (sceneIds.size !== scene.entities.length) throw new Error('PlanningScene entity IDs must be unique');
+  if (sceneIds.size !== scene.entities.length) throw new PlanningError('INVALID_SCENE', 'PlanningScene entity IDs must be unique');
   const movableIds = new Set(activeGroup.movable.map((entity) => entity.id));
   const contextIds = new Set(activeGroup.fixedContext.map((entity) => entity.id));
   if (movableIds.size !== activeGroup.movable.length || contextIds.size !== activeGroup.fixedContext.length) {
-    throw new Error('ActiveGroup entity IDs must be unique');
+    throw new PlanningError('INVALID_ACTIVE_GROUP', 'ActiveGroup entity IDs must be unique');
   }
   if (activeGroup.movable.some((entity) => !sceneIds.has(entity.id))
     || activeGroup.fixedContext.some((entity) => !sceneIds.has(entity.id))) {
-    throw new Error('ActiveGroup entities must belong to the PlanningScene');
+    throw new PlanningError('INVALID_ACTIVE_GROUP', 'ActiveGroup entities must belong to the PlanningScene');
   }
   if (activeGroup.movable.some((entity) => contextIds.has(entity.id))) {
-    throw new Error('ActiveGroup movable entities cannot be fixed context');
+    throw new PlanningError('INVALID_ACTIVE_GROUP', 'ActiveGroup movable entities cannot be fixed context');
   }
   if (scene.entities.some((entity) => !movableIds.has(entity.id) && !contextIds.has(entity.id))) {
-    throw new Error('ActiveGroup fixed context must cover every non-movable scene entity');
+    throw new PlanningError('INVALID_ACTIVE_GROUP', 'ActiveGroup fixed context must cover every non-movable scene entity');
   }
   if (activeGroup.movable.some((entity) => !activeGroup.participants.some((participant) => participant.id === entity.id))) {
-    throw new Error('ActiveGroup movable entities must be participants');
+    throw new PlanningError('INVALID_ACTIVE_GROUP', 'ActiveGroup movable entities must be participants');
   }
 };
 
@@ -189,6 +202,7 @@ const evaluate = (request: LayoutPlanRequest, arrangement: Arrangement): LayoutE
   let translation = 0;
   let rotation = 0;
   const keys: string[] = [];
+  // Iteration order intentionally follows scene.entities to preserve legacy TV planner deterministic tie-break behavior.
   for (const entity of request.scene.entities) {
     const candidate = arrangement.get(entity.id);
     if (!candidate) continue;
@@ -220,17 +234,21 @@ const better = (a: LayoutEvaluation, b: LayoutEvaluation): boolean => {
 };
 
 export const roomObjectInstanceId = (entity: PlanningEntity): string => {
-  if (entity.source.kind !== 'roomObject') throw new Error(`Entity ${entity.id} does not originate from a room object`);
+  if (entity.source.kind !== 'roomObject') throw new PlanningError('INVALID_SCENE', `Entity ${entity.id} does not originate from a room object`);
   return entity.source.instanceId;
 };
 
 export const runLivingRoomLayout = (request: LayoutPlanRequest): LayoutPlanResult => {
   validateActiveGroup(request.scene, request.activeGroup);
+  const maxEvaluations = request.searchLimits?.maxEvaluations;
+  if (maxEvaluations !== undefined && (!Number.isInteger(maxEvaluations) || maxEvaluations < 1)) {
+    throw new PlanningError('SEARCH_LIMIT_EXCEEDED', 'Layout search maxEvaluations must be a positive integer');
+  }
   const dimensionIds = new Set(request.dimensions.map((dimension) => dimension.entity.id));
   if (dimensionIds.size !== request.dimensions.length
     || dimensionIds.size !== request.activeGroup.movable.length
     || request.activeGroup.movable.some((entity) => !dimensionIds.has(entity.id))) {
-    throw new Error('Candidate dimensions must cover the active movable group exactly once');
+    throw new PlanningError('INVALID_ACTIVE_GROUP', 'Candidate dimensions must cover the active movable group exactly once');
   }
 
   const diagnostics: LayoutDiagnostics = {
@@ -239,20 +257,26 @@ export const runLivingRoomLayout = (request: LayoutPlanRequest): LayoutPlanResul
     candidateDimensionCount: request.dimensions.length,
     arrangementsEvaluated: 0,
     branchesPruned: 0,
+    stoppedByBudget: false,
     maxCandidateCountByEntity: {},
   };
   const current = new Map<string, Candidate>(request.activeGroup.movable.map((entity) => [entity.id, { ...entity.transform, key: 'current' }]));
   if (!hardConstraintsPass(request, current, true)) {
-    throw new Error('Current PlanningScene arrangement violates hard constraints');
+    throw new PlanningError('CURRENT_LAYOUT_INVALID', 'Current PlanningScene arrangement violates hard constraints');
   }
   const currentEvaluation = evaluate(request, current);
   let best: LayoutEvaluation | undefined;
   let bestAlternative: LayoutEvaluation | undefined;
 
   const visit = (index: number, arrangement: Arrangement): void => {
+    if (diagnostics.stoppedByBudget) return;
     if (index === request.dimensions.length) {
       if (!hardConstraintsPass(request, arrangement, true)) {
         diagnostics.branchesPruned += 1;
+        return;
+      }
+      if (maxEvaluations !== undefined && diagnostics.arrangementsEvaluated >= maxEvaluations) {
+        diagnostics.stoppedByBudget = true;
         return;
       }
       diagnostics.arrangementsEvaluated += 1;
@@ -268,6 +292,7 @@ export const runLivingRoomLayout = (request: LayoutPlanRequest): LayoutPlanResul
       candidates.length,
     );
     for (const candidate of candidates) {
+      if (diagnostics.stoppedByBudget) break;
       arrangement.set(dimension.entity.id, candidate);
       if (hardConstraintsPass(request, arrangement, false)) visit(index + 1, arrangement);
       else diagnostics.branchesPruned += 1;

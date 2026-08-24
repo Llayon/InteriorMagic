@@ -21,6 +21,7 @@ import {
 import type { PlanningEntity, PlanningScene, PlanningTransform } from '@/editor/planning/livingRoom';
 
 const SCORE_EPSILON = 1e-9;
+const compareLexical = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
 const DEFAULT_PRIORITIES: PlanningPriority[] = ['viewing', 'circulation', 'conversation'];
 const PRIORITY_SLOTS = [45, 30, 15] as const;
 
@@ -189,11 +190,11 @@ export const planTvViewing = (scene: PlanningScene, goal: PlanningGoal): PlanPro
   const focalMatches = scene.entities.filter((entity) => entity.id === goal.focalPointId);
   if (focalMatches.length !== 1 || focalMatches[0]!.role !== 'tv') throw new Error(`Unable to resolve unique TV focal entity: ${goal.focalPointId}`);
   const focal = focalMatches[0]!;
-  const sofas = scene.entities.filter((entity) => entity.role === 'sofa').sort((a, b) => a.id.localeCompare(b.id));
+  const sofas = scene.entities.filter((entity) => entity.role === 'sofa').sort((a, b) => compareLexical(a.id, b.id));
   if (sofas.length !== 1) throw new Error('TV planning requires exactly one movable sofa');
   const roleOrder = { sofa: 0, armchair: 1, coffeeTable: 2 } as const;
   const movable = scene.entities.filter((entity): entity is PlanningEntity & { role: keyof typeof roleOrder } =>
-    entity.role in roleOrder).sort((a, b) => roleOrder[a.role] - roleOrder[b.role] || a.id.localeCompare(b.id));
+    entity.role in roleOrder).sort((a, b) => roleOrder[a.role] - roleOrder[b.role] || compareLexical(a.id, b.id));
   for (const entity of movable) {
     if (entity.placementType !== 'floor') throw new Error(`Unsupported placement type for movable entity ${entity.id}: ${entity.placementType}`);
     if (entity.source.kind !== 'roomObject') throw new Error(`Movable entity ${entity.id} must originate from a room object`);

@@ -7,6 +7,7 @@ import {
   type CandidateDimension,
   type LayoutPlanRequest,
 } from './engine';
+import { PlanningError } from './errors';
 
 const entity = (
   id: string,
@@ -136,5 +137,77 @@ describe('scenario-neutral living-room layout engine', () => {
     expect(result.proposal.moves).toEqual([]);
     expect(result.selection.key).toBe('first:current|second:current');
     expect(result.diagnostics.arrangementsEvaluated).toBe(1);
+  });
+
+  it('rejects opening-zone candidates unless the scenario exempts the entity', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    const input = { ...scene([movable]), immediateOpeningZones: [{ id: 'opening', center: { x: 1.5, z: 0 }, bounds: { width: 1, depth: 1 } }] };
+    const dimensions: CandidateDimension[] = [{
+      entity: movable,
+      provide: () => [candidate(movable, 'current', 0, 0), candidate(movable, 'opening', 1.5, 0)],
+    }];
+    const evaluate = (arrangement: Arrangement) => [{ id: 'quality', quality: arrangement.get('movable')?.key === 'opening' ? .9 : .5 }];
+    const blocked = runLivingRoomLayout(request(input, [movable], dimensions, evaluate));
+    const exempt = runLivingRoomLayout({ ...request(input, [movable], dimensions, evaluate), openingZoneExempt: (item) => item.id === 'movable' });
+
+    expect(blocked.selection.key).toBe('movable:current');
+    expect(blocked.proposal.moves).toEqual([]);
+    expect(exempt.proposal.moves).toEqual([{ instanceId: 'movable', position: { x: 1.5, z: 0 }, rotationY: 0 }]);
+  });
+
+  it('returns a deterministic no-op for an empty movable group', () => {
+    const result = runLivingRoomLayout(request(scene([]), [], [], () => [{ id: 'quality', quality: .5 }]));
+
+    expect(result.proposal.moves).toEqual([]);
+    expect(result.selection.outcome).toBe('already-good');
+    expect(result.diagnostics.activeMovableCount).toBe(0);
+    expect(result.diagnostics.arrangementsEvaluated).toBe(1);
+  });
+
+  it('keeps repeated tie proposals identical across multiple dimensions', () => {
+    const first = entity('first', 'sofa', -1, 0);
+    const second = entity('second', 'armchair', 1, 0);
+    const input = scene([first, second]);
+    const dimensions: CandidateDimension[] = [
+      { entity: first, provide: () => [candidate(first, 'current', -1, 0), candidate(first, 'duplicate', -1, 0)] },
+      { entity: second, provide: () => [candidate(second, 'current', 1, 0), candidate(second, 'duplicate', 1, 0)] },
+    ];
+    const evaluateTie = () => [{ id: 'quality', quality: .5 }];
+    const firstRun = runLivingRoomLayout(request(input, [first, second], dimensions, evaluateTie));
+    const secondRun = runLivingRoomLayout(request(input, [first, second], dimensions, evaluateTie));
+
+    expect(firstRun.proposal).toEqual(secondRun.proposal);
+    expect(firstRun.selection.key).toBe('first:current|second:current');
+  });
+
+  it('stops exhaustive evaluation at the configured search budget', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    const input = scene([movable]);
+    const dimensions: CandidateDimension[] = [{
+      entity: movable,
+      provide: () => [candidate(movable, 'current', 0, 0), candidate(movable, 'alternate', .5, 0)],
+    }];
+    const result = runLivingRoomLayout({
+      ...request(input, [movable], dimensions, () => [{ id: 'quality', quality: .5 }]),
+      searchLimits: { maxEvaluations: 1 },
+    });
+
+    expect(result.diagnostics.arrangementsEvaluated).toBe(1);
+    expect(result.diagnostics.stoppedByBudget).toBe(true);
+  });
+
+  it('reports typed errors for invalid active groups and current layouts', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    expect(() => runLivingRoomLayout(request(scene([movable]), [movable, movable], [], () => [])))
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'INVALID_ACTIVE_GROUP' }));
+
+    const invalidScene = { ...scene([movable]), immediateOpeningZones: [{ id: 'opening', center: { x: 0, z: 0 }, bounds: { width: 1, depth: 1 } }] };
+    expect(() => runLivingRoomLayout(request(invalidScene, [movable], [{ entity: movable, provide: () => [candidate(movable, 'current', 0, 0)] }], () => [])))
+      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'CURRENT_LAYOUT_INVALID' }));
+
+    expect(() => runLivingRoomLayout({
+      ...request(scene([movable]), [movable], [{ entity: movable, provide: () => [candidate(movable, 'current', 0, 0)] }], () => []),
+      searchLimits: { maxEvaluations: 0 },
+    })).toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'SEARCH_LIMIT_EXCEEDED' }));
   });
 });
