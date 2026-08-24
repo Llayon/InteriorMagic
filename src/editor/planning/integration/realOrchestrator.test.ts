@@ -3,6 +3,7 @@ import type { PlanProposal } from '@/editor/planning/contracts';
 import { planningProjectFingerprint } from './projectFingerprint';
 import { createRealPlannerOrchestrator } from './realOrchestrator';
 import { createIntegrationProject, resolveIntegrationAsset } from './testFixtures';
+import { PlanningError, type PlanningErrorCode } from '@/editor/planning/livingRoom';
 
 const uiPort = () => {
   const state: { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null } = {
@@ -82,5 +83,44 @@ describe('real planner orchestrator', () => {
     await orchestrator.beginAnalysis();
     expect(ui.state.status).toBe('error');
     expect(ui.state.proposal).toBeNull();
+  });
+
+  it.each([
+    ['INVALID_SCENE', 'Текущая комната пока не поддерживается планировщиком.'],
+    ['INVALID_ACTIVE_GROUP', 'Текущая комната пока не поддерживается планировщиком.'],
+    ['CURRENT_LAYOUT_INVALID', 'Текущая расстановка нарушает обязательные ограничения планировщика.'],
+    ['NO_VALID_PLAN', 'Не удалось найти допустимую расстановку.'],
+    ['SEARCH_LIMIT_EXCEEDED', 'Не удалось безопасно завершить планирование расстановки.'],
+  ] as const)('maps PlanningError %s to a controlled message', async (code: PlanningErrorCode, expected: string) => {
+    const ui = uiPort();
+    const orchestrator = createRealPlannerOrchestrator({
+      readProject: createIntegrationProject,
+      store: ui.port,
+      resolveAsset: resolveIntegrationAsset,
+      applyMoves: () => ({ ok: true }),
+      plan: () => { throw new PlanningError(code, 'internal planning detail'); },
+    });
+
+    await orchestrator.beginAnalysis();
+
+    expect(ui.state.status).toBe('error');
+    expect(ui.state.error).toBe(expected);
+    expect(ui.state.error).not.toContain('internal planning detail');
+  });
+
+  it('keeps unknown non-PlanningError failures on the generic controlled message', async () => {
+    const ui = uiPort();
+    const orchestrator = createRealPlannerOrchestrator({
+      readProject: createIntegrationProject,
+      store: ui.port,
+      resolveAsset: resolveIntegrationAsset,
+      applyMoves: () => ({ ok: true }),
+      plan: () => { throw new Error('internal planning detail'); },
+    });
+
+    await orchestrator.beginAnalysis();
+
+    expect(ui.state.error).toBe('Не удалось проанализировать расстановку.');
+    expect(ui.state.error).not.toContain('internal planning detail');
   });
 });

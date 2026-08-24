@@ -199,4 +199,26 @@ describe('deterministic TV planner', () => {
       },
     });
   });
+
+  it('freezes the TV improvement-too-small proposal', () => {
+    const input = scene({
+      room: { width: 6, depth: 4.1 },
+      entities: [entity('tv', 'tv', 0, 1, Math.PI, 1.2, .1, true), entity('sofa', 'sofa', 0, -1.5, .03, 2, .9)],
+    });
+    const first = planTvViewing(input, goal);
+    const second = planTvViewing(input, goal);
+
+    expect(first).toEqual({
+      moves: [],
+      scoreBefore: { total: 95.18267386099674 },
+      scoreAfter: { total: 95.18267386099674 },
+      findings: [{
+        ruleId: 'layout.selection',
+        code: 'layout-improvement-too-small',
+        severity: 'info',
+        params: { score: 95.18267386099674 },
+      }],
+    });
+    expect(second).toEqual(first);
+  });
 });
