@@ -1,40 +1,15 @@
-import type { Vec2 } from '@/editor/model/types';
-import type { RectBounds } from '@/editor/spatial/geometry';
+import type {
+  PlanningEntity as LivingRoomPlanningEntity,
+  PlanningScene as LivingRoomPlanningScene,
+} from '../livingRoom/PlanningScene';
+export type {
+  PlanningEntitySource,
+  PlanningEntityRole,
+  PlanningPlacementType,
+  PlanningTransform,
+  PlanningZone,
+} from '../livingRoom/PlanningScene';
 
-export type PlanningPlacementType = 'floor' | 'wall';
-export type PlanningEntityRole = 'tv' | 'sofa' | 'armchair' | 'coffeeTable' | 'floorLamp' | 'obstacle';
-
-export type PlanningTransform = {
-  position: Vec2;
-  rotationY: number;
-};
-
-export type PlanningEntitySource =
-  | { kind: 'roomObject'; instanceId: string }
-  | { kind: 'roomStructure'; structuralId: string }
-  | { kind: 'derived' };
-
-export type PlanningEntity = {
-  id: string;
-  source: PlanningEntitySource;
-  role: PlanningEntityRole;
-  placementType: PlanningPlacementType;
-  fixed: boolean;
-  footprint: RectBounds;
-  collision: { group: number; mask: number };
-  transform: PlanningTransform;
-};
-
-export type PlanningZone = {
-  id: string;
-  bounds: RectBounds;
-  center: Vec2;
-  rotationY?: number;
-};
-
-export type PlanningScene = {
-  room: RectBounds;
-  immediateOpeningZones: PlanningZone[];
-  circulationZones: PlanningZone[];
-  entities: PlanningEntity[];
-};
+/** Compatibility shape for existing TV fixtures and imports. */
+export type PlanningEntity = LivingRoomPlanningEntity & { fixed?: boolean };
+export type PlanningScene = Omit<LivingRoomPlanningScene, 'entities'> & { entities: PlanningEntity[] };

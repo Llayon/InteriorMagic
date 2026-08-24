@@ -10,7 +10,7 @@ import { planTvViewing } from '@/editor/planning/tv';
 import { buildPlanningScene, PlanningSceneBuildError, resolveSingleTvFocalId, type AssetDefinitionResolver } from './buildPlanningScene';
 import { planningProjectFingerprint } from './projectFingerprint';
 import type { PlanningIntentAnalysisPort } from './planningIntentAnalysisPort';
-import type { PlanningScene } from '@/editor/planning/tv';
+import type { PlanningScene } from '@/editor/planning/livingRoom';
 import type { PlanningGoal } from '@/editor/planning/contracts';
 
 export interface RealPlannerStorePort {
