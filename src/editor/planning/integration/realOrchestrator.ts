@@ -10,7 +10,7 @@ import { planTvViewing } from '@/editor/planning/tv';
 import { buildPlanningScene, PlanningSceneBuildError, resolveSingleTvFocalId, type AssetDefinitionResolver } from './buildPlanningScene';
 import { planningProjectFingerprint } from './projectFingerprint';
 import type { PlanningIntentAnalysisPort } from './planningIntentAnalysisPort';
-import type { PlanningScene } from '@/editor/planning/tv';
+import { PlanningError, type PlanningScene } from '@/editor/planning/livingRoom';
 import type { PlanningGoal } from '@/editor/planning/contracts';
 
 export interface RealPlannerStorePort {
@@ -37,8 +37,20 @@ const controlledAnalysisMessage = (cause: unknown): string => {
     if (cause.code === 'ambiguous-tv') return 'Найдено несколько телевизоров. Выбор цели пока не поддерживается.';
     return 'Текущая комната пока не поддерживается планировщиком.';
   }
-  if (cause instanceof Error && cause.message.includes('Current PlanningScene arrangement')) {
-    return 'Текущая расстановка нарушает обязательные ограничения планировщика.';
+  if (cause instanceof PlanningError) {
+    switch (cause.code) {
+      case 'CURRENT_LAYOUT_INVALID':
+        return 'Текущая расстановка нарушает обязательные ограничения планировщика.';
+      case 'INVALID_SCENE':
+      case 'INVALID_ACTIVE_GROUP':
+        return 'Текущая комната пока не поддерживается планировщиком.';
+      case 'SEARCH_LIMIT_EXCEEDED':
+        return 'Не удалось безопасно завершить планирование расстановки.';
+      case 'NO_VALID_PLAN':
+        // The engine currently reports this as a normal no-op PlanProposal;
+        // keep a controlled mapping if a future adapter propagates the code.
+        return 'Не удалось найти допустимую расстановку.';
+    }
   }
   return 'Не удалось проанализировать расстановку.';
 };

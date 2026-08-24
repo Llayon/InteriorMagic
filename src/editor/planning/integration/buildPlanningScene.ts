@@ -1,6 +1,6 @@
 import { getAsset } from '@/editor/assets/registry';
 import type { FurnitureAssetDefinition, FurnitureSemanticRole, RoomProject } from '@/editor/model/types';
-import type { PlanningEntity, PlanningEntityRole, PlanningPlacementType, PlanningScene } from '@/editor/planning/tv';
+import type { PlanningEntity, PlanningEntityRole, PlanningPlacementType, PlanningScene } from '@/editor/planning/livingRoom';
 
 export type AssetDefinitionResolver = (assetId: string) => FurnitureAssetDefinition;
 
@@ -56,15 +56,14 @@ export const buildPlanningScene = (
       source: { kind: 'roomObject', instanceId: object.instanceId },
       role,
       placementType: planningPlacement(asset, role),
-      fixed: role === 'tv' || role === 'floorLamp' || role === 'obstacle',
       footprint: { ...asset.footprint },
       collision: { ...asset.collision },
       transform: { position: { x: object.position.x, z: object.position.z }, rotationY: object.rotationY },
     };
   });
-  const sofas = entities.filter((entity) => entity.role === 'sofa' && !entity.fixed);
-  const chairs = entities.filter((entity) => entity.role === 'armchair' && !entity.fixed);
-  const tables = entities.filter((entity) => entity.role === 'coffeeTable' && !entity.fixed);
+  const sofas = entities.filter((entity) => entity.role === 'sofa');
+  const chairs = entities.filter((entity) => entity.role === 'armchair');
+  const tables = entities.filter((entity) => entity.role === 'coffeeTable');
   if (sofas.length !== 1 || chairs.length > 2 || tables.length > 1) {
     throw new PlanningSceneBuildError('unsupported-layout', 'TV planner supports one sofa, up to two armchairs, and up to one coffee table');
   }

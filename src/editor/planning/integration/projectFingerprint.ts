@@ -1,5 +1,7 @@
 import type { RoomProject } from '@/editor/model/types';
 
+const compareLexical = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
+
 export const planningProjectFingerprint = (project: RoomProject): string => JSON.stringify({
   room: {
     width: project.room.width,
@@ -7,7 +9,7 @@ export const planningProjectFingerprint = (project: RoomProject): string => JSON
     height: project.room.height,
   },
   objects: [...project.objects]
-    .sort((a, b) => a.instanceId.localeCompare(b.instanceId))
+    .sort((a, b) => compareLexical(a.instanceId, b.instanceId))
     .map((object) => ({
       instanceId: object.instanceId,
       assetId: object.assetId,
