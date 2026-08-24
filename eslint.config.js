@@ -5,7 +5,7 @@ import hooks from 'eslint-plugin-react-hooks';
 import refresh from 'eslint-plugin-react-refresh';
 
 export default tseslint.config(
-  { ignores: ['dist', 'playwright-report', 'test-results'] },
+  { ignores: ['dist', 'playwright-report', 'test-results', '**/.wrangler', 'workers/**/worker-configuration.d.ts'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

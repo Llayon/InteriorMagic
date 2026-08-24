@@ -12,7 +12,7 @@
     }
   },
   "include": [
-    "playwright.config.ts",
+    "playwright*.config.ts",
     "playwright.ithappy-catalog.config.ts",
     "tests/e2e/**/*.ts",
     "tests/catalog-local/**/*.ts",

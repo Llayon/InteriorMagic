@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "interior-magic-planning-intent",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  // Non-secret deployment allowlist. Replace only for a controlled deployment.
+  "vars": {
+    "ALLOWED_ORIGIN": "https://example.invalid"
+  },
+  "observability": {
+    "enabled": false
+  }
+}

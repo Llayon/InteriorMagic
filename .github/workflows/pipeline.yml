@@ -61,6 +61,8 @@ jobs:
         run: npm run test:e2e:planner
       - name: Run real planner integration browser tests
         run: npm run test:e2e:planner-real
+      - name: Run planning intent integration browser tests
+        run: npm run test:e2e:planner-intent
       - name: Upload Playwright artifacts
         if: failure()
         uses: actions/upload-artifact@v6
