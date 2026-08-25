@@ -27,6 +27,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-small',
+      testIgnore: /(?:ar0|planner-(?:preview|integration|intent))\.spec\.ts/,
       use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
@@ -36,7 +37,20 @@ export default defineConfig({
     },
     {
       name: 'desktop',
-      testIgnore: /(?:interactions-touch|planner-(?:preview|integration|intent))\.spec\.ts/,
+      testIgnore: /(?:ar0|interactions-touch|planner-(?:preview|integration|intent))\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+    },
+    // Native-AR landing tests instantiate model-viewer, which owns a separate
+    // WebGL renderer. Dedicated projects keep that renderer out of the editor
+    // worker process while retaining the same mobile and desktop assertions.
+    {
+      name: 'ar0-mobile-small',
+      testMatch: /ar0\.spec\.ts/,
+      use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
+    },
+    {
+      name: 'ar0-desktop',
+      testMatch: /ar0\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],
