@@ -2,6 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { buildPlanningIntentOutputSchema, planningIntentSystemPrompt } from './prompt';
 
 describe('Planning Contract v2 provider instructions', () => {
+  const branchEnums = (focalIds: readonly string[]) => {
+    const schema = buildPlanningIntentOutputSchema(focalIds);
+    return schema.schema.oneOf.map((branch) => {
+      const activity = branch.properties['activity'];
+      const intent = branch.properties['intent'];
+      return activity?.enum[0] ?? intent?.enum[0];
+    });
+  };
+
   it('exposes strict TV, focal-free Conversation, and controlled sentinel branches', () => {
     const schema = buildPlanningIntentOutputSchema(['tv-a', 'tv-b']);
     expect(schema.name).toBe('planning_goal_v2');
@@ -21,6 +30,14 @@ describe('Planning Contract v2 provider instructions', () => {
       },
     ]));
     expect(JSON.stringify(schema)).not.toContain('priorities');
+  });
+
+  it('makes TV and ambiguous-focal branches match focal cardinality', () => {
+    expect(branchEnums([])).toEqual(['conversation', 'unsupported_intent']);
+    expect(branchEnums(['tv-a'])).toEqual(['watchTv', 'conversation', 'unsupported_intent']);
+    expect(branchEnums(['tv-a', 'tv-b'])).toEqual([
+      'watchTv', 'conversation', 'unsupported_intent', 'ambiguous_focal',
+    ]);
   });
 
   it('rejects tuning and multi-activity requests instead of silently dropping intent', () => {

@@ -28,13 +28,11 @@ export const planningIntentSystemPrompt = [
  * parsePlanningGoalV2() remains the final structural authority regardless of
  * what any provider-side schema enforcement does. No schema library involved.
  */
-export const buildPlanningIntentOutputSchema = (allowedFocalIds: readonly PlanningEntityId[]) => ({
-  name: 'planning_goal_v2',
-  strict: true,
-  schema: {
-    type: 'object',
-    oneOf: [
-      {
+export const buildPlanningIntentOutputSchema = (allowedFocalIds: readonly PlanningEntityId[]) => {
+  const branches = [
+    ...(allowedFocalIds.length === 0
+      ? []
+      : [{
         type: 'object',
         additionalProperties: false,
         required: ['activity', 'focalPointId'],
@@ -42,23 +40,41 @@ export const buildPlanningIntentOutputSchema = (allowedFocalIds: readonly Planni
           activity: { type: 'string', enum: ['watchTv'] },
           focalPointId: { type: 'string', enum: [...allowedFocalIds] },
         },
+      }]),
+    {
+      type: 'object',
+      additionalProperties: false,
+      required: ['activity'],
+      properties: {
+        activity: { type: 'string', enum: ['conversation'] },
       },
-      {
-        type: 'object',
-        additionalProperties: false,
-        required: ['activity'],
-        properties: {
-          activity: { type: 'string', enum: ['conversation'] },
-        },
+    },
+    {
+      type: 'object',
+      additionalProperties: false,
+      required: ['intent'],
+      properties: {
+        intent: { type: 'string', enum: ['unsupported_intent'] },
       },
-      {
+    },
+    ...(allowedFocalIds.length <= 1
+      ? []
+      : [{
         type: 'object',
         additionalProperties: false,
         required: ['intent'],
         properties: {
-          intent: { type: 'string', enum: ['unsupported_intent', 'ambiguous_focal'] },
+          intent: { type: 'string', enum: ['ambiguous_focal'] },
         },
-      },
-    ],
-  },
-});
+      }]),
+  ];
+
+  return {
+    name: 'planning_goal_v2',
+    strict: true,
+    schema: {
+      type: 'object',
+      oneOf: branches,
+    },
+  };
+};

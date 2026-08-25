@@ -80,6 +80,12 @@ export const interpretPlanningIntent = async (
       return { outcome: 'unsupported_intent' };
     }
     if (providerOutput['intent'] === 'ambiguous_focal') {
+      if (validated.tvFocalPoints.length <= 1) {
+        return {
+          outcome: 'invalid_model_output',
+          reason: 'ambiguous_focal requires multiple TV focal points',
+        };
+      }
       return {
         outcome: 'ambiguous_focal',
         candidateIds: validated.tvFocalPoints.map((focal) => focal.id),

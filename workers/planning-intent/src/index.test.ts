@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { planningIntentSystemPrompt } from '../../../src/editor/planning/intent';
-import { GROQ_INTENT_MODEL, GROQ_TIMEOUT_MS, QWEN_OUTPUT_SHAPE_HINT } from './groq';
+import { buildQwenOutputShapeHint, GROQ_INTENT_MODEL, GROQ_TIMEOUT_MS } from './groq';
 import { createPlanningIntentHandler } from './index';
 
 const wire = (text = 'Сделай просмотр телевизора удобнее') => ({
@@ -131,12 +131,35 @@ describe('planning intent Worker', () => {
     const userContent = typeof user === 'object' && user !== null && 'content' in user
       ? (user as Record<string, unknown>)['content']
       : '';
-    expect(userContent).toContain(QWEN_OUTPUT_SHAPE_HINT);
+    expect(userContent).toContain(buildQwenOutputShapeHint(1));
     expect(serialized).toContain('Главное — проход');
     expect(serialized).toContain('room-object:tv');
     for (const forbidden of ['position', 'rotation', 'footprint', 'room dimensions', 'collision']) {
       expect(serialized).not.toContain(forbidden);
     }
+  });
+
+  it.each([
+    [0, false, false],
+    [1, true, false],
+    [2, true, true],
+  ])('advertises only cardinality-valid output shapes for %i TV focals', async (count, hasTv, hasAmbiguous) => {
+    const bodies: Record<string, unknown>[] = [];
+    const upstream = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+      return groqResponse('{"activity":"conversation"}');
+    });
+    await call({
+      ...wire('Classify this request'),
+      focals: Array.from({ length: count }, (_, index) => ({ id: `tv-${index}`, kind: 'tv' })),
+    }, upstream);
+    const messages = bodies[0]?.['messages'];
+    const user = Array.isArray(messages) ? messages[1] : null;
+    const content = typeof user === 'object' && user !== null && 'content' in user
+      ? String((user as Record<string, unknown>)['content'])
+      : '';
+    expect(content.includes('TV success:')).toBe(hasTv);
+    expect(content.includes('Ambiguous:')).toBe(hasAmbiguous);
   });
 
   it('fails closed without the server secret and never echoes it', async () => {

@@ -96,6 +96,17 @@ describe('Planning Contract v2 interpretation', () => {
       .resolves.toEqual({ outcome: 'ambiguous_focal', candidateIds: ['tv-a', 'tv-b'] });
   });
 
+  it.each([
+    { focalPoints: [] },
+    { focalPoints: [{ id: 'tv-main', kind: 'tv' as const }] },
+  ])('rejects ambiguous_focal unless multiple TV focals exist', async (context) => {
+    await expect(interpretPlanningIntent('x', context, providerFor({ intent: 'ambiguous_focal' })))
+      .resolves.toEqual({
+        outcome: 'invalid_model_output',
+        reason: 'ambiguous_focal requires multiple TV focal points',
+      });
+  });
+
   it('rejects malformed sentinels and maps provider failures', async () => {
     await expect(interpretPlanningIntent('x', singleTv, providerFor({ intent: 'unsupported_intent', extra: true })))
       .resolves.toMatchObject({ outcome: 'invalid_model_output' });
