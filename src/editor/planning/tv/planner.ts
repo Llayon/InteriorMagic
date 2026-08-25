@@ -1,4 +1,9 @@
-import type { PlanningFinding, PlanningGoal, PlanProposal } from '../contracts/types';
+import type {
+  PlanningFinding,
+  PlanningPriorityV1,
+  PlanProposal,
+  WatchTvGoalV2,
+} from '../contracts/types';
 import {
   angularDifference,
   orientedRectsOverlap,
@@ -185,8 +190,13 @@ const findings = (before: LayoutQuality, after: LayoutQuality, outcome: Selectio
   return result;
 };
 
-export const planTvViewing = (scene: PlanningScene, goal: PlanningGoal): PlanProposal => {
-  const requestedPriorities = goal.priorities ?? [];
+/** Legacy-only compatibility entry. Do not export from the TV public barrel. */
+export const planTvViewingWithLegacyPriorities = (
+  scene: PlanningScene,
+  goal: WatchTvGoalV2,
+  legacyPriorityOrder: readonly PlanningPriorityV1[] = [],
+): PlanProposal => {
+  const requestedPriorities = legacyPriorityOrder;
   const priorities = [...requestedPriorities, ...TV_DEFAULT_PRIORITIES.filter((priority) => !requestedPriorities.includes(priority))];
   const focalMatches = scene.entities.filter((entity) => entity.id === goal.focalPointId);
   if (focalMatches.length !== 1 || focalMatches[0]!.role !== 'tv') {
@@ -220,3 +230,6 @@ export const planTvViewing = (scene: PlanningScene, goal: PlanningGoal): PlanPro
   });
   return result.proposal;
 };
+
+export const planTvViewing = (scene: PlanningScene, goal: WatchTvGoalV2): PlanProposal =>
+  planTvViewingWithLegacyPriorities(scene, goal);

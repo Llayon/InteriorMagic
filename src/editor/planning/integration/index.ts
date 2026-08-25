@@ -9,3 +9,4 @@ export type { RemotePlanningIntentProviderOptions } from './remotePlanningIntent
 export type { PlanningIntentAnalysisPort } from './planningIntentAnalysisPort';
 export { resolveTvPlannerCapability } from './tvPlannerCapability';
 export type { TvPlannerCapability } from './tvPlannerCapability';
+export { planLegacyPlanningGoalV1, planPlanningGoal } from './planPlanningGoal';

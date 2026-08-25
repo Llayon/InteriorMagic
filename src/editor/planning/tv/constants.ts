@@ -1,11 +1,11 @@
-import type { PlanningPriority } from '../contracts/types';
+import type { PlanningPriorityV1 } from '../contracts/types';
 import type { LayoutSelectionPolicy } from '@/editor/planning/livingRoom';
 
 /**
  * Frozen G1 TV heuristics. These values preserve the characterized planner
  * behavior; they are not general interior-design standards.
  */
-export const TV_DEFAULT_PRIORITIES: PlanningPriority[] = ['viewing', 'circulation', 'conversation'];
+export const TV_DEFAULT_PRIORITIES: PlanningPriorityV1[] = ['viewing', 'circulation', 'conversation'];
 
 export const TV_LAYOUT_HEURISTICS = {
   prioritySlots: [45, 30, 15] as const,
