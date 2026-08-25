@@ -8,8 +8,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  // Several parallel WebGL + PMREM contexts can starve software-rendered local/CI GPUs.
-  workers: process.env.CI ? 1 : 4,
+  // The editor and model-viewer both create WebGL contexts. Keep local
+  // concurrency below the software-renderer starvation boundary; CI remains 1.
+  workers: process.env.CI ? 1 : 2,
   reporter: [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
   use: {

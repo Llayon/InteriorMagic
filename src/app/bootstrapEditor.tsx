@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
-import { installTestDiagnostics, registerPlanningIntentAnalysisPort } from '@/test/diagnostics';
+import { registerPlanningIntentAnalysisPort } from '@/test/diagnostics';
 import { createBeautifulRoomProject } from '@/app/demo/beautifulRoom';
 import { createPlannerFixtureProject } from '@/app/demo/plannerFixtureRoom';
 import { useEditorStore } from '@/editor/state/store';
@@ -22,7 +22,6 @@ import {
 } from '@/editor/planning/integration';
 
 export const bootstrapEditor = async () => {
-  installTestDiagnostics();
   const query = new URLSearchParams(window.location.search);
   if (import.meta.env.MODE === 'test' && query.get('registry') === 'ithappy') {
     const { installIthappyRegistryPrototype } = await import('@/app/local/ithappyRegistryPrototype');
