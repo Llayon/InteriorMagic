@@ -28,9 +28,9 @@ Telegram Mini Apps expose `window.Telegram.WebApp.initData` (raw query string in
   external_identities(provider TEXT NOT NULL, provider_subject TEXT NOT NULL, user_id TEXT NOT NULL, created_at INTEGER NOT NULL,
     PRIMARY KEY(provider, provider_subject), UNIQUE(user_id, provider), FOREIGN KEY(user_id) REFERENCES users(id))
   ```
-  `provider='telegram'`, `user.id = crypto.randomUUID()`, `provider_subject = String(Telegram user id)` decimal. Same subject → same `user.id`; different subjects → different users. Concurrent first auth is proven by race test to create no orphan `users` row (transactional `DB.batch()` atomic rollback on PK failure, then `SELECT` of winner).
+  `provider='telegram'`, `user.id = crypto.randomUUID()`, `provider_subject = String(Telegram user id)` decimal. Same subject → same `user.id`; different subjects → different users. Concurrent first auth is unit-characterized; no-orphan guarantee relies on D1's documented transactional `DB.batch()` rollback semantics (mock race test plus `wrangler d1 migrations apply DB --local` gate on the real `0001_init.sql`).
 
-- **Endpoint:** `POST /auth/telegram` `{initData:"<raw>"}` → `200 {user:{id:"<uuid>"}, identity:{provider:"telegram"}}`. Bounded body 16 KiB (`readBoundedText` streaming guard + `Content-Length` early 413), strict `Content-Type: application/json`, strict method (`405` else), exact `ALLOWED_ORIGIN` CORS (`configuredOrigin` + `Vary: Origin`, `Cache-Control: no-store`), `OPTIONS` 204/403, controlled public errors (`invalid_request` 400/405/415, `origin_forbidden` 403, `server_misconfigured` 503, `invalid_init_data`/`init_data_expired` 401 with `{ok:false, error:{code}}`), no PII/initData/hash/token in logs or responses.
+- **Endpoint:** `POST /auth/telegram` `{initData:"<raw>"}` → `200 {user:{id:"<uuid>"}, identity:{provider:"telegram"}}`. Bounded body 16 KiB (`readBoundedText` streaming guard + `Content-Length` early 413), strict `Content-Type: application/json` (missing → 415), strict method (`405` else), exact `ALLOWED_ORIGIN` CORS (`configuredOrigin`, missing `Origin` → 403 `origin_forbidden`, `Vary: Origin`, `Cache-Control: no-store`), `OPTIONS` 204/403, controlled public errors (`invalid_request` 400/405/415, `origin_forbidden` 403, `server_misconfigured` 503, `invalid_init_data`/`init_data_expired` 401, `internal_error` 500 with `{ok:false, error:{code}}`), no PII/initData/hash/token in logs or responses.
 
 - **Reusable verifier:** `verifyTelegramInitData(initData, botToken, maxAge)` is exported from `workers/app-api/src/telegram.ts` for H3 protected routes to reuse the same checked logic.
 
@@ -42,7 +42,7 @@ Telegram Mini Apps expose `window.Telegram.WebApp.initData` (raw query string in
 
 - `User` is independent of Telegram; `ExternalIdentity` is `provider='telegram'` + decimal `provider_subject`.
 - Browser without Telegram or without endpoint stays anonymous and fully usable.
-- Verified Telegram bootstrap creates or recovers the same internal `User` idempotently; concurrent first auth leaves exactly one identity and zero orphan users.
+- Verified Telegram bootstrap creates or recovers the same internal `User` idempotently; concurrent first auth is unit-characterized to leave exactly one identity and zero orphan users, with guarantee rooted in D1's documented `batch()` transaction rollback.
 - `VITE_APP_API_ENDPOINT` absence disables identity without code change; `ALLOWED_ORIGIN` for GitHub Pages is `https://llayon.github.io` (origin, not `/InteriorMagic` path) but committed template stays `https://example.invalid`.
 - `freshness 86400` is temporary development policy, not architectural constant; `initData` is not a long-lived bearer for future APIs.
 

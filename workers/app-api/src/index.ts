@@ -9,7 +9,8 @@ export type WorkerErrorCode =
   | 'server_misconfigured'
   | 'invalid_init_data'
   | 'init_data_expired'
-  | 'payload_too_large';
+  | 'payload_too_large'
+  | 'internal_error';
 
 const corsHeaders = (origin: string) => ({
   'Access-Control-Allow-Origin': origin,
@@ -88,42 +89,39 @@ export const createAppApiHandler = () =>
     if (maxAge === null) return errorResponse('server_misconfigured', 503);
 
     const requestOrigin = request.headers.get('origin');
-    if (requestOrigin !== null && requestOrigin !== allowedOrigin) return errorResponse('origin_forbidden', 403);
+    if (requestOrigin !== allowedOrigin) return errorResponse('origin_forbidden', 403);
 
     if (request.method === 'OPTIONS') {
-      if (requestOrigin === null) return errorResponse('origin_forbidden', 403);
       return new Response(null, { status: 204, headers: corsHeaders(allowedOrigin) });
     }
 
-    const responseOrigin = requestOrigin === allowedOrigin ? allowedOrigin : undefined;
-
-    if (request.method !== 'POST') return errorResponse('invalid_request', 405, responseOrigin);
+    if (request.method !== 'POST') return errorResponse('invalid_request', 405, allowedOrigin);
 
     const contentType = request.headers.get('content-type');
-    if (contentType !== null && !contentType.toLowerCase().startsWith('application/json')) {
-      return errorResponse('invalid_request', 415, responseOrigin);
+    if (contentType === null || !contentType.toLowerCase().startsWith('application/json')) {
+      return errorResponse('invalid_request', 415, allowedOrigin);
     }
 
     const contentLength = request.headers.get('content-length');
     if (contentLength !== null && Number(contentLength) > MAX_WIRE_BODY_BYTES) {
-      return errorResponse('payload_too_large', 413, responseOrigin);
+      return errorResponse('payload_too_large', 413, allowedOrigin);
     }
 
-    if (!env.DB) return errorResponse('server_misconfigured', 503, responseOrigin);
+    if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
 
     const rawToken = (env as unknown as { TELEGRAM_BOT_TOKEN?: unknown }).TELEGRAM_BOT_TOKEN;
-    if (typeof rawToken !== 'string' || rawToken.trim().length === 0) return errorResponse('server_misconfigured', 503, responseOrigin);
+    if (typeof rawToken !== 'string' || rawToken.trim().length === 0) return errorResponse('server_misconfigured', 503, allowedOrigin);
     const botToken = rawToken.trim();
 
     let initData: string;
     try {
       const text = await readBoundedText(request.body, MAX_WIRE_BODY_BYTES);
-      if (text.length > MAX_WIRE_BODY_BYTES) return errorResponse('payload_too_large', 413, responseOrigin);
+      if (text.length > MAX_WIRE_BODY_BYTES) return errorResponse('payload_too_large', 413, allowedOrigin);
       const parsed = parseBody(text);
       initData = parsed.initData;
     } catch (e) {
-      if (e instanceof Error && e.message === 'payload_too_large') return errorResponse('payload_too_large', 413, responseOrigin);
-      return errorResponse('invalid_request', 400, responseOrigin);
+      if (e instanceof Error && e.message === 'payload_too_large') return errorResponse('payload_too_large', 413, allowedOrigin);
+      return errorResponse('invalid_request', 400, allowedOrigin);
     }
 
     let providerSubject: string;
@@ -132,18 +130,18 @@ export const createAppApiHandler = () =>
       providerSubject = result.providerSubject;
     } catch (err) {
       if (err instanceof TelegramVerificationError) {
-        if (err.code === 'init_data_expired') return errorResponse('init_data_expired', 401, responseOrigin);
-        if (err.code === 'invalid_init_data') return errorResponse('invalid_init_data', 401, responseOrigin);
-        if (err.code === 'server_misconfigured') return errorResponse('server_misconfigured', 503, responseOrigin);
+        if (err.code === 'init_data_expired') return errorResponse('init_data_expired', 401, allowedOrigin);
+        if (err.code === 'invalid_init_data') return errorResponse('invalid_init_data', 401, allowedOrigin);
+        if (err.code === 'server_misconfigured') return errorResponse('server_misconfigured', 503, allowedOrigin);
       }
-      return errorResponse('invalid_init_data', 401, responseOrigin);
+      return errorResponse('invalid_init_data', 401, allowedOrigin);
     }
 
     try {
       const userId = await getOrCreateUserId(env.DB, 'telegram', providerSubject);
-      return json({ user: { id: userId }, identity: { provider: 'telegram' } }, 200, responseOrigin);
+      return json({ user: { id: userId }, identity: { provider: 'telegram' } }, 200, allowedOrigin);
     } catch {
-      return errorResponse('invalid_request', 500, responseOrigin);
+      return errorResponse('internal_error', 500, allowedOrigin);
     }
   };
 

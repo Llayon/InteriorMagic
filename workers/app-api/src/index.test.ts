@@ -291,4 +291,67 @@ describe('POST /auth/telegram', () => {
     expect(typeof body.error.code).toBe('string');
     expect(JSON.stringify(body)).not.toContain(BOT_TOKEN);
   });
+
+  it('rejects POST without Origin', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = new Request('https://app.test/auth/telegram', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(403);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('origin_forbidden');
+  });
+
+  it('rejects POST without Content-Type', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = new Request('https://app.test/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(415);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('invalid_request');
+  });
+
+  it('returns internal_error for unexpected D1 failure', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const failingDb = {
+      prepare: () => ({
+        bind: () => ({
+          first: async () => null,
+          run: async () => ({ success: true }) as unknown as D1Result,
+          all: async () => ({ results: [] }) as unknown as D1Result,
+        }),
+      }),
+      batch: async () => {
+        throw new Error('D1 unavailable');
+      },
+      exec: async () => ({ count: 0, duration: 0 }) as unknown as D1ExecResult,
+      dump: async () => new ArrayBuffer(0),
+    } as unknown as D1Database;
+    const env = makeEnv({ DB: failingDb } as unknown as Record<string, unknown>);
+    const req = makeRequest('/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(500);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('internal_error');
+    expect(JSON.stringify(body)).not.toContain('D1 unavailable');
+  });
 });
