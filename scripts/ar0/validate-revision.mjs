@@ -3,12 +3,16 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { unzipSync } from 'three/examples/jsm/libs/fflate.module.js';
 import { measureGlbFile, parseGlb } from './glb-bounds.mjs';
+import { AR0_REVISION_ID, validateUsdzEvidence } from './usdz-evidence.mjs';
 
 const root = process.cwd();
 const staged = process.argv.includes('--staged');
 const revisionRoot = staged
   ? path.join(root, 'public/ar0/sheen-chair/r1')
   : path.join(root, '.agent-data/ar0/sheen-chair-r1');
+const stageEvidencePath = staged
+  ? path.join(root, 'docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json')
+  : path.join(revisionRoot, 'usdz-stage-report.json');
 const files = {
   glb: { path: 'model.glb', contentType: 'model/gltf-binary' },
   usdz: { path: 'model.usdz', contentType: 'model/vnd.usdz+zip' },
@@ -23,7 +27,7 @@ const readArtifact = async (name) => {
 const [glb, usdz, poster, source, stageReportBytes] = await Promise.all([
   readArtifact('glb'), readArtifact('usdz'), readArtifact('poster'),
   readFile(path.join(root, 'public/models/sheen_chair.glb')),
-  readFile(path.join(root, '.agent-data/ar0/sheen-chair-r1/usdz-stage-report.json')).catch(() => null),
+  readFile(stageEvidencePath),
 ]);
 if (usdz.length < 100_000) throw new Error('USDZ is not a meaningful model package');
 if (poster.length < 1_000) throw new Error('Poster is not a meaningful image');
@@ -50,17 +54,18 @@ if ((canonicalParsed.json.images?.length ?? 0) !== (sourceParsed.json.images?.le
 if ((canonicalParsed.json.materials?.length ?? 0) !== (sourceParsed.json.materials?.length ?? 0)) throw new Error('Canonical GLB changed material count');
 
 const glbBounds = await measureGlbFile(path.join(revisionRoot, 'model.glb'));
-const stageReport = stageReportBytes
-  ? JSON.parse(stageReportBytes.toString('utf8'))
-  : { upAxis: 'Y', metersPerUnit: 1, dependencies: { unresolved: [] }, stageBounds: { sizeMeters: glbBounds.size } };
-if (stageReport.upAxis !== 'Y' || stageReport.metersPerUnit !== 1) throw new Error('USDZ stage is not Y-up in meters');
-if (stageReport.dependencies?.unresolved?.length) throw new Error('USDZ has unresolved dependencies');
-const usdzSize = stageReport.stageBounds?.sizeMeters;
-if (!Array.isArray(usdzSize) || usdzSize.length !== 3) throw new Error('USDZ stage bounds are unavailable');
-for (let axis = 0; axis < 3; axis += 1) {
-  const delta = Math.abs(glbBounds.size[axis] - usdzSize[axis]) / glbBounds.size[axis];
-  if (!Number.isFinite(delta) || delta > 0.01) throw new Error(`USDZ/GLB dimension delta exceeds 1% on axis ${axis}`);
+let parsedStageEvidence;
+try {
+  parsedStageEvidence = JSON.parse(stageReportBytes.toString('utf8'));
+} catch (error) {
+  throw new Error(`USDZ validation evidence is malformed: ${error instanceof Error ? error.message : String(error)}`);
 }
+const stageReport = validateUsdzEvidence(parsedStageEvidence, {
+  assetRevisionId: AR0_REVISION_ID,
+  usdzSha256: sha256(usdz),
+  glbSize: glbBounds.size,
+});
+const usdzSize = stageReport.stageBounds.sizeMeters;
 if (Math.abs(glbBounds.min[1]) > 0.001 || Math.abs(glbBounds.center[0]) > 0.001 || Math.abs(glbBounds.center[2]) > 0.001) {
   throw new Error('Canonical GLB does not meet floor/centering tolerance');
 }
@@ -70,7 +75,7 @@ for (const [key, definition] of Object.entries(files)) {
   const bytes = key === 'glb' ? glb : key === 'usdz' ? usdz : poster;
   records[key] = { path: definition.path, sha256: sha256(bytes) };
 }
-const manifest = { schemaVersion: 1, assetRevisionId: 'sheen-chair-r1', assetId: 'sheenChair', files: records };
+const manifest = { schemaVersion: 1, assetRevisionId: AR0_REVISION_ID, assetId: 'sheenChair', files: records };
 const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`);
 if (staged) {
   const existingManifest = await readFile(path.join(revisionRoot, 'manifest.json'));
@@ -85,7 +90,7 @@ const checksumEntries = [
   }),
   { path: 'manifest.json', bytes: manifestBytes.length, sha256: sha256(manifestBytes), contentType: 'application/json; charset=utf-8' },
 ];
-const checksums = { schemaVersion: 1, assetRevisionId: 'sheen-chair-r1', files: checksumEntries };
+const checksums = { schemaVersion: 1, assetRevisionId: AR0_REVISION_ID, files: checksumEntries };
 const checksumBytes = Buffer.from(`${JSON.stringify(checksums, null, 2)}\n`);
 if (staged) {
   const existingChecksums = await readFile(path.join(revisionRoot, 'checksums.json'));

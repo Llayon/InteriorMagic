@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { assertRemoteMediaType } from './remote-media-type.mjs';
 
 const root = process.cwd();
 const revisionRoot = path.join(root, 'public/ar0/sheen-chair/r1');
@@ -72,7 +73,7 @@ if (verify) {
     const bytes = Buffer.from(await response.arrayBuffer());
     const record = { path: object.path, status: response.status, bytes: bytes.length, sha256: sha256(bytes), contentType: response.headers.get('content-type'), cors: response.headers.get('access-control-allow-origin') };
     if (!response.ok || record.bytes !== object.bytes || record.sha256 !== object.sha256) throw new Error(`Remote verification failed: ${JSON.stringify(record)}`);
-    if (object.path === 'model.usdz' && record.contentType?.split(';', 1)[0] !== 'model/vnd.usdz+zip') throw new Error('Remote USDZ MIME is incorrect');
+    assertRemoteMediaType(object.path, record.contentType, object.contentType);
     if (appOrigin && record.cors !== '*' && record.cors !== appOrigin) throw new Error(`Remote CORS does not allow ${appOrigin}`);
     results.push(record);
   }

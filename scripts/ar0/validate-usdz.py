@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -11,11 +12,13 @@ from pxr import Usd, UsdGeom, UsdUtils
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", default=os.environ.get("AR0_USDZ_INPUT"))
 parser.add_argument("--report", default=os.environ.get("AR0_USDZ_REPORT"))
+parser.add_argument("--asset-revision-id", default=os.environ.get("AR0_ASSET_REVISION_ID"))
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 args = parser.parse_args(argv)
-if not args.input or not args.report:
-    raise RuntimeError("USDZ input/report paths were not provided")
+if not args.input or not args.report or not args.asset_revision_id:
+    raise RuntimeError("USDZ input/report/revision paths were not provided")
 input_path = Path(args.input).resolve()
+usdz_sha256 = hashlib.sha256(input_path.read_bytes()).hexdigest()
 stage = Usd.Stage.Open(str(input_path))
 if stage is None:
     raise RuntimeError("pxr.Usd could not open the USDZ stage")
@@ -32,17 +35,36 @@ if not all(math.isfinite(value) for value in minimum + maximum + size_stage) or 
 size_meters = [value * meters_per_unit for value in size_stage]
 
 layers, assets, unresolved = UsdUtils.ComputeAllDependencies(str(input_path))
+
+
+def portable_dependency(value):
+    text = str(value)
+    package_marker = text.find("[")
+    if package_marker >= 0:
+        return input_path.name + text[package_marker:]
+    try:
+        if Path(text).resolve() == input_path:
+            return input_path.name
+    except OSError:
+        pass
+    return text
+
+
 report = {
     "schemaVersion": 1,
+    "assetRevisionId": args.asset_revision_id,
+    "usdzSha256": usdz_sha256,
     "parser": "Blender-bundled pxr.Usd/UsdGeom",
     "upAxis": up_axis,
     "metersPerUnit": meters_per_unit,
     "stageBounds": {"min": minimum, "max": maximum, "size": size_stage, "sizeMeters": size_meters},
     "dependencies": {
-        "layers": sorted(str(layer.identifier) for layer in layers),
-        "assets": sorted(str(asset) for asset in assets),
-        "unresolved": sorted(str(asset) for asset in unresolved),
+        "layers": sorted(portable_dependency(layer.identifier) for layer in layers),
+        "assets": sorted(portable_dependency(asset) for asset in assets),
+        "unresolved": sorted(portable_dependency(asset) for asset in unresolved),
     },
 }
-Path(args.report).resolve().write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+report_path = Path(args.report).resolve()
+report_path.parent.mkdir(parents=True, exist_ok=True)
+report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(json.dumps(report, ensure_ascii=False, indent=2))

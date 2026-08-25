@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = 'http://127.0.0.1:4173';
+const ar0EnabledBaseURL = 'http://127.0.0.1:4174';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -46,18 +47,31 @@ export default defineConfig({
     {
       name: 'ar0-mobile-small',
       testMatch: /ar0\.spec\.ts/,
-      use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
+      use: { baseURL: ar0EnabledBaseURL, browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
       name: 'ar0-desktop',
       testMatch: /ar0\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], baseURL: ar0EnabledBaseURL, viewport: { width: 1440, height: 900 } },
+    },
+    {
+      name: 'ar0-default-off',
+      testMatch: /ar0-disabled\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
   ],
-  webServer: {
-    command: 'npm run dev -- --host 127.0.0.1 --port 4173 --strictPort --mode test',
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: 'npm run dev -- --host 127.0.0.1 --port 4173 --strictPort --mode test',
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      command: 'node scripts/ar0/run-enabled-e2e-server.mjs',
+      url: ar0EnabledBaseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
 });

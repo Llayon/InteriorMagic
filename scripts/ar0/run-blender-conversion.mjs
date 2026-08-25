@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { readApprovedBlenderVersion } from './blender-provenance.mjs';
 
 const root = process.cwd();
 const outputRoot = path.join(root, '.agent-data/ar0/sheen-chair-r1');
@@ -39,16 +40,23 @@ const exportArgs = [
 const previousUsdz = await readFile(usdz).catch(() => null);
 const previousPoster = await readFile(poster).catch(() => null);
 await run(blender, exportArgs);
+let converterReport;
+try {
+  converterReport = JSON.parse(await readFile(blenderReport, 'utf8'));
+} catch (error) {
+  throw new Error(`Blender converter report is missing or malformed: ${error instanceof Error ? error.message : String(error)}`);
+}
+const actualBlenderVersion = readApprovedBlenderVersion(converterReport);
 await run(blender, [
   '--background', '--factory-startup', '--python', path.join(root, 'scripts/ar0/validate-usdz.py'),
-], { AR0_USDZ_INPUT: usdz, AR0_USDZ_REPORT: usdReport });
+], { AR0_USDZ_INPUT: usdz, AR0_USDZ_REPORT: usdReport, AR0_ASSET_REVISION_ID: 'sheen-chair-r1' });
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const [glbBytes, usdzBytes, posterBytes] = await Promise.all([readFile(canonical), readFile(usdz), readFile(poster)]);
 const command = [`"${blender}"`, ...exportArgs.map((value) => value.includes(' ') ? `"${value}"` : value)].join(' ');
 await writeFile(path.join(outputRoot, 'conversion-provenance.json'), `${JSON.stringify({
   schemaVersion: 1,
-  converter: { name: 'Blender', version: '5.2.0 LTS', executable: blender },
+  converter: { name: 'Blender', version: actualBlenderVersion, executable: blender },
   command,
   input: { path: 'model.glb', bytes: glbBytes.length, sha256: sha256(glbBytes) },
   output: { path: 'model.usdz', bytes: usdzBytes.length, sha256: sha256(usdzBytes) },

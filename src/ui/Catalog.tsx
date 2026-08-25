@@ -7,6 +7,7 @@ import { assetCache } from '@/scene/assets/AssetCache';
 import { DISPLAY_CATEGORY_LABELS, getCatalogConfiguration, type CatalogCategoryId, type DisplayCategory } from '@/editor/catalog/CatalogRepository';
 import { buildAr0LandingUrl, getAr0RevisionForAsset } from '@/ar0/revisions';
 import { openExternalLink } from '@/platform/externalLink';
+import { isAr0Enabled } from '@/ar0/releaseGate';
 
 const defaultTabs: [Category, string][] = [['sofas', 'Диваны'], ['chairs', 'Кресла'], ['tables', 'Столы'], ['plants', 'Растения'], ['rugs', 'Ковры'], ['lamps', 'Свет']];
 
@@ -50,7 +51,7 @@ export function Catalog() {
     <nav className="categories">{tabs.map(([id, label]) => <button key={id} data-category-id={id} aria-label={`Category ${id}`} className={category === id ? 'active' : ''} onClick={() => useEditorStore.getState().setCatalogCategory(id)}>{label}</button>)}</nav>
     {error && <div className="catalog-error" role="alert">{error}</div>}
     <div className="items" ref={itemsRef}>{catalogItems.map(({ assetId, asset, canPlace, displayName, thumbnailUrl }) => {
-      const arRevision = getAr0RevisionForAsset(assetId);
+      const arRevision = isAr0Enabled() ? getAr0RevisionForAsset(assetId) : null;
       const arUrl = arRevision ? buildAr0LandingUrl(arRevision.assetRevisionId) : null;
       return <div className={`item-shell ${arUrl ? 'has-ar' : ''}`} key={assetId}>
         <button className={`item ${object?.assetId === assetId ? 'active' : ''}`} data-asset-id={assetId} aria-label={canPlace ? `Add ${assetId}` : `Browse ${assetId}`} aria-busy={loadingAssetId === assetId} aria-disabled={!canPlace} disabled={!canPlace} onClick={() => asset && void addAsset(asset)}>{thumbnailUrl ? <img src={thumbnailUrl} alt={`${displayName} thumbnail`} loading="lazy" width="256" height="192" /> : <span>{asset?.icon}</span>}<b>{displayName}</b><small>{canPlace ? (loadingAssetId === assetId ? 'Загрузка…' : 'Добавить') : 'Только просмотр'}</small></button>
