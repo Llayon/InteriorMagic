@@ -219,6 +219,36 @@ describe('POST /auth/telegram', () => {
     expect(res.status).toBe(415);
   });
 
+  it('rejects application/jsonxxx (exact media type required)', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = new Request('https://app.test/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', 'content-type': 'application/jsonxxx' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(415);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('invalid_request');
+  });
+
+  it('accepts application/json with parameters (charset)', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = new Request('https://app.test/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', 'content-type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(200);
+  });
+
   it('rejects oversized body', async () => {
     const handler = createAppApiHandler();
     const env = makeEnv();

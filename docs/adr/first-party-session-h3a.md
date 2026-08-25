@@ -46,7 +46,22 @@ As above; `llayon.github.io` + `workers.dev` remains demo-only cross-site (no sh
 
 ## 8. Exact Origin + SameSite boundary for CSRF
 
-Mutating `POST /auth/telegram`, `POST /logout` → `Origin` must `=== allowedOrigin` (`missing`/`wrong` → `403 origin_forbidden`, no wildcard, no suffix/regex, no substring), `Access-Control-Allow-Origin: <exact>` + `Allow-Credentials:true` + `Vary: Origin` when `Origin` allowed, `SameSite=Lax` cookie. `GET /session` (safe read) still requires exact `Origin` check for credentialed CORS (`Allow-Credentials:true` + exact origin), otherwise `401` with `Vary` but no leak. All auth/session responses `Cache-Control: no-store`.
+Mutating `POST /auth/telegram`, `POST /logout` → `Origin` MUST be present and `=== allowedOrigin` (`missing`/`wrong` → `403 origin_forbidden`, no wildcard, no suffix/regex, no substring), with `Access-Control-Allow-Origin: <exact>` + `Allow-Credentials:true` + `Vary: Origin` when allowed, and the `SameSite=Lax` cookie as second defense layer.
+
+`GET /session` (safe read) contract:
+
+```
+Origin present
+  → Origin MUST === ALLOWED_ORIGIN
+Origin absent (same-origin topology, preferred production)
+  → request URL origin MUST === ALLOWED_ORIGIN
+otherwise
+  → 403 origin_forbidden
+```
+
+When `Origin` is present and exact, responses carry `Access-Control-Allow-Origin: <exact>` + `Access-Control-Allow-Credentials:true`; same-origin requests without `Origin` need no CORS headers. Cross-origin readers never receive authenticated bodies. All auth/session responses are `Cache-Control: no-store`.
+
+`POST /auth/telegram` requires strict JSON body: media type (before any `; parameters`) must equal exactly `application/json` (e.g. `application/json; charset=utf-8` is valid, `application/jsonxxx` is rejected `415`).
 
 ## 9. Frontend authenticated state is not authorization
 
