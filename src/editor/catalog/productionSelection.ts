@@ -1,12 +1,14 @@
 // src/editor/catalog/productionSelection.ts
 // Single source of truth: imports the canonical JSON manifest.
+// semanticRole uses the canonical FurnitureSemanticRole from @/editor/model/types.
 import selection from './data/production-catalog-v1.json';
+import type { FurnitureSemanticRole } from '@/editor/model/types';
 
 export const PRODUCTION_CATALOG_VERSION = 1 as const;
 
 export interface ProductionAssetRecord {
   assetId: string;
-  semanticRole: 'sofa' | 'armchair' | 'coffeeTable' | 'sideTable' | 'console' | 'tv' | 'floorLamp' | 'plant' | 'rug' | 'floorDecor';
+  semanticRole: FurnitureSemanticRole;
 }
 
 interface ProductionCatalogManifest {
@@ -42,7 +44,7 @@ export function isProductionCatalogId(assetId: string): boolean {
   return BY_ID.has(assetId);
 }
 
-export function getProductionAssetSemanticRole(assetId: string): ProductionAssetRecord['semanticRole'] | undefined {
+export function getProductionAssetSemanticRole(assetId: string): FurnitureSemanticRole | undefined {
   return BY_ID.get(assetId)?.semanticRole;
 }
 

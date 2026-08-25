@@ -8,14 +8,17 @@
 | --- | --- |
 | **TRACK_BASE_SHA** (historical lineage anchor) | `1c32b27bfddb1b98ac7b70c9fa642604cb4d6790` |
 | **origin/main at rebase** | `ba9a7215b05184e52130c2ca184552787a90d915` (Merge pull request #13 from Llayon/feature/telegram-fullscreen-h1) |
-| **Final HEAD (pre-I2.5)** | `a4f522d72b88576838fc37c409c9e920aeca34aa` |
-| **Final HEAD (after I2.5)** | (recorded after I2.5 commit) |
+| **PR base/main (current at PR #17 open)** | `4d3a7c33043e5db51e0552690a9dc35081d60d0e` (Merge pull request #16 from Llayon/feature/external-identity-h2) |
+| **Final HEAD (after P1 landing pass)** | `74f680405f889e29cfcd701bb08eacce479722d4` (post-I2.5 + user-added I2.4-rationale + I3.4-integration + P1 fix-pass) |
 
-HEAD descends from rebased `origin/main` (rebased earlier in this resumed cycle). `git status` is clean.
+HEAD descends from rebased `origin/main` (rebased earlier in this resumed cycle at `ba9a7215`). The PR base has since moved to `4d3a7c3` (H2 merge). **The branch does not contain H2 itself**; GitHub reports PR #17 mergeable against the new base. `git status` is clean.
 
-## Track I commits (14 total in the branch, oldest → newest)
+## Track I commits (16 total in the branch, oldest → newest)
 
 ```
+74f6804 I3.4: document opt-in production catalog integration
+f219b22 I2.4: add per-asset production selection rationale
+3220727 I2.5: close per-asset semantic verification (47 assets, 18 role-trap exclusions, 7 TVs, all gates green)
 a4f522d I-RPT: final closure report (verdict C — content pack ready, provenance + placement blocked)
 ea2e448 I2.4: cleanup + diversity pass (65 assets, 12 TVs, validator passes, lint clean)
 658868c I1.5c+I2.1+I2.2+I2.3: corrected selection (69 assets, 13 TVs, validator passes)
@@ -31,7 +34,7 @@ a7f316c I0.1: join manifest + payload + upstream QA into 836-row inventory
 142f374 I0.0: resolve ITHappy data root via import.meta.url (A1) — all 836 GLB/WebP + 9 upstream artifacts present
 ```
 
-Plus an I2.5 commit (per-asset semantic closure) added in this final pass.
+(P1 landing-quality fix-pass adds two more commits on top — see P1 section.)
 
 ## Inventory
 
@@ -244,3 +247,50 @@ Track I remains local on `feature/production-catalog-v1` (rebased onto `origin/m
 - `docs/catalog/i2.5-application-report.json` — input/output sizes + per-id exclusion records
 - `src/editor/catalog/data/production-catalog-v1.json` — canonical selection (47 assets; rebuilt after exclusions; SHA256 hashes of upstream policy/manifest/payload updated)
 - `.agent-data/production-catalog-v1/final-contact-sheets/` — gitignored working sheets (html + index)
+## P1 — Landing-quality fix-pass
+
+Applied at HEAD `74f6804` (commits on top of `3220727e`):
+
+### P1.1 — Validator made fail-closed
+- `scripts/catalog/validate-selection.mjs` now enforces for every selected id:
+  - membership in the runtime manifest (joined via `buildInventory()`)
+  - `runtimePolicyStatus === 'PASS'`
+  - `geometryInvarianceStatus === 'PASS'`
+  - `gltfValidationStatus === 'PASS'`
+  - `conversionStatus === 'built'`
+  - `thumbnailBytes > 0` and `thumbnailStatus` non-empty
+  - producer policy constraints (`policyVersion === 1`, `maxTextureDimension ≤ 512`)
+- `assetCount === assets.length` enforced
+- `byRole` is recomputed from `assets` and required to match exactly
+- No duplicated upstream joins — validator reuses `buildInventory()`
+
+### P1.2 — Input hashes verified
+- The validator reads the actual `asset-policy.json`, `runtime-catalog.json`, `catalog-payload.json` bytes, computes SHA256, and compares to the manifest's declared hashes. Mismatch → FAIL. The validator output includes a `hashCheck` block exposing declared/actual/match for all three inputs.
+- Real-data run on HEAD `74f6804`: all three hashes match (no manifest regeneration).
+
+### P1.3 — Positive I2.5 evidence persisted
+- `docs/catalog/i2.5-per-asset-verification.csv` — 47 rows, one per retained asset, with `assetId`, `semanticRole`, `confidence`, `evidence` (every row a direct-vision statement; no sourceCategory-only evidence).
+- `docs/catalog/i2.5-per-asset-exclusions.csv` — 18 rows from the I2.5 closure (unchanged).
+- Reconciliation invariant: `verified ∩ retained == retained` (47 == 47), `retained ∩ excluded == empty`, `retained ∪ excluded == 65`. Enforced by `tests/catalog/i2.5-reconciliation.test.mjs`.
+
+### P2 — Reuse canonical `FurnitureSemanticRole`
+- `src/editor/catalog/productionSelection.ts` now imports `FurnitureSemanticRole` from `@/editor/model/types` and uses it as the `semanticRole` type for `ProductionAssetRecord`. The literal local union is gone. The JS validator keeps a runtime allowed-role list (it cannot rely on a TypeScript type) — that list mirrors the canonical type.
+- `model/types.ts` was not modified.
+
+### Validator tests (new) — `tests/catalog/validate-selection.test.mjs`
+- 7 specs covering: valid current 47 selection → PASS, geometry FAIL → FAIL (synthetic), policy FAIL → FAIL (synthetic), hash mismatch → FAIL, assetCount mismatch → FAIL, byRole mismatch → FAIL, absent-from-manifest → FAIL, plus hashCheck object match=true on real selection.
+- `tests/catalog/i2.5-reconciliation.test.mjs` — verifies 47/18 reconciliation.
+
+### Final gates (HEAD `74f6804`)
+
+| Gate | Result |
+| --- | --- |
+| `node --test tests/catalog/*.test.mjs` | 42/42 pass |
+| `npm test` (vitest) | 287/287 pass |
+| `npm run typecheck` | exit 0 |
+| `npm run typecheck:e2e` | exit 0 |
+| `npm run lint` | exit 0 |
+| `npm run build` | exit 0 |
+| `node scripts/catalog/validate-selection.mjs` (real data) | **passed: true**, 0 violations, all 3 hash checks match |
+| `git diff --check` | clean |
+
