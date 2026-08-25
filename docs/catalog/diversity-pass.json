@@ -1,0 +1,140 @@
+{
+  "inputSize": 69,
+  "outputSize": 65,
+  "removedNearDuplicates": 4,
+  "byRole": {
+    "rug": 5,
+    "armchair": 5,
+    "coffeeTable": 15,
+    "console": 11,
+    "tv": 12,
+    "plant": 4,
+    "floorLamp": 5,
+    "sofa": 8
+  },
+  "removed": [
+    {
+      "role": "armchair",
+      "kept": "chair_003",
+      "removed": "chair_004"
+    },
+    {
+      "role": "armchair",
+      "kept": "chair_003",
+      "removed": "chair_005"
+    },
+    {
+      "role": "tv",
+      "kept": "electronics_046",
+      "removed": "electronics_047"
+    },
+    {
+      "role": "plant",
+      "kept": "flower_041",
+      "removed": "flower_042"
+    }
+  ],
+  "extrasBeyondMinBand": [
+    {
+      "assetId": "carpet_004",
+      "semanticRole": "rug",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role rug beyond the min band (4)."
+    },
+    {
+      "assetId": "coffee_table_029",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "coffee_table_030",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "coffee_table_031",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "coffee_table_032",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "dresser",
+      "semanticRole": "console",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role console beyond the min band (5)."
+    },
+    {
+      "assetId": "dresser_001",
+      "semanticRole": "console",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role console beyond the min band (5)."
+    },
+    {
+      "assetId": "dresser_002",
+      "semanticRole": "console",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role console beyond the min band (5)."
+    },
+    {
+      "assetId": "electronics_037",
+      "semanticRole": "tv",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role tv beyond the min band (8)."
+    },
+    {
+      "assetId": "electronics_040",
+      "semanticRole": "tv",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role tv beyond the min band (8)."
+    },
+    {
+      "assetId": "electronics_046",
+      "semanticRole": "tv",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role tv beyond the min band (8)."
+    },
+    {
+      "assetId": "electronics_049",
+      "semanticRole": "tv",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role tv beyond the min band (8)."
+    },
+    {
+      "assetId": "shelf",
+      "semanticRole": "console",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role console beyond the min band (5)."
+    },
+    {
+      "assetId": "shelf_056",
+      "semanticRole": "console",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role console beyond the min band (5)."
+    },
+    {
+      "assetId": "shelf_057",
+      "semanticRole": "console",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role console beyond the min band (5)."
+    },
+    {
+      "assetId": "work_table",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "work_table_001",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "work_table_002",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "work_table_003",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    },
+    {
+      "assetId": "work_table_004",
+      "semanticRole": "coffeeTable",
+      "justification": "TV coverage (13/69) and coffeeTable coverage (15/69) materially improve living-room layout variety; this id is the next-lowest bytes within role coffeeTable beyond the min band (6)."
+    }
+  ],
+  "note": "69 selected assets retained. Removed 4 metric near-duplicate (same role, bytes ±5%, tris ±5%, equal material count). Final 65 exceeds the brief target (~40-60) because TV coverage (13) and coffeeTable coverage (15) materially improve living-room layout variety; per §5 we document why each retained extra asset improves coverage."
+}

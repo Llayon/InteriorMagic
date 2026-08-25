@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "inputSize": 65,
+  "excludedCount": 18,
+  "outputSize": 47,
+  "byRole": {
+    "rug": 5,
+    "armchair": 2,
+    "coffeeTable": 10,
+    "console": 8,
+    "tv": 7,
+    "plant": 4,
+    "floorLamp": 3,
+    "sofa": 8
+  },
+  "excluded": [
+    {
+      "assetId": "chair_002",
+      "originalRole": "armchair",
+      "excludeReason": "ambom_footstool",
+      "confidence": "high",
+      "evidence": "\"direct vision: square ottoman/footstool; not a lounge armchair\""
+    },
+    {
+      "assetId": "chair_003",
+      "originalRole": "armchair",
+      "excludeReason": "ambom_footstool",
+      "confidence": "high",
+      "evidence": "\"direct vision: rectangular ottoman/footstool; not a lounge armchair\""
+    },
+    {
+      "assetId": "chair_006",
+      "originalRole": "armchair",
+      "excludeReason": "ambom_footstool",
+      "confidence": "high",
+      "evidence": "\"direct vision: round ottoman/pouf; not a lounge armchair\""
+    },
+    {
+      "assetId": "shelf",
+      "originalRole": "console",
+      "excludeReason": "decorative_wall_shelf",
+      "confidence": "high",
+      "evidence": "\"direct vision: single floating wooden wall shelf; not a floor-standing storage piece\""
+    },
+    {
+      "assetId": "shelf_056",
+      "originalRole": "console",
+      "excludeReason": "round_bar_shelf",
+      "confidence": "high",
+      "evidence": "\"direct vision: circular/round bar shelf; not a typical living-room storage piece\""
+    },
+    {
+      "assetId": "shelf_057",
+      "originalRole": "console",
+      "excludeReason": "storage_cubes_set",
+      "confidence": "high",
+      "evidence": "\"direct vision: modular storage cubes/set pieces; not a single living-room storage piece\""
+    },
+    {
+      "assetId": "electronics_027",
+      "originalRole": "tv",
+      "excludeReason": "desktop_computer",
+      "confidence": "high",
+      "evidence": "\"direct vision: desktop computer with keyboard and mouse; not a TV\""
+    },
+    {
+      "assetId": "electronics_028",
+      "originalRole": "tv",
+      "excludeReason": "printer",
+      "confidence": "high",
+      "evidence": "\"direct vision: printer; not a TV\""
+    },
+    {
+      "assetId": "electronics_029",
+      "originalRole": "tv",
+      "excludeReason": "espresso_machine",
+      "confidence": "high",
+      "evidence": "\"direct vision: espresso machine; not a TV\""
+    },
+    {
+      "assetId": "electronics_030",
+      "originalRole": "tv",
+      "excludeReason": "cooker_or_kitchen_appliance",
+      "confidence": "high",
+      "evidence": "\"direct vision: cooker/rice cooker; not a TV\""
+    },
+    {
+      "assetId": "electronics_031",
+      "originalRole": "tv",
+      "excludeReason": "storage_box",
+      "confidence": "high",
+      "evidence": "\"direct vision: black/white storage box; not a TV\""
+    },
+    {
+      "assetId": "work_table",
+      "originalRole": "coffeeTable",
+      "excludeReason": "desk_with_monitors",
+      "confidence": "high",
+      "evidence": "\"direct vision: dual-monitor desk setup with keyboard and mouse; not a living-room side/coffee table\""
+    },
+    {
+      "assetId": "work_table_001",
+      "originalRole": "coffeeTable",
+      "excludeReason": "office_white_desk",
+      "confidence": "high",
+      "evidence": "\"direct vision: white office desk; not a living-room side/coffee table\""
+    },
+    {
+      "assetId": "work_table_002",
+      "originalRole": "coffeeTable",
+      "excludeReason": "office_desk_with_drawers",
+      "confidence": "high",
+      "evidence": "\"direct vision: dark wood office desk with drawers; not a low living-room coffee table\""
+    },
+    {
+      "assetId": "work_table_003",
+      "originalRole": "coffeeTable",
+      "excludeReason": "office_desk_3_drawer",
+      "confidence": "high",
+      "evidence": "\"direct vision: brown wood office desk with 3-drawer pedestal; not living-room\""
+    },
+    {
+      "assetId": "work_table_004",
+      "originalRole": "coffeeTable",
+      "excludeReason": "office_desk_4_drawer",
+      "confidence": "high",
+      "evidence": "\"direct vision: dark wood office desk with 4-drawer pedestal; not living-room\""
+    },
+    {
+      "assetId": "lamp_029",
+      "originalRole": "floorLamp",
+      "excludeReason": "table_lamp",
+      "confidence": "high",
+      "evidence": "\"direct vision: white round-shade lamp with silver base sitting on a table surface; table lamp not floor lamp\""
+    },
+    {
+      "assetId": "lamp_030",
+      "originalRole": "floorLamp",
+      "excludeReason": "table_lamp",
+      "confidence": "high",
+      "evidence": "\"direct vision: white lamp with rounded silver base; table lamp not floor lamp\""
+    }
+  ]
+}

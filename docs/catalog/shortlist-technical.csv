@@ -1,0 +1,501 @@
+assetId,sourceCategory,displayCategory,displayName,thumbnailFilename,runtimeFilename,runtimeBytes,triangleCount,materialCount,textureCount,maxTextureDimension,runtimePolicyStatus
+prop_147,prop,Decor,Prop 147,thumbnails/prop_147.webp,runtime-assets/prop_147.glb,3536,4,1,1,512,PASS
+prop_148,prop,Decor,Prop 148,thumbnails/prop_148.webp,runtime-assets/prop_148.glb,3820,8,1,1,512,PASS
+ladder_001,ladder,Decor,Ladder 1,thumbnails/ladder_001.webp,runtime-assets/ladder_001.glb,4040,12,1,1,512,PASS
+ladder_003,ladder,Decor,Ladder 3,thumbnails/ladder_003.webp,runtime-assets/ladder_003.glb,4040,12,1,1,512,PASS
+ladder_018,ladder,Decor,Ladder 18,thumbnails/ladder_018.webp,runtime-assets/ladder_018.glb,4976,28,1,1,512,PASS
+prop_155,prop,Decor,Prop 155,thumbnails/prop_155.webp,runtime-assets/prop_155.glb,6020,100,1,1,512,PASS
+ladder_009,ladder,Decor,Ladder 9,thumbnails/ladder_009.webp,runtime-assets/ladder_009.glb,6284,44,1,1,512,PASS
+shelf_078,shelf,Storage,Shelf 78,thumbnails/shelf_078.webp,runtime-assets/shelf_078.glb,6316,92,1,1,512,PASS
+prop_166,prop,Decor,Prop 166,thumbnails/prop_166.webp,runtime-assets/prop_166.glb,6452,108,1,1,512,PASS
+electronics,electronics,Decor,Electronics,thumbnails/electronics.webp,runtime-assets/electronics.glb,6892,60,2,1,512,PASS
+cupboard_018,cupboard,Storage,Cupboard 18,thumbnails/cupboard_018.webp,runtime-assets/cupboard_018.glb,7024,60,1,1,512,PASS
+cupboard_023,cupboard,Storage,Cupboard 23,thumbnails/cupboard_023.webp,runtime-assets/cupboard_023.glb,7024,60,1,1,512,PASS
+curtain_003,curtain,Decor,Curtain 3,thumbnails/curtain_003.webp,runtime-assets/curtain_003.glb,7068,132,1,1,512,PASS
+curtain_004,curtain,Decor,Curtain 4,thumbnails/curtain_004.webp,runtime-assets/curtain_004.glb,7068,132,1,1,512,PASS
+curtain_007,curtain,Decor,Curtain 7,thumbnails/curtain_007.webp,runtime-assets/curtain_007.glb,7068,132,1,1,512,PASS
+curtain_035,curtain,Decor,Curtain 35,thumbnails/curtain_035.webp,runtime-assets/curtain_035.glb,7068,132,1,1,512,PASS
+curtain_049,curtain,Decor,Curtain 49,thumbnails/curtain_049.webp,runtime-assets/curtain_049.glb,7068,132,1,1,512,PASS
+curtain_050,curtain,Decor,Curtain 50,thumbnails/curtain_050.webp,runtime-assets/curtain_050.glb,7068,132,1,1,512,PASS
+training_001,training,Decor,Training 1,thumbnails/training_001.webp,runtime-assets/training_001.glb,7100,80,1,1,512,PASS
+sofa_031,sofa,Seating,Sofa 31,thumbnails/sofa_031.webp,runtime-assets/sofa_031.glb,7592,120,1,1,512,PASS
+work_table_017,work,Tables,Work Table 17,thumbnails/work_table_017.webp,runtime-assets/work_table_017.glb,7600,78,1,1,512,PASS
+picture,picture,Decor,Picture,thumbnails/picture.webp,runtime-assets/picture.glb,7624,28,2,2,512,PASS
+chair_007,chair,Seating,Chair 7,thumbnails/chair_007.webp,runtime-assets/chair_007.glb,7744,106,1,1,512,PASS
+chair_006,chair,Seating,Chair 6,thumbnails/chair_006.webp,runtime-assets/chair_006.glb,7748,106,1,1,512,PASS
+picture_070,picture,Decor,Picture 70,thumbnails/picture_070.webp,runtime-assets/picture_070.glb,7944,28,2,2,512,PASS
+ladder_006,ladder,Decor,Ladder 6,thumbnails/ladder_006.webp,runtime-assets/ladder_006.glb,7968,68,1,1,512,PASS
+work_table_018,work,Tables,Work Table 18,thumbnails/work_table_018.webp,runtime-assets/work_table_018.glb,7984,78,1,1,512,PASS
+chair_001,chair,Seating,Chair 1,thumbnails/chair_001.webp,runtime-assets/chair_001.glb,8000,142,1,1,512,PASS
+dresser_026,dresser,Storage,Dresser 26,thumbnails/dresser_026.webp,runtime-assets/dresser_026.glb,8040,128,1,1,512,PASS
+dresser_027,dresser,Storage,Dresser 27,thumbnails/dresser_027.webp,runtime-assets/dresser_027.glb,8040,128,1,1,512,PASS
+dresser_028,dresser,Storage,Dresser 28,thumbnails/dresser_028.webp,runtime-assets/dresser_028.glb,8040,128,1,1,512,PASS
+prop_164,prop,Decor,Prop 164,thumbnails/prop_164.webp,runtime-assets/prop_164.glb,8132,164,1,1,512,PASS
+chair_005,chair,Seating,Chair 5,thumbnails/chair_005.webp,runtime-assets/chair_005.glb,8308,130,1,1,512,PASS
+chair_004,chair,Seating,Chair 4,thumbnails/chair_004.webp,runtime-assets/chair_004.glb,8312,130,1,1,512,PASS
+dresser_006,dresser,Storage,Dresser 6,thumbnails/dresser_006.webp,runtime-assets/dresser_006.glb,8328,128,1,1,512,PASS
+shelf_068,shelf,Storage,Shelf 68,thumbnails/shelf_068.webp,runtime-assets/shelf_068.glb,8328,128,1,1,512,PASS
+prop_094,prop,Decor,Prop 94,thumbnails/prop_094.webp,runtime-assets/prop_094.glb,8356,164,1,1,512,PASS
+prop_170,prop,Decor,Prop 170,thumbnails/prop_170.webp,runtime-assets/prop_170.glb,8432,164,1,1,512,PASS
+picture_073,picture,Decor,Picture 73,thumbnails/picture_073.webp,runtime-assets/picture_073.glb,8444,28,2,2,512,PASS
+chair_003,chair,Seating,Chair 3,thumbnails/chair_003.webp,runtime-assets/chair_003.glb,8472,136,1,1,512,PASS
+shelf_074,shelf,Storage,Shelf 74,thumbnails/shelf_074.webp,runtime-assets/shelf_074.glb,8648,96,1,1,512,PASS
+picture_085,picture,Decor,Picture 85,thumbnails/picture_085.webp,runtime-assets/picture_085.glb,8780,28,2,2,512,PASS
+prop_159,prop,Decor,Prop 159,thumbnails/prop_159.webp,runtime-assets/prop_159.glb,8792,172,1,1,512,PASS
+prop_090,prop,Decor,Prop 90,thumbnails/prop_090.webp,runtime-assets/prop_090.glb,8820,132,1,1,512,PASS
+picture_087,picture,Decor,Picture 87,thumbnails/picture_087.webp,runtime-assets/picture_087.glb,8976,28,2,2,512,PASS
+chair_002,chair,Seating,Chair 2,thumbnails/chair_002.webp,runtime-assets/chair_002.glb,9000,160,1,1,512,PASS
+prop_139,prop,Decor,Prop 139,thumbnails/prop_139.webp,runtime-assets/prop_139.glb,9012,142,1,1,512,PASS
+picture_066,picture,Decor,Picture 66,thumbnails/picture_066.webp,runtime-assets/picture_066.glb,9180,28,2,2,512,PASS
+prop_109,prop,Decor,Prop 109,thumbnails/prop_109.webp,runtime-assets/prop_109.glb,9228,116,2,1,512,PASS
+prop_110,prop,Decor,Prop 110,thumbnails/prop_110.webp,runtime-assets/prop_110.glb,9228,116,2,1,512,PASS
+work_table_014,work,Tables,Work Table 14,thumbnails/work_table_014.webp,runtime-assets/work_table_014.glb,9228,104,1,1,512,PASS
+work_table_016,work,Tables,Work Table 16,thumbnails/work_table_016.webp,runtime-assets/work_table_016.glb,9228,104,1,1,512,PASS
+prop_156,prop,Decor,Prop 156,thumbnails/prop_156.webp,runtime-assets/prop_156.glb,9292,107,2,1,512,PASS
+electronics_049,electronics,Decor,Electronics 49,thumbnails/electronics_049.webp,runtime-assets/electronics_049.glb,9352,116,2,1,512,PASS
+coffee_table_028,coffee,Tables,Coffee Table 28,thumbnails/coffee_table_028.webp,runtime-assets/coffee_table_028.glb,9356,106,1,1,512,PASS
+ladder_002,ladder,Decor,Ladder 2,thumbnails/ladder_002.webp,runtime-assets/ladder_002.glb,9508,90,1,1,512,PASS
+prop_158,prop,Decor,Prop 158,thumbnails/prop_158.webp,runtime-assets/prop_158.glb,9676,148,2,1,512,PASS
+picture_069,picture,Decor,Picture 69,thumbnails/picture_069.webp,runtime-assets/picture_069.glb,9712,28,2,2,512,PASS
+prop_107,prop,Decor,Prop 107,thumbnails/prop_107.webp,runtime-assets/prop_107.glb,9720,156,2,1,512,PASS
+prop_106,prop,Decor,Prop 106,thumbnails/prop_106.webp,runtime-assets/prop_106.glb,9724,156,2,1,512,PASS
+carpet_005,carpet,Decor,Carpet 5,thumbnails/carpet_005.webp,runtime-assets/carpet_005.glb,9752,189,1,1,512,PASS
+carpet_020,carpet,Decor,Carpet 20,thumbnails/carpet_020.webp,runtime-assets/carpet_020.glb,9752,189,1,1,512,PASS
+carpet_053,carpet,Decor,Carpet 53,thumbnails/carpet_053.webp,runtime-assets/carpet_053.glb,9752,189,1,1,512,PASS
+carpet_062,carpet,Decor,Carpet 62,thumbnails/carpet_062.webp,runtime-assets/carpet_062.glb,9752,189,1,1,512,PASS
+carpet_039,carpet,Decor,Carpet 39,thumbnails/carpet_039.webp,runtime-assets/carpet_039.glb,9756,189,1,1,512,PASS
+carpet_067,carpet,Decor,Carpet 67,thumbnails/carpet_067.webp,runtime-assets/carpet_067.glb,9756,189,1,1,512,PASS
+prop_098,prop,Decor,Prop 98,thumbnails/prop_098.webp,runtime-assets/prop_098.glb,9796,148,1,1,512,PASS
+prop_092,prop,Decor,Prop 92,thumbnails/prop_092.webp,runtime-assets/prop_092.glb,9984,128,2,1,512,PASS
+prop_161,prop,Decor,Prop 161,thumbnails/prop_161.webp,runtime-assets/prop_161.glb,10036,123,2,1,512,PASS
+picture_071,picture,Decor,Picture 71,thumbnails/picture_071.webp,runtime-assets/picture_071.glb,10212,30,2,2,512,PASS
+training_010,training,Decor,Training 10,thumbnails/training_010.webp,runtime-assets/training_010.glb,10344,164,2,1,512,PASS
+chair_010,chair,Seating,Chair 10,thumbnails/chair_010.webp,runtime-assets/chair_010.glb,10788,258,1,1,512,PASS
+chair_049,chair,Seating,Chair 49,thumbnails/chair_049.webp,runtime-assets/chair_049.glb,10788,258,1,1,512,PASS
+picture_072,picture,Decor,Picture 72,thumbnails/picture_072.webp,runtime-assets/picture_072.glb,10852,28,2,2,512,PASS
+picture_080,picture,Decor,Picture 80,thumbnails/picture_080.webp,runtime-assets/picture_080.glb,10868,30,2,2,512,PASS
+ladder_005,ladder,Decor,Ladder 5,thumbnails/ladder_005.webp,runtime-assets/ladder_005.glb,10908,110,1,1,512,PASS
+prop_150,prop,Decor,Prop 150,thumbnails/prop_150.webp,runtime-assets/prop_150.glb,11084,159,2,1,512,PASS
+prop_162,prop,Decor,Prop 162,thumbnails/prop_162.webp,runtime-assets/prop_162.glb,11232,162,2,1,512,PASS
+prop_165,prop,Decor,Prop 165,thumbnails/prop_165.webp,runtime-assets/prop_165.glb,11232,162,2,1,512,PASS
+prop_174,prop,Decor,Prop 174,thumbnails/prop_174.webp,runtime-assets/prop_174.glb,11232,162,2,1,512,PASS
+prop_177,prop,Decor,Prop 177,thumbnails/prop_177.webp,runtime-assets/prop_177.glb,11232,162,2,1,512,PASS
+prop_157,prop,Decor,Prop 157,thumbnails/prop_157.webp,runtime-assets/prop_157.glb,11304,143,3,1,512,PASS
+prop_184,prop,Decor,Prop 184,thumbnails/prop_184.webp,runtime-assets/prop_184.glb,11340,154,2,1,512,PASS
+prop_111,prop,Decor,Prop 111,thumbnails/prop_111.webp,runtime-assets/prop_111.glb,11428,156,3,1,512,PASS
+prop_187,prop,Decor,Prop 187,thumbnails/prop_187.webp,runtime-assets/prop_187.glb,11564,212,1,1,512,PASS
+prop_179,prop,Decor,Prop 179,thumbnails/prop_179.webp,runtime-assets/prop_179.glb,11612,162,2,1,512,PASS
+prop_176,prop,Decor,Prop 176,thumbnails/prop_176.webp,runtime-assets/prop_176.glb,11616,162,2,1,512,PASS
+cupboard_025,cupboard,Storage,Cupboard 25,thumbnails/cupboard_025.webp,runtime-assets/cupboard_025.glb,11668,172,1,1,512,PASS
+prop_185,prop,Decor,Prop 185,thumbnails/prop_185.webp,runtime-assets/prop_185.glb,11712,162,2,1,512,PASS
+picture_081,picture,Decor,Picture 81,thumbnails/picture_081.webp,runtime-assets/picture_081.glb,11736,30,2,2,512,PASS
+chair_009,chair,Seating,Chair 9,thumbnails/chair_009.webp,runtime-assets/chair_009.glb,11752,232,1,1,512,PASS
+prop_169,prop,Decor,Prop 169,thumbnails/prop_169.webp,runtime-assets/prop_169.glb,11756,182,2,1,512,PASS
+prop_167,prop,Decor,Prop 167,thumbnails/prop_167.webp,runtime-assets/prop_167.glb,11780,184,2,1,512,PASS
+carpet_029,carpet,Decor,Carpet 29,thumbnails/carpet_029.webp,runtime-assets/carpet_029.glb,11808,220,2,1,512,PASS
+carpet_016,carpet,Decor,Carpet 16,thumbnails/carpet_016.webp,runtime-assets/carpet_016.glb,11836,184,1,1,512,PASS
+carpet_007,carpet,Decor,Carpet 7,thumbnails/carpet_007.webp,runtime-assets/carpet_007.glb,11908,184,1,1,512,PASS
+carpet_022,carpet,Decor,Carpet 22,thumbnails/carpet_022.webp,runtime-assets/carpet_022.glb,11908,184,1,1,512,PASS
+picture_067,picture,Decor,Picture 67,thumbnails/picture_067.webp,runtime-assets/picture_067.glb,12148,28,2,2,512,PASS
+prop_182,prop,Decor,Prop 182,thumbnails/prop_182.webp,runtime-assets/prop_182.glb,12160,208,1,1,512,PASS
+dresser_021,dresser,Storage,Dresser 21,thumbnails/dresser_021.webp,runtime-assets/dresser_021.glb,12248,194,2,1,512,PASS
+prop_149,prop,Decor,Prop 149,thumbnails/prop_149.webp,runtime-assets/prop_149.glb,12260,192,2,1,512,PASS
+coffee_table_030,coffee,Tables,Coffee Table 30,thumbnails/coffee_table_030.webp,runtime-assets/coffee_table_030.glb,12444,194,1,1,512,PASS
+coffee_table_040,coffee,Tables,Coffee Table 40,thumbnails/coffee_table_040.webp,runtime-assets/coffee_table_040.glb,12444,194,1,1,512,PASS
+training_013,training,Decor,Training 13,thumbnails/training_013.webp,runtime-assets/training_013.glb,12456,128,2,1,512,PASS
+prop_160,prop,Decor,Prop 160,thumbnails/prop_160.webp,runtime-assets/prop_160.glb,12496,178,2,1,512,PASS
+chair_025,chair,Seating,Chair 25,thumbnails/chair_025.webp,runtime-assets/chair_025.glb,12668,180,2,1,512,PASS
+prop_180,prop,Decor,Prop 180,thumbnails/prop_180.webp,runtime-assets/prop_180.glb,12876,178,2,1,512,PASS
+prop_153,prop,Decor,Prop 153,thumbnails/prop_153.webp,runtime-assets/prop_153.glb,12992,155,3,1,512,PASS
+prop_178,prop,Decor,Prop 178,thumbnails/prop_178.webp,runtime-assets/prop_178.glb,13100,180,2,1,512,PASS
+prop_189,prop,Decor,Prop 189,thumbnails/prop_189.webp,runtime-assets/prop_189.glb,13128,155,3,1,512,PASS
+prop_105,prop,Decor,Prop 105,thumbnails/prop_105.webp,runtime-assets/prop_105.glb,13156,232,2,1,512,PASS
+sofa_043,sofa,Seating,Sofa 43,thumbnails/sofa_043.webp,runtime-assets/sofa_043.glb,13164,238,1,1,512,PASS
+chair_066,chair,Seating,Chair 66,thumbnails/chair_066.webp,runtime-assets/chair_066.glb,13196,196,2,1,512,PASS
+chair_043,chair,Seating,Chair 43,thumbnails/chair_043.webp,runtime-assets/chair_043.glb,13224,148,2,1,512,PASS
+picture_084,picture,Decor,Picture 84,thumbnails/picture_084.webp,runtime-assets/picture_084.glb,13280,30,2,2,512,PASS
+curtain_085,curtain,Decor,Curtain 85,thumbnails/curtain_085.webp,runtime-assets/curtain_085.glb,13344,444,1,1,512,PASS
+dresser_005,dresser,Storage,Dresser 5,thumbnails/dresser_005.webp,runtime-assets/dresser_005.glb,13472,168,2,1,512,PASS
+shelf_059,shelf,Storage,Shelf 59,thumbnails/shelf_059.webp,runtime-assets/shelf_059.glb,13556,252,1,1,512,PASS
+dresser,dresser,Storage,Dresser,thumbnails/dresser.webp,runtime-assets/dresser.glb,13664,232,2,1,512,PASS
+prop_163,prop,Decor,Prop 163,thumbnails/prop_163.webp,runtime-assets/prop_163.glb,13756,236,1,1,512,PASS
+prop_142,prop,Decor,Prop 142,thumbnails/prop_142.webp,runtime-assets/prop_142.glb,13768,274,1,1,512,PASS
+cupboard_014,cupboard,Storage,Cupboard 14,thumbnails/cupboard_014.webp,runtime-assets/cupboard_014.glb,13772,172,3,1,512,PASS
+chair_019,chair,Seating,Chair 19,thumbnails/chair_019.webp,runtime-assets/chair_019.glb,13860,278,1,1,512,PASS
+sofa_042,sofa,Seating,Sofa 42,thumbnails/sofa_042.webp,runtime-assets/sofa_042.glb,14124,238,2,1,512,PASS
+sofa_054,sofa,Seating,Sofa 54,thumbnails/sofa_054.webp,runtime-assets/sofa_054.glb,14124,238,2,1,512,PASS
+electronics_033,electronics,Decor,Electronics 33,thumbnails/electronics_033.webp,runtime-assets/electronics_033.glb,14140,182,3,1,512,PASS
+prop_099,prop,Decor,Prop 99,thumbnails/prop_099.webp,runtime-assets/prop_099.glb,14176,260,1,1,512,PASS
+picture_076,picture,Decor,Picture 76,thumbnails/picture_076.webp,runtime-assets/picture_076.glb,14248,28,2,2,512,PASS
+carpet_017,carpet,Decor,Carpet 17,thumbnails/carpet_017.webp,runtime-assets/carpet_017.glb,14264,321,1,1,512,PASS
+carpet_018,carpet,Decor,Carpet 18,thumbnails/carpet_018.webp,runtime-assets/carpet_018.glb,14264,321,1,1,512,PASS
+shelf_064,shelf,Storage,Shelf 64,thumbnails/shelf_064.webp,runtime-assets/shelf_064.glb,14296,312,1,1,512,PASS
+prop_188,prop,Decor,Prop 188,thumbnails/prop_188.webp,runtime-assets/prop_188.glb,14324,242,2,1,512,PASS
+flower_049,flower,Plants,Flower 49,thumbnails/flower_049.webp,runtime-assets/flower_049.glb,14336,264,1,1,512,PASS
+cupboard_016,cupboard,Storage,Cupboard 16,thumbnails/cupboard_016.webp,runtime-assets/cupboard_016.glb,14460,222,2,1,512,PASS
+entertainment_034,entertainment,Storage,Entertainment 34,thumbnails/entertainment_034.webp,runtime-assets/entertainment_034.glb,14500,210,3,1,512,PASS
+prop_096,prop,Decor,Prop 96,thumbnails/prop_096.webp,runtime-assets/prop_096.glb,14524,304,2,1,512,PASS
+chair_012,chair,Seating,Chair 12,thumbnails/chair_012.webp,runtime-assets/chair_012.glb,14796,318,2,1,512,PASS
+entertainment_032,entertainment,Storage,Entertainment 32,thumbnails/entertainment_032.webp,runtime-assets/entertainment_032.glb,14864,220,3,1,512,PASS
+prop_095,prop,Decor,Prop 95,thumbnails/prop_095.webp,runtime-assets/prop_095.glb,15124,324,2,1,512,PASS
+prop_173,prop,Decor,Prop 173,thumbnails/prop_173.webp,runtime-assets/prop_173.glb,15148,206,3,1,512,PASS
+prop_117,prop,Decor,Prop 117,thumbnails/prop_117.webp,runtime-assets/prop_117.glb,15244,240,1,1,512,PASS
+picture_082,picture,Decor,Picture 82,thumbnails/picture_082.webp,runtime-assets/picture_082.glb,15316,30,2,2,512,PASS
+prop_091,prop,Decor,Prop 91,thumbnails/prop_091.webp,runtime-assets/prop_091.glb,15336,252,1,1,512,PASS
+prop_116,prop,Decor,Prop 116,thumbnails/prop_116.webp,runtime-assets/prop_116.glb,15424,298,2,1,512,PASS
+picture_079,picture,Decor,Picture 79,thumbnails/picture_079.webp,runtime-assets/picture_079.glb,15548,156,2,2,512,PASS
+work_table_001,work,Tables,Work Table 1,thumbnails/work_table_001.webp,runtime-assets/work_table_001.glb,15656,196,1,1,512,PASS
+ladder_007,ladder,Decor,Ladder 7,thumbnails/ladder_007.webp,runtime-assets/ladder_007.glb,15812,180,1,1,512,PASS
+prop_084,prop,Decor,Prop 84,thumbnails/prop_084.webp,runtime-assets/prop_084.glb,15824,328,2,1,512,PASS
+prop_171,prop,Decor,Prop 171,thumbnails/prop_171.webp,runtime-assets/prop_171.glb,15844,236,1,1,512,PASS
+prop_181,prop,Decor,Prop 181,thumbnails/prop_181.webp,runtime-assets/prop_181.glb,15928,242,2,1,512,PASS
+training_009,training,Decor,Training 9,thumbnails/training_009.webp,runtime-assets/training_009.glb,15988,319,2,1,512,PASS
+training_006,training,Decor,Training 6,thumbnails/training_006.webp,runtime-assets/training_006.glb,16260,248,3,1,512,PASS
+flower_051,flower,Plants,Flower 51,thumbnails/flower_051.webp,runtime-assets/flower_051.glb,16500,475,1,1,512,PASS
+flower_050,flower,Plants,Flower 50,thumbnails/flower_050.webp,runtime-assets/flower_050.glb,16512,461,1,1,512,PASS
+prop_152,prop,Decor,Prop 152,thumbnails/prop_152.webp,runtime-assets/prop_152.glb,16528,414,1,1,512,PASS
+chair_042,chair,Seating,Chair 42,thumbnails/chair_042.webp,runtime-assets/chair_042.glb,16944,384,1,1,512,PASS
+ladder_004,ladder,Decor,Ladder 4,thumbnails/ladder_004.webp,runtime-assets/ladder_004.glb,17072,198,1,1,512,PASS
+sofa_068,sofa,Seating,Sofa 68,thumbnails/sofa_068.webp,runtime-assets/sofa_068.glb,17436,326,2,1,512,PASS
+picture_078,picture,Decor,Picture 78,thumbnails/picture_078.webp,runtime-assets/picture_078.glb,17500,156,2,2,512,PASS
+cupboard_017,cupboard,Storage,Cupboard 17,thumbnails/cupboard_017.webp,runtime-assets/cupboard_017.glb,17564,256,3,1,512,PASS
+entertainment_033,entertainment,Storage,Entertainment 33,thumbnails/entertainment_033.webp,runtime-assets/entertainment_033.glb,17668,252,2,1,512,PASS
+prop_190,prop,Decor,Prop 190,thumbnails/prop_190.webp,runtime-assets/prop_190.glb,17688,414,2,1,512,PASS
+flower_046,flower,Plants,Flower 46,thumbnails/flower_046.webp,runtime-assets/flower_046.glb,17700,499,1,1,512,PASS
+picture_077,picture,Decor,Picture 77,thumbnails/picture_077.webp,runtime-assets/picture_077.glb,17980,92,2,2,512,PASS
+curtain_015,curtain,Decor,Curtain 15,thumbnails/curtain_015.webp,runtime-assets/curtain_015.glb,18064,364,1,1,512,PASS
+prop_151,prop,Decor,Prop 151,thumbnails/prop_151.webp,runtime-assets/prop_151.glb,18104,430,2,1,512,PASS
+prop_154,prop,Decor,Prop 154,thumbnails/prop_154.webp,runtime-assets/prop_154.glb,18224,268,3,1,512,PASS
+flower_053,flower,Plants,Flower 53,thumbnails/flower_053.webp,runtime-assets/flower_053.glb,18452,518,1,1,512,PASS
+prop,prop,Decor,Prop,thumbnails/prop.webp,runtime-assets/prop.glb,18700,402,1,1,512,PASS
+work_table_005,work,Tables,Work Table 5,thumbnails/work_table_005.webp,runtime-assets/work_table_005.glb,18876,344,2,1,512,PASS
+flower_052,flower,Plants,Flower 52,thumbnails/flower_052.webp,runtime-assets/flower_052.glb,18948,547,1,1,512,PASS
+curtain_074,curtain,Decor,Curtain 74,thumbnails/curtain_074.webp,runtime-assets/curtain_074.glb,19104,364,2,1,512,PASS
+flower_038,flower,Plants,Flower 38,thumbnails/flower_038.webp,runtime-assets/flower_038.glb,19556,528,2,1,512,PASS
+lamp_032,lamp,Lighting,Lamp 32,thumbnails/lamp_032.webp,runtime-assets/lamp_032.glb,20100,358,4,1,512,PASS
+sofa_028,sofa,Seating,Sofa 28,thumbnails/sofa_028.webp,runtime-assets/sofa_028.glb,20304,400,2,1,512,PASS
+sofa_055,sofa,Seating,Sofa 55,thumbnails/sofa_055.webp,runtime-assets/sofa_055.glb,20304,400,2,1,512,PASS
+sofa_072,sofa,Seating,Sofa 72,thumbnails/sofa_072.webp,runtime-assets/sofa_072.glb,20304,400,2,1,512,PASS
+chair_038,chair,Seating,Chair 38,thumbnails/chair_038.webp,runtime-assets/chair_038.glb,20572,440,2,1,512,PASS
+chair_157,chair,Seating,Chair 157,thumbnails/chair_157.webp,runtime-assets/chair_157.glb,20572,440,2,1,512,PASS
+picture_083,picture,Decor,Picture 83,thumbnails/picture_083.webp,runtime-assets/picture_083.glb,21836,417,2,1,512,PASS
+picture_061,picture,Decor,Picture 61,thumbnails/picture_061.webp,runtime-assets/picture_061.glb,21896,28,2,2,512,PASS
+prop_191,prop,Decor,Prop 191,thumbnails/prop_191.webp,runtime-assets/prop_191.glb,22228,510,2,1,512,PASS
+picture_059,picture,Decor,Picture 59,thumbnails/picture_059.webp,runtime-assets/picture_059.glb,22376,30,2,2,512,PASS
+cupboard_008,cupboard,Storage,Cupboard 8,thumbnails/cupboard_008.webp,runtime-assets/cupboard_008.glb,22788,356,2,1,512,PASS
+picture_064,picture,Decor,Picture 64,thumbnails/picture_064.webp,runtime-assets/picture_064.glb,23032,28,2,2,512,PASS
+chair_026,chair,Seating,Chair 26,thumbnails/chair_026.webp,runtime-assets/chair_026.glb,23064,452,1,1,512,PASS
+chair_051,chair,Seating,Chair 51,thumbnails/chair_051.webp,runtime-assets/chair_051.glb,23064,452,1,1,512,PASS
+picture_074,picture,Decor,Picture 74,thumbnails/picture_074.webp,runtime-assets/picture_074.glb,23232,28,2,2,512,PASS
+curtain_005,curtain,Decor,Curtain 5,thumbnails/curtain_005.webp,runtime-assets/curtain_005.glb,23336,764,2,1,512,PASS
+curtain_067,curtain,Decor,Curtain 67,thumbnails/curtain_067.webp,runtime-assets/curtain_067.glb,23336,764,2,1,512,PASS
+curtain_008,curtain,Decor,Curtain 8,thumbnails/curtain_008.webp,runtime-assets/curtain_008.glb,23340,764,2,1,512,PASS
+curtain_047,curtain,Decor,Curtain 47,thumbnails/curtain_047.webp,runtime-assets/curtain_047.glb,23340,764,2,1,512,PASS
+curtain_009,curtain,Decor,Curtain 9,thumbnails/curtain_009.webp,runtime-assets/curtain_009.glb,23380,764,2,1,512,PASS
+curtain_048,curtain,Decor,Curtain 48,thumbnails/curtain_048.webp,runtime-assets/curtain_048.glb,23380,764,2,1,512,PASS
+curtain_010,curtain,Decor,Curtain 10,thumbnails/curtain_010.webp,runtime-assets/curtain_010.glb,23484,764,2,1,512,PASS
+curtain_033,curtain,Decor,Curtain 33,thumbnails/curtain_033.webp,runtime-assets/curtain_033.glb,23484,764,2,1,512,PASS
+curtain_011,curtain,Decor,Curtain 11,thumbnails/curtain_011.webp,runtime-assets/curtain_011.glb,23524,764,2,1,512,PASS
+curtain_034,curtain,Decor,Curtain 34,thumbnails/curtain_034.webp,runtime-assets/curtain_034.glb,23524,764,2,1,512,PASS
+lamp_027,lamp,Lighting,Lamp 27,thumbnails/lamp_027.webp,runtime-assets/lamp_027.glb,24496,482,4,1,512,PASS
+sofa_029,sofa,Seating,Sofa 29,thumbnails/sofa_029.webp,runtime-assets/sofa_029.glb,24876,532,2,1,512,PASS
+electronics_047,electronics,Decor,Electronics 47,thumbnails/electronics_047.webp,runtime-assets/electronics_047.glb,25348,600,1,1,512,PASS
+curtain_014,curtain,Decor,Curtain 14,thumbnails/curtain_014.webp,runtime-assets/curtain_014.glb,25904,540,1,1,512,PASS
+electronics_046,electronics,Decor,Electronics 46,thumbnails/electronics_046.webp,runtime-assets/electronics_046.glb,26344,600,1,1,512,PASS
+curtain_030,curtain,Decor,Curtain 30,thumbnails/curtain_030.webp,runtime-assets/curtain_030.glb,26484,872,2,1,512,PASS
+curtain_044,curtain,Decor,Curtain 44,thumbnails/curtain_044.webp,runtime-assets/curtain_044.glb,26484,872,2,1,512,PASS
+curtain_006,curtain,Decor,Curtain 6,thumbnails/curtain_006.webp,runtime-assets/curtain_006.glb,26520,872,2,1,512,PASS
+curtain_031,curtain,Decor,Curtain 31,thumbnails/curtain_031.webp,runtime-assets/curtain_031.glb,26520,872,2,1,512,PASS
+curtain_045,curtain,Decor,Curtain 45,thumbnails/curtain_045.webp,runtime-assets/curtain_045.glb,26520,872,2,1,512,PASS
+curtain_077,curtain,Decor,Curtain 77,thumbnails/curtain_077.webp,runtime-assets/curtain_077.glb,26816,540,2,1,512,PASS
+electronics_034,electronics,Decor,Electronics 34,thumbnails/electronics_034.webp,runtime-assets/electronics_034.glb,27028,608,2,1,512,PASS
+work_table_010,work,Tables,Work Table 10,thumbnails/work_table_010.webp,runtime-assets/work_table_010.glb,27244,604,1,1,512,PASS
+electronics_039,electronics,Decor,Electronics 39,thumbnails/electronics_039.webp,runtime-assets/electronics_039.glb,27672,600,2,1,512,PASS
+shelf_057,shelf,Storage,Shelf 57,thumbnails/shelf_057.webp,runtime-assets/shelf_057.glb,28176,576,1,1,512,PASS
+lamp_035,lamp,Lighting,Lamp 35,thumbnails/lamp_035.webp,runtime-assets/lamp_035.glb,28268,576,3,1,512,PASS
+flower_044,flower,Plants,Flower 44,thumbnails/flower_044.webp,runtime-assets/flower_044.glb,28560,560,2,1,512,PASS
+picture_075,picture,Decor,Picture 75,thumbnails/picture_075.webp,runtime-assets/picture_075.glb,28868,28,2,2,512,PASS
+flower_048,flower,Plants,Flower 48,thumbnails/flower_048.webp,runtime-assets/flower_048.glb,29856,594,1,1,512,PASS
+training_016,training,Decor,Training 16,thumbnails/training_016.webp,runtime-assets/training_016.glb,30232,458,3,1,512,PASS
+training_005,training,Decor,Training 5,thumbnails/training_005.webp,runtime-assets/training_005.glb,30408,657,3,1,512,PASS
+training_018,training,Decor,Training 18,thumbnails/training_018.webp,runtime-assets/training_018.glb,30676,592,3,1,512,PASS
+training_019,training,Decor,Training 19,thumbnails/training_019.webp,runtime-assets/training_019.glb,30684,592,3,1,512,PASS
+cupboard_007,cupboard,Storage,Cupboard 7,thumbnails/cupboard_007.webp,runtime-assets/cupboard_007.glb,30832,696,1,1,512,PASS
+picture_060,picture,Decor,Picture 60,thumbnails/picture_060.webp,runtime-assets/picture_060.glb,30992,28,2,2,512,PASS
+chair_027,chair,Seating,Chair 27,thumbnails/chair_027.webp,runtime-assets/chair_027.glb,31084,808,2,1,512,PASS
+entertainment_011,entertainment,Storage,Entertainment 11,thumbnails/entertainment_011.webp,runtime-assets/entertainment_011.glb,31704,556,3,1,512,PASS
+electronics_041,electronics,Decor,Electronics 41,thumbnails/electronics_041.webp,runtime-assets/electronics_041.glb,32124,442,3,1,512,PASS
+electronics_042,electronics,Decor,Electronics 42,thumbnails/electronics_042.webp,runtime-assets/electronics_042.glb,32124,442,3,1,512,PASS
+electronics_035,electronics,Decor,Electronics 35,thumbnails/electronics_035.webp,runtime-assets/electronics_035.glb,32168,638,5,1,512,PASS
+flower,flower,Plants,Flower,thumbnails/flower.webp,runtime-assets/flower.glb,32524,1078,2,1,512,PASS
+prop_140,prop,Decor,Prop 140,thumbnails/prop_140.webp,runtime-assets/prop_140.glb,33916,804,1,1,512,PASS
+electronics_032,electronics,Decor,Electronics 32,thumbnails/electronics_032.webp,runtime-assets/electronics_032.glb,34228,514,3,1,512,PASS
+flower_043,flower,Plants,Flower 43,thumbnails/flower_043.webp,runtime-assets/flower_043.glb,35072,724,1,1,512,PASS
+electronics_028,electronics,Decor,Electronics 28,thumbnails/electronics_028.webp,runtime-assets/electronics_028.glb,35596,566,3,1,512,PASS
+curtain_012,curtain,Decor,Curtain 12,thumbnails/curtain_012.webp,runtime-assets/curtain_012.glb,35708,760,1,1,512,PASS
+dresser_031,dresser,Storage,Dresser 31,thumbnails/dresser_031.webp,runtime-assets/dresser_031.glb,35720,610,2,1,512,PASS
+flower_039,flower,Plants,Flower 39,thumbnails/flower_039.webp,runtime-assets/flower_039.glb,36076,688,2,1,512,PASS
+dresser_030,dresser,Storage,Dresser 30,thumbnails/dresser_030.webp,runtime-assets/dresser_030.glb,36132,824,1,1,512,PASS
+curtain_076,curtain,Decor,Curtain 76,thumbnails/curtain_076.webp,runtime-assets/curtain_076.glb,36456,760,2,1,512,PASS
+training_017,training,Decor,Training 17,thumbnails/training_017.webp,runtime-assets/training_017.glb,36716,744,3,1,512,PASS
+dresser_010,dresser,Storage,Dresser 10,thumbnails/dresser_010.webp,runtime-assets/dresser_010.glb,37072,770,1,1,512,PASS
+dresser_029,dresser,Storage,Dresser 29,thumbnails/dresser_029.webp,runtime-assets/dresser_029.glb,37292,824,2,1,512,PASS
+entertainment_025,entertainment,Storage,Entertainment 25,thumbnails/entertainment_025.webp,runtime-assets/entertainment_025.glb,38332,914,4,1,512,PASS
+prop_141,prop,Decor,Prop 141,thumbnails/prop_141.webp,runtime-assets/prop_141.glb,39204,938,1,1,512,PASS
+electronics_027,electronics,Decor,Electronics 27,thumbnails/electronics_027.webp,runtime-assets/electronics_027.glb,40200,640,3,1,512,PASS
+flower_041,flower,Plants,Flower 41,thumbnails/flower_041.webp,runtime-assets/flower_041.glb,40352,953,2,1,512,PASS
+flower_042,flower,Plants,Flower 42,thumbnails/flower_042.webp,runtime-assets/flower_042.glb,40488,959,2,1,512,PASS
+prop_145,prop,Decor,Prop 145,thumbnails/prop_145.webp,runtime-assets/prop_145.glb,40652,962,1,1,512,PASS
+work_table,work,Tables,Work Table,thumbnails/work_table.webp,runtime-assets/work_table.glb,40796,686,3,1,512,PASS
+dresser_013,dresser,Storage,Dresser 13,thumbnails/dresser_013.webp,runtime-assets/dresser_013.glb,42820,924,2,1,512,PASS
+picture_062,picture,Decor,Picture 62,thumbnails/picture_062.webp,runtime-assets/picture_062.glb,45668,30,2,2,512,PASS
+training_003,training,Decor,Training 3,thumbnails/training_003.webp,runtime-assets/training_003.glb,46508,1074,2,1,512,PASS
+shelf_065,shelf,Storage,Shelf 65,thumbnails/shelf_065.webp,runtime-assets/shelf_065.glb,50016,1140,2,1,512,PASS
+entertainment_043,entertainment,Storage,Entertainment 43,thumbnails/entertainment_043.webp,runtime-assets/entertainment_043.glb,50904,1166,3,1,512,PASS
+entertainment,entertainment,Storage,Entertainment,thumbnails/entertainment.webp,runtime-assets/entertainment.glb,52396,912,1,1,512,PASS
+picture_068,picture,Decor,Picture 68,thumbnails/picture_068.webp,runtime-assets/picture_068.glb,53916,28,2,2,512,PASS
+picture_063,picture,Decor,Picture 63,thumbnails/picture_063.webp,runtime-assets/picture_063.glb,56184,28,2,2,512,PASS
+sofa,sofa,Seating,Sofa,thumbnails/sofa.webp,runtime-assets/sofa.glb,58020,1630,2,1,512,PASS
+prop_144,prop,Decor,Prop 144,thumbnails/prop_144.webp,runtime-assets/prop_144.glb,61348,1510,1,1,512,PASS
+entertainment_031,entertainment,Storage,Entertainment 31,thumbnails/entertainment_031.webp,runtime-assets/entertainment_031.glb,63944,384,4,2,512,PASS
+prop_143,prop,Decor,Prop 143,thumbnails/prop_143.webp,runtime-assets/prop_143.glb,69908,1742,1,1,512,PASS
+prop_146,prop,Decor,Prop 146,thumbnails/prop_146.webp,runtime-assets/prop_146.glb,69908,1742,1,1,512,PASS
+lamp_045,lamp,Lighting,Lamp 45,thumbnails/lamp_045.webp,runtime-assets/lamp_045.glb,73096,264,2,1,512,PASS
+chair_033,chair,Seating,Chair 33,thumbnails/chair_033.webp,runtime-assets/chair_033.glb,73584,1932,2,1,512,PASS
+lamp_034,lamp,Lighting,Lamp 34,thumbnails/lamp_034.webp,runtime-assets/lamp_034.glb,75348,298,3,1,512,PASS
+entertainment_041,entertainment,Storage,Entertainment 41,thumbnails/entertainment_041.webp,runtime-assets/entertainment_041.glb,76924,1186,3,1,512,PASS
+lamp_046,lamp,Lighting,Lamp 46,thumbnails/lamp_046.webp,runtime-assets/lamp_046.glb,85372,80,2,2,512,PASS
+cupboard_022,cupboard,Storage,Cupboard 22,thumbnails/cupboard_022.webp,runtime-assets/cupboard_022.glb,85384,1212,2,1,512,PASS
+cupboard_024,cupboard,Storage,Cupboard 24,thumbnails/cupboard_024.webp,runtime-assets/cupboard_024.glb,85384,1212,2,1,512,PASS
+coffee_table_038,coffee,Tables,Coffee Table 38,thumbnails/coffee_table_038.webp,runtime-assets/coffee_table_038.glb,88168,160,2,1,512,PASS
+cupboard_038,cupboard,Storage,Cupboard 38,thumbnails/cupboard_038.webp,runtime-assets/cupboard_038.glb,88696,106,2,2,512,PASS
+picture_065,picture,Decor,Picture 65,thumbnails/picture_065.webp,runtime-assets/picture_065.glb,88704,28,2,2,512,PASS
+flower_040,flower,Plants,Flower 40,thumbnails/flower_040.webp,runtime-assets/flower_040.glb,89632,1565,2,1,512,PASS
+prop_089,prop,Decor,Prop 89,thumbnails/prop_089.webp,runtime-assets/prop_089.glb,89944,166,2,2,512,PASS
+prop_212,prop,Decor,Prop 212,thumbnails/prop_212.webp,runtime-assets/prop_212.glb,89944,166,2,2,512,PASS
+coffee_table_025,coffee,Tables,Coffee Table 25,thumbnails/coffee_table_025.webp,runtime-assets/coffee_table_025.glb,90768,240,2,1,512,PASS
+chair_039,chair,Seating,Chair 39,thumbnails/chair_039.webp,runtime-assets/chair_039.glb,90772,348,2,2,512,PASS
+chair_052,chair,Seating,Chair 52,thumbnails/chair_052.webp,runtime-assets/chair_052.glb,90772,348,2,2,512,PASS
+chair_156,chair,Seating,Chair 156,thumbnails/chair_156.webp,runtime-assets/chair_156.glb,90772,348,2,2,512,PASS
+prop_186,prop,Decor,Prop 186,thumbnails/prop_186.webp,runtime-assets/prop_186.glb,91016,171,3,2,512,PASS
+chair_024,chair,Seating,Chair 24,thumbnails/chair_024.webp,runtime-assets/chair_024.glb,91220,380,2,2,512,PASS
+prop_175,prop,Decor,Prop 175,thumbnails/prop_175.webp,runtime-assets/prop_175.glb,91796,208,3,2,512,PASS
+prop_183,prop,Decor,Prop 183,thumbnails/prop_183.webp,runtime-assets/prop_183.glb,91796,208,3,2,512,PASS
+chair_018,chair,Seating,Chair 18,thumbnails/chair_018.webp,runtime-assets/chair_018.glb,92060,322,2,2,512,PASS
+chair_020,chair,Seating,Chair 20,thumbnails/chair_020.webp,runtime-assets/chair_020.glb,92080,400,2,2,512,PASS
+chair_022,chair,Seating,Chair 22,thumbnails/chair_022.webp,runtime-assets/chair_022.glb,92148,360,2,2,512,PASS
+lamp_033,lamp,Lighting,Lamp 33,thumbnails/lamp_033.webp,runtime-assets/lamp_033.glb,92168,278,3,2,512,PASS
+chair_017,chair,Seating,Chair 17,thumbnails/chair_017.webp,runtime-assets/chair_017.glb,92604,354,2,2,512,PASS
+chair_016,chair,Seating,Chair 16,thumbnails/chair_016.webp,runtime-assets/chair_016.glb,92984,248,3,2,512,PASS
+prop_168,prop,Decor,Prop 168,thumbnails/prop_168.webp,runtime-assets/prop_168.glb,93836,248,3,2,512,PASS
+chair_021,chair,Seating,Chair 21,thumbnails/chair_021.webp,runtime-assets/chair_021.glb,94564,442,2,2,512,PASS
+lamp_039,lamp,Lighting,Lamp 39,thumbnails/lamp_039.webp,runtime-assets/lamp_039.glb,94864,292,3,2,512,PASS
+chair_014,chair,Seating,Chair 14,thumbnails/chair_014.webp,runtime-assets/chair_014.glb,95096,452,2,2,512,PASS
+chair_050,chair,Seating,Chair 50,thumbnails/chair_050.webp,runtime-assets/chair_050.glb,95096,452,2,2,512,PASS
+electronics_045,electronics,Decor,Electronics 45,thumbnails/electronics_045.webp,runtime-assets/electronics_045.glb,95736,324,4,2,512,PASS
+electronics_048,electronics,Decor,Electronics 48,thumbnails/electronics_048.webp,runtime-assets/electronics_048.glb,95736,324,4,2,512,PASS
+flower_055,flower,Plants,Flower 55,thumbnails/flower_055.webp,runtime-assets/flower_055.glb,95940,3458,1,1,512,PASS
+chair_008,chair,Seating,Chair 8,thumbnails/chair_008.webp,runtime-assets/chair_008.glb,96764,374,2,2,512,PASS
+chair_048,chair,Seating,Chair 48,thumbnails/chair_048.webp,runtime-assets/chair_048.glb,96764,374,2,2,512,PASS
+electronics_038,electronics,Decor,Electronics 38,thumbnails/electronics_038.webp,runtime-assets/electronics_038.glb,97268,276,4,2,512,PASS
+electronics_044,electronics,Decor,Electronics 44,thumbnails/electronics_044.webp,runtime-assets/electronics_044.glb,97468,340,4,2,512,PASS
+lamp_037,lamp,Lighting,Lamp 37,thumbnails/lamp_037.webp,runtime-assets/lamp_037.glb,97800,386,4,2,512,PASS
+prop_101,prop,Decor,Prop 101,thumbnails/prop_101.webp,runtime-assets/prop_101.glb,98756,396,3,2,512,PASS
+lamp_058,lamp,Lighting,Lamp 58,thumbnails/lamp_058.webp,runtime-assets/lamp_058.glb,99496,428,4,2,512,PASS
+sofa_040,sofa,Seating,Sofa 40,thumbnails/sofa_040.webp,runtime-assets/sofa_040.glb,99564,450,2,2,512,PASS
+electronics_043,electronics,Decor,Electronics 43,thumbnails/electronics_043.webp,runtime-assets/electronics_043.glb,100044,380,4,2,512,PASS
+lamp_048,lamp,Lighting,Lamp 48,thumbnails/lamp_048.webp,runtime-assets/lamp_048.glb,100200,428,4,2,512,PASS
+chair_037,chair,Seating,Chair 37,thumbnails/chair_037.webp,runtime-assets/chair_037.glb,100488,480,3,2,512,PASS
+lamp_030,lamp,Lighting,Lamp 30,thumbnails/lamp_030.webp,runtime-assets/lamp_030.glb,101028,442,5,2,512,PASS
+prop_172,prop,Decor,Prop 172,thumbnails/prop_172.webp,runtime-assets/prop_172.glb,102540,2450,2,1,512,PASS
+chair_058,chair,Seating,Chair 58,thumbnails/chair_058.webp,runtime-assets/chair_058.glb,103072,380,3,2,512,PASS
+prop_100,prop,Decor,Prop 100,thumbnails/prop_100.webp,runtime-assets/prop_100.glb,106508,548,4,2,512,PASS
+prop_114,prop,Decor,Prop 114,thumbnails/prop_114.webp,runtime-assets/prop_114.glb,106852,552,4,2,512,PASS
+picture_086,picture,Decor,Picture 86,thumbnails/picture_086.webp,runtime-assets/picture_086.glb,108568,30,3,3,512,PASS
+lamp_028,lamp,Lighting,Lamp 28,thumbnails/lamp_028.webp,runtime-assets/lamp_028.glb,110876,748,4,2,512,PASS
+training_007,training,Decor,Training 7,thumbnails/training_007.webp,runtime-assets/training_007.glb,111320,626,4,2,512,PASS
+entertainment_039,entertainment,Storage,Entertainment 39,thumbnails/entertainment_039.webp,runtime-assets/entertainment_039.glb,112604,2196,4,1,512,PASS
+sofa_044,sofa,Seating,Sofa 44,thumbnails/sofa_044.webp,runtime-assets/sofa_044.glb,113000,3378,2,1,512,PASS
+lamp_029,lamp,Lighting,Lamp 29,thumbnails/lamp_029.webp,runtime-assets/lamp_029.glb,113152,764,5,2,512,PASS
+lamp_036,lamp,Lighting,Lamp 36,thumbnails/lamp_036.webp,runtime-assets/lamp_036.glb,116328,856,4,2,512,PASS
+chair_044,chair,Seating,Chair 44,thumbnails/chair_044.webp,runtime-assets/chair_044.glb,117584,2758,2,1,512,PASS
+training_002,training,Decor,Training 2,thumbnails/training_002.webp,runtime-assets/training_002.glb,117692,894,4,2,512,PASS
+electronics_040,electronics,Decor,Electronics 40,thumbnails/electronics_040.webp,runtime-assets/electronics_040.glb,118040,696,4,2,512,PASS
+electronics_053,electronics,Decor,Electronics 53,thumbnails/electronics_053.webp,runtime-assets/electronics_053.glb,118040,696,4,2,512,PASS
+carpet_004,carpet,Decor,Carpet 4,thumbnails/carpet_004.webp,runtime-assets/carpet_004.glb,120288,220,2,2,512,PASS
+electronics_037,electronics,Decor,Electronics 37,thumbnails/electronics_037.webp,runtime-assets/electronics_037.glb,121852,932,3,2,512,PASS
+carpet_001,carpet,Decor,Carpet 1,thumbnails/carpet_001.webp,runtime-assets/carpet_001.glb,122240,184,2,3,512,PASS
+electronics_036,electronics,Decor,Electronics 36,thumbnails/electronics_036.webp,runtime-assets/electronics_036.glb,125156,986,6,2,512,PASS
+electronics_029,electronics,Decor,Electronics 29,thumbnails/electronics_029.webp,runtime-assets/electronics_029.glb,125460,932,6,2,512,PASS
+chair_045,chair,Seating,Chair 45,thumbnails/chair_045.webp,runtime-assets/chair_045.glb,127332,2900,4,1,512,PASS
+training_008,training,Decor,Training 8,thumbnails/training_008.webp,runtime-assets/training_008.glb,131024,1013,4,2,512,PASS
+cupboard_003,cupboard,Storage,Cupboard 3,thumbnails/cupboard_003.webp,runtime-assets/cupboard_003.glb,146032,288,3,3,512,PASS
+training_004,training,Decor,Training 4,thumbnails/training_004.webp,runtime-assets/training_004.glb,148532,3376,3,1,512,PASS
+carpet_002,carpet,Decor,Carpet 2,thumbnails/carpet_002.webp,runtime-assets/carpet_002.glb,149568,386,2,3,512,PASS
+coffee_table_027,coffee,Tables,Coffee Table 27,thumbnails/coffee_table_027.webp,runtime-assets/coffee_table_027.glb,154588,106,1,2,512,PASS
+dresser_007,dresser,Storage,Dresser 7,thumbnails/dresser_007.webp,runtime-assets/dresser_007.glb,154732,130,1,2,512,PASS
+training_012,training,Decor,Training 12,thumbnails/training_012.webp,runtime-assets/training_012.glb,155468,1794,4,2,512,PASS
+cupboard_001,cupboard,Storage,Cupboard 1,thumbnails/cupboard_001.webp,runtime-assets/cupboard_001.glb,158528,116,3,3,512,PASS
+cupboard,cupboard,Storage,Cupboard,thumbnails/cupboard.webp,runtime-assets/cupboard.glb,160268,192,2,3,512,PASS
+training,training,Decor,Training,thumbnails/training.webp,runtime-assets/training.glb,160308,1895,5,2,512,PASS
+coffee_table,coffee,Tables,Coffee Table,thumbnails/coffee_table.webp,runtime-assets/coffee_table.glb,165912,436,1,2,512,PASS
+work_table_004,work,Tables,Work Table 4,thumbnails/work_table_004.webp,runtime-assets/work_table_004.glb,166444,326,2,3,512,PASS
+cupboard_019,cupboard,Storage,Cupboard 19,thumbnails/cupboard_019.webp,runtime-assets/cupboard_019.glb,168300,248,3,3,512,PASS
+dresser_024,dresser,Storage,Dresser 24,thumbnails/dresser_024.webp,runtime-assets/dresser_024.glb,171444,324,3,3,512,PASS
+carpet,carpet,Decor,Carpet,thumbnails/carpet.webp,runtime-assets/carpet.glb,173560,321,2,3,512,PASS
+work_table_013,work,Tables,Work Table 13,thumbnails/work_table_013.webp,runtime-assets/work_table_013.glb,175888,212,3,3,512,PASS
+work_table_012,work,Tables,Work Table 12,thumbnails/work_table_012.webp,runtime-assets/work_table_012.glb,176648,592,3,3,512,PASS
+prop_108,prop,Decor,Prop 108,thumbnails/prop_108.webp,runtime-assets/prop_108.glb,181256,214,1,2,512,PASS
+shelf_067,shelf,Storage,Shelf 67,thumbnails/shelf_067.webp,runtime-assets/shelf_067.glb,182144,340,1,2,512,PASS
+chair_227,chair,Seating,Chair 227,thumbnails/chair_227.webp,runtime-assets/chair_227.glb,184228,768,2,3,512,PASS
+cupboard_015,cupboard,Storage,Cupboard 15,thumbnails/cupboard_015.webp,runtime-assets/cupboard_015.glb,185296,154,2,3,512,PASS
+coffee_table_039,coffee,Tables,Coffee Table 39,thumbnails/coffee_table_039.webp,runtime-assets/coffee_table_039.glb,188968,208,2,3,512,PASS
+chair_015,chair,Seating,Chair 15,thumbnails/chair_015.webp,runtime-assets/chair_015.glb,190876,346,2,3,512,PASS
+work_table_003,work,Tables,Work Table 3,thumbnails/work_table_003.webp,runtime-assets/work_table_003.glb,191112,196,2,3,512,PASS
+sofa_037,sofa,Seating,Sofa 37,thumbnails/sofa_037.webp,runtime-assets/sofa_037.glb,196336,504,2,3,512,PASS
+shelf_073,shelf,Storage,Shelf 73,thumbnails/shelf_073.webp,runtime-assets/shelf_073.glb,199332,352,1,2,512,PASS
+training_011,training,Decor,Training 11,thumbnails/training_011.webp,runtime-assets/training_011.glb,202584,2924,4,2,512,PASS
+sofa_026,sofa,Seating,Sofa 26,thumbnails/sofa_026.webp,runtime-assets/sofa_026.glb,205892,664,1,2,512,PASS
+dresser_011,dresser,Storage,Dresser 11,thumbnails/dresser_011.webp,runtime-assets/dresser_011.glb,205916,670,3,3,512,PASS
+coffee_table_024,coffee,Tables,Coffee Table 24,thumbnails/coffee_table_024.webp,runtime-assets/coffee_table_024.glb,208932,92,2,3,512,PASS
+coffee_table_031,coffee,Tables,Coffee Table 31,thumbnails/coffee_table_031.webp,runtime-assets/coffee_table_031.glb,209732,194,1,2,512,PASS
+lamp,lamp,Lighting,Lamp,thumbnails/lamp.webp,runtime-assets/lamp.glb,211400,862,4,4,512,PASS
+sofa_045,sofa,Seating,Sofa 45,thumbnails/sofa_045.webp,runtime-assets/sofa_045.glb,212160,1396,2,3,512,PASS
+cupboard_070,cupboard,Storage,Cupboard 70,thumbnails/cupboard_070.webp,runtime-assets/cupboard_070.glb,212352,192,2,3,512,PASS
+sofa_030,sofa,Seating,Sofa 30,thumbnails/sofa_030.webp,runtime-assets/sofa_030.glb,212488,238,2,3,512,PASS
+sofa_041,sofa,Seating,Sofa 41,thumbnails/sofa_041.webp,runtime-assets/sofa_041.glb,212488,238,2,3,512,PASS
+dresser_083,dresser,Storage,Dresser 83,thumbnails/dresser_083.webp,runtime-assets/dresser_083.glb,213216,232,2,3,512,PASS
+prop_102,prop,Decor,Prop 102,thumbnails/prop_102.webp,runtime-assets/prop_102.glb,213572,188,1,2,512,PASS
+ladder_008,ladder,Decor,Ladder 8,thumbnails/ladder_008.webp,runtime-assets/ladder_008.glb,213660,198,1,2,512,PASS
+prop_087,prop,Decor,Prop 87,thumbnails/prop_087.webp,runtime-assets/prop_087.glb,214088,188,1,2,512,PASS
+prop_088,prop,Decor,Prop 88,thumbnails/prop_088.webp,runtime-assets/prop_088.glb,214088,188,1,2,512,PASS
+prop_097,prop,Decor,Prop 97,thumbnails/prop_097.webp,runtime-assets/prop_097.glb,214160,136,1,2,512,PASS
+prop_103,prop,Decor,Prop 103,thumbnails/prop_103.webp,runtime-assets/prop_103.glb,214856,188,1,2,512,PASS
+coffee_table_032,coffee,Tables,Coffee Table 32,thumbnails/coffee_table_032.webp,runtime-assets/coffee_table_032.glb,215008,106,1,2,512,PASS
+prop_112,prop,Decor,Prop 112,thumbnails/prop_112.webp,runtime-assets/prop_112.glb,215640,92,2,3,512,PASS
+entertainment_045,entertainment,Storage,Entertainment 45,thumbnails/entertainment_045.webp,runtime-assets/entertainment_045.glb,215740,1348,3,3,512,PASS
+work_table_002,work,Tables,Work Table 2,thumbnails/work_table_002.webp,runtime-assets/work_table_002.glb,216548,296,2,3,512,PASS
+prop_086,prop,Decor,Prop 86,thumbnails/prop_086.webp,runtime-assets/prop_086.glb,216816,248,1,2,512,PASS
+coffee_table_037,coffee,Tables,Coffee Table 37,thumbnails/coffee_table_037.webp,runtime-assets/coffee_table_037.glb,217216,140,2,3,512,PASS
+entertainment_035,entertainment,Storage,Entertainment 35,thumbnails/entertainment_035.webp,runtime-assets/entertainment_035.glb,218676,314,4,3,512,PASS
+chair_041,chair,Seating,Chair 41,thumbnails/chair_041.webp,runtime-assets/chair_041.glb,220724,470,2,3,512,PASS
+work_table_009,work,Tables,Work Table 9,thumbnails/work_table_009.webp,runtime-assets/work_table_009.glb,221304,356,3,3,512,PASS
+cupboard_069,cupboard,Storage,Cupboard 69,thumbnails/cupboard_069.webp,runtime-assets/cupboard_069.glb,221468,192,2,3,512,PASS
+ladder_010,ladder,Decor,Ladder 10,thumbnails/ladder_010.webp,runtime-assets/ladder_010.glb,221644,28,1,2,512,PASS
+prop_104,prop,Decor,Prop 104,thumbnails/prop_104.webp,runtime-assets/prop_104.glb,221860,200,3,3,512,PASS
+dresser_003,dresser,Storage,Dresser 3,thumbnails/dresser_003.webp,runtime-assets/dresser_003.glb,221948,232,2,3,512,PASS
+prop_085,prop,Decor,Prop 85,thumbnails/prop_085.webp,runtime-assets/prop_085.glb,222480,296,2,3,512,PASS
+chair_036,chair,Seating,Chair 36,thumbnails/chair_036.webp,runtime-assets/chair_036.glb,223092,547,2,3,512,PASS
+ladder,ladder,Decor,Ladder,thumbnails/ladder.webp,runtime-assets/ladder.glb,223300,60,1,2,512,PASS
+shelf_071,shelf,Storage,Shelf 71,thumbnails/shelf_071.webp,runtime-assets/shelf_071.glb,223656,328,2,3,512,PASS
+dresser_019,dresser,Storage,Dresser 19,thumbnails/dresser_019.webp,runtime-assets/dresser_019.glb,223732,228,2,3,512,PASS
+ladder_012,ladder,Decor,Ladder 12,thumbnails/ladder_012.webp,runtime-assets/ladder_012.glb,224980,72,1,2,512,PASS
+ladder_014,ladder,Decor,Ladder 14,thumbnails/ladder_014.webp,runtime-assets/ladder_014.glb,224984,72,1,2,512,PASS
+dresser_085,dresser,Storage,Dresser 85,thumbnails/dresser_085.webp,runtime-assets/dresser_085.glb,225468,458,3,3,512,PASS
+shelf_063,shelf,Storage,Shelf 63,thumbnails/shelf_063.webp,runtime-assets/shelf_063.glb,225860,272,1,2,512,PASS
+chair_013,chair,Seating,Chair 13,thumbnails/chair_013.webp,runtime-assets/chair_013.glb,225892,680,2,3,512,PASS
+ladder_011,ladder,Decor,Ladder 11,thumbnails/ladder_011.webp,runtime-assets/ladder_011.glb,226204,116,1,2,512,PASS
+ladder_016,ladder,Decor,Ladder 16,thumbnails/ladder_016.webp,runtime-assets/ladder_016.glb,226204,116,1,2,512,PASS
+dresser_008,dresser,Storage,Dresser 8,thumbnails/dresser_008.webp,runtime-assets/dresser_008.glb,226256,274,3,3,512,PASS
+lamp_031,lamp,Lighting,Lamp 31,thumbnails/lamp_031.webp,runtime-assets/lamp_031.glb,226264,328,4,3,512,PASS
+work_table_015,work,Tables,Work Table 15,thumbnails/work_table_015.webp,runtime-assets/work_table_015.glb,226816,328,2,3,512,PASS
+dresser_020,dresser,Storage,Dresser 20,thumbnails/dresser_020.webp,runtime-assets/dresser_020.glb,227084,306,2,3,512,PASS
+shelf_061,shelf,Storage,Shelf 61,thumbnails/shelf_061.webp,runtime-assets/shelf_061.glb,227384,244,2,3,512,PASS
+shelf_062,shelf,Storage,Shelf 62,thumbnails/shelf_062.webp,runtime-assets/shelf_062.glb,227548,80,2,3,512,PASS
+curtain_032,curtain,Decor,Curtain 32,thumbnails/curtain_032.webp,runtime-assets/curtain_032.glb,227688,132,1,2,512,PASS
+dresser_009,dresser,Storage,Dresser 9,thumbnails/dresser_009.webp,runtime-assets/dresser_009.glb,227772,174,1,2,512,PASS
+ladder_015,ladder,Decor,Ladder 15,thumbnails/ladder_015.webp,runtime-assets/ladder_015.glb,227784,112,1,2,512,PASS
+shelf,shelf,Storage,Shelf,thumbnails/shelf.webp,runtime-assets/shelf.glb,228980,92,1,2,512,PASS
+coffee_table_029,coffee,Tables,Coffee Table 29,thumbnails/coffee_table_029.webp,runtime-assets/coffee_table_029.glb,229340,436,2,3,512,PASS
+coffee_table_036,coffee,Tables,Coffee Table 36,thumbnails/coffee_table_036.webp,runtime-assets/coffee_table_036.glb,229532,504,2,3,512,PASS
+coffee_table_026,coffee,Tables,Coffee Table 26,thumbnails/coffee_table_026.webp,runtime-assets/coffee_table_026.glb,230008,194,1,2,512,PASS
+ladder_013,ladder,Decor,Ladder 13,thumbnails/ladder_013.webp,runtime-assets/ladder_013.glb,230020,144,1,2,512,PASS
+training_014,training,Decor,Training 14,thumbnails/training_014.webp,runtime-assets/training_014.glb,230220,208,1,2,512,PASS
+dresser_018,dresser,Storage,Dresser 18,thumbnails/dresser_018.webp,runtime-assets/dresser_018.glb,230432,384,2,3,512,PASS
+carpet_003,carpet,Decor,Carpet 3,thumbnails/carpet_003.webp,runtime-assets/carpet_003.glb,230468,189,2,3,512,PASS
+entertainment_037,entertainment,Storage,Entertainment 37,thumbnails/entertainment_037.webp,runtime-assets/entertainment_037.glb,231600,582,4,3,512,PASS
+shelf_060,shelf,Storage,Shelf 60,thumbnails/shelf_060.webp,runtime-assets/shelf_060.glb,233548,220,1,2,512,PASS
+chair_023,chair,Seating,Chair 23,thumbnails/chair_023.webp,runtime-assets/chair_023.glb,233628,376,1,2,512,PASS
+shelf_066,shelf,Storage,Shelf 66,thumbnails/shelf_066.webp,runtime-assets/shelf_066.glb,233696,264,2,3,512,PASS
+cupboard_005,cupboard,Storage,Cupboard 5,thumbnails/cupboard_005.webp,runtime-assets/cupboard_005.glb,233972,228,2,3,512,PASS
+cupboard_004,cupboard,Storage,Cupboard 4,thumbnails/cupboard_004.webp,runtime-assets/cupboard_004.glb,234104,206,2,3,512,PASS
+electronics_031,electronics,Decor,Electronics 31,thumbnails/electronics_031.webp,runtime-assets/electronics_031.glb,234244,500,5,4,512,PASS
+dresser_022,dresser,Storage,Dresser 22,thumbnails/dresser_022.webp,runtime-assets/dresser_022.glb,234512,458,3,3,512,PASS
+chair_034,chair,Seating,Chair 34,thumbnails/chair_034.webp,runtime-assets/chair_034.glb,234820,604,3,3,512,PASS
+dresser_084,dresser,Storage,Dresser 84,thumbnails/dresser_084.webp,runtime-assets/dresser_084.glb,235048,610,3,3,512,PASS
+cupboard_059,cupboard,Storage,Cupboard 59,thumbnails/cupboard_059.webp,runtime-assets/cupboard_059.glb,235464,154,2,3,512,PASS
+prop_113,prop,Decor,Prop 113,thumbnails/prop_113.webp,runtime-assets/prop_113.glb,235524,288,1,2,512,PASS
+electronics_030,electronics,Decor,Electronics 30,thumbnails/electronics_030.webp,runtime-assets/electronics_030.glb,236324,820,5,3,512,PASS
+chair_035,chair,Seating,Chair 35,thumbnails/chair_035.webp,runtime-assets/chair_035.glb,236628,324,2,3,512,PASS
+dresser_001,dresser,Storage,Dresser 1,thumbnails/dresser_001.webp,runtime-assets/dresser_001.glb,236988,272,1,2,512,PASS
+prop_083,prop,Decor,Prop 83,thumbnails/prop_083.webp,runtime-assets/prop_083.glb,237448,296,2,3,512,PASS
+chair_030,chair,Seating,Chair 30,thumbnails/chair_030.webp,runtime-assets/chair_030.glb,237648,740,2,3,512,PASS
+sofa_070,sofa,Seating,Sofa 70,thumbnails/sofa_070.webp,runtime-assets/sofa_070.glb,238620,238,2,3,512,PASS
+dresser_012,dresser,Storage,Dresser 12,thumbnails/dresser_012.webp,runtime-assets/dresser_012.glb,238660,824,2,3,512,PASS
+prop_115,prop,Decor,Prop 115,thumbnails/prop_115.webp,runtime-assets/prop_115.glb,238812,594,4,3,512,PASS
+coffee_table_068,coffee,Tables,Coffee Table 68,thumbnails/coffee_table_068.webp,runtime-assets/coffee_table_068.glb,238824,436,1,2,512,PASS
+ladder_023,ladder,Decor,Ladder 23,thumbnails/ladder_023.webp,runtime-assets/ladder_023.glb,239744,198,1,2,512,PASS
+entertainment_044,entertainment,Storage,Entertainment 44,thumbnails/entertainment_044.webp,runtime-assets/entertainment_044.glb,240268,866,4,3,512,PASS
+entertainment_038,entertainment,Storage,Entertainment 38,thumbnails/entertainment_038.webp,runtime-assets/entertainment_038.glb,240712,582,4,3,512,PASS
+entertainment_047,entertainment,Storage,Entertainment 47,thumbnails/entertainment_047.webp,runtime-assets/entertainment_047.glb,241820,210,4,3,512,PASS
+entertainment_042,entertainment,Storage,Entertainment 42,thumbnails/entertainment_042.webp,runtime-assets/entertainment_042.glb,242400,328,2,3,512,PASS
+chair_040,chair,Seating,Chair 40,thumbnails/chair_040.webp,runtime-assets/chair_040.glb,242416,382,3,3,512,PASS
+shelf_056,shelf,Storage,Shelf 56,thumbnails/shelf_056.webp,runtime-assets/shelf_056.glb,243912,648,2,3,512,PASS
+dresser_014,dresser,Storage,Dresser 14,thumbnails/dresser_014.webp,runtime-assets/dresser_014.glb,244160,610,3,3,512,PASS
+sofa_035,sofa,Seating,Sofa 35,thumbnails/sofa_035.webp,runtime-assets/sofa_035.glb,246812,326,2,3,512,PASS
+dresser_016,dresser,Storage,Dresser 16,thumbnails/dresser_016.webp,runtime-assets/dresser_016.glb,247020,420,2,3,512,PASS
+shelf_070,shelf,Storage,Shelf 70,thumbnails/shelf_070.webp,runtime-assets/shelf_070.glb,247120,732,1,2,512,PASS
+training_015,training,Decor,Training 15,thumbnails/training_015.webp,runtime-assets/training_015.glb,247420,426,3,3,512,PASS
+entertainment_046,entertainment,Storage,Entertainment 46,thumbnails/entertainment_046.webp,runtime-assets/entertainment_046.glb,247692,338,4,3,512,PASS
+chair_162,chair,Seating,Chair 162,thumbnails/chair_162.webp,runtime-assets/chair_162.glb,250700,704,1,2,512,PASS
+flower_047,flower,Plants,Flower 47,thumbnails/flower_047.webp,runtime-assets/flower_047.glb,253536,1181,2,3,512,PASS
+flower_054,flower,Plants,Flower 54,thumbnails/flower_054.webp,runtime-assets/flower_054.glb,255524,1203,3,3,512,PASS
+cupboard_006,cupboard,Storage,Cupboard 6,thumbnails/cupboard_006.webp,runtime-assets/cupboard_006.glb,255780,582,2,3,512,PASS
+coffee_table_033,coffee,Tables,Coffee Table 33,thumbnails/coffee_table_033.webp,runtime-assets/coffee_table_033.glb,256212,968,2,3,512,PASS
+chair_028,chair,Seating,Chair 28,thumbnails/chair_028.webp,runtime-assets/chair_028.glb,256220,704,1,2,512,PASS
+sofa_033,sofa,Seating,Sofa 33,thumbnails/sofa_033.webp,runtime-assets/sofa_033.glb,257192,1080,1,2,512,PASS
+cupboard_020,cupboard,Storage,Cupboard 20,thumbnails/cupboard_020.webp,runtime-assets/cupboard_020.glb,257968,824,1,2,512,PASS
+flower_045,flower,Plants,Flower 45,thumbnails/flower_045.webp,runtime-assets/flower_045.glb,258264,1351,2,3,512,PASS
+coffee_table_034,coffee,Tables,Coffee Table 34,thumbnails/coffee_table_034.webp,runtime-assets/coffee_table_034.glb,263768,98,3,4,512,PASS
+sofa_027,sofa,Seating,Sofa 27,thumbnails/sofa_027.webp,runtime-assets/sofa_027.glb,264896,630,3,3,512,PASS
+chair_032,chair,Seating,Chair 32,thumbnails/chair_032.webp,runtime-assets/chair_032.glb,277008,2684,3,3,512,PASS
+shelf_072,shelf,Storage,Shelf 72,thumbnails/shelf_072.webp,runtime-assets/shelf_072.glb,282644,1216,2,3,512,PASS
+work_table_007,work,Tables,Work Table 7,thumbnails/work_table_007.webp,runtime-assets/work_table_007.glb,295412,344,3,4,512,PASS
+dresser_023,dresser,Storage,Dresser 23,thumbnails/dresser_023.webp,runtime-assets/dresser_023.glb,298376,378,4,4,512,PASS
+work_table_006,work,Tables,Work Table 6,thumbnails/work_table_006.webp,runtime-assets/work_table_006.glb,304480,344,3,4,512,PASS
+cupboard_013,cupboard,Storage,Cupboard 13,thumbnails/cupboard_013.webp,runtime-assets/cupboard_013.glb,306992,36,3,4,512,PASS
+cupboard_002,cupboard,Storage,Cupboard 2,thumbnails/cupboard_002.webp,runtime-assets/cupboard_002.glb,307496,106,3,4,512,PASS
+sofa_096,sofa,Seating,Sofa 96,thumbnails/sofa_096.webp,runtime-assets/sofa_096.glb,308668,2253,2,3,512,PASS
+lamp_047,lamp,Lighting,Lamp 47,thumbnails/lamp_047.webp,runtime-assets/lamp_047.glb,313660,142,3,4,512,PASS
+work_table_008,work,Tables,Work Table 8,thumbnails/work_table_008.webp,runtime-assets/work_table_008.glb,319548,342,3,4,512,PASS
+chair_031,chair,Seating,Chair 31,thumbnails/chair_031.webp,runtime-assets/chair_031.glb,330176,654,3,4,512,PASS
+chair_029,chair,Seating,Chair 29,thumbnails/chair_029.webp,runtime-assets/chair_029.glb,332244,316,2,3,512,PASS
+dresser_017,dresser,Storage,Dresser 17,thumbnails/dresser_017.webp,runtime-assets/dresser_017.glb,337364,112,3,5,512,PASS
+shelf_058,shelf,Storage,Shelf 58,thumbnails/shelf_058.webp,runtime-assets/shelf_058.glb,338388,288,2,4,512,PASS
+dresser_025,dresser,Storage,Dresser 25,thumbnails/dresser_025.webp,runtime-assets/dresser_025.glb,341828,216,3,5,512,PASS
+sofa_039,sofa,Seating,Sofa 39,thumbnails/sofa_039.webp,runtime-assets/sofa_039.glb,368144,1192,3,3,512,PASS
+work_table_011,work,Tables,Work Table 11,thumbnails/work_table_011.webp,runtime-assets/work_table_011.glb,376632,342,4,5,512,PASS
+coffee_table_035,coffee,Tables,Coffee Table 35,thumbnails/coffee_table_035.webp,runtime-assets/coffee_table_035.glb,384052,464,3,5,512,PASS
+entertainment_036,entertainment,Storage,Entertainment 36,thumbnails/entertainment_036.webp,runtime-assets/entertainment_036.glb,416748,7046,3,2,512,PASS
+cupboard_010,cupboard,Storage,Cupboard 10,thumbnails/cupboard_010.webp,runtime-assets/cupboard_010.glb,424072,306,4,6,512,PASS
+dresser_002,dresser,Storage,Dresser 2,thumbnails/dresser_002.webp,runtime-assets/dresser_002.glb,428704,360,3,5,512,PASS
+dresser_015,dresser,Storage,Dresser 15,thumbnails/dresser_015.webp,runtime-assets/dresser_015.glb,440400,168,3,5,512,PASS
+cupboard_011,cupboard,Storage,Cupboard 11,thumbnails/cupboard_011.webp,runtime-assets/cupboard_011.glb,441060,126,3,5,512,PASS
+cupboard_012,cupboard,Storage,Cupboard 12,thumbnails/cupboard_012.webp,runtime-assets/cupboard_012.glb,445064,216,3,5,512,PASS
+prop_082,prop,Decor,Prop 82,thumbnails/prop_082.webp,runtime-assets/prop_082.glb,445728,580,2,4,512,PASS
+shelf_069,shelf,Storage,Shelf 69,thumbnails/shelf_069.webp,runtime-assets/shelf_069.glb,446352,232,3,5,512,PASS
+chair_047,chair,Seating,Chair 47,thumbnails/chair_047.webp,runtime-assets/chair_047.glb,484592,520,3,5,512,PASS
+sofa_034,sofa,Seating,Sofa 34,thumbnails/sofa_034.webp,runtime-assets/sofa_034.glb,505604,1243,3,5,512,PASS
+cupboard_021,cupboard,Storage,Cupboard 21,thumbnails/cupboard_021.webp,runtime-assets/cupboard_021.glb,522032,1252,4,6,512,PASS
+chair_011,chair,Seating,Chair 11,thumbnails/chair_011.webp,runtime-assets/chair_011.glb,528044,768,2,4,512,PASS
+chair_046,chair,Seating,Chair 46,thumbnails/chair_046.webp,runtime-assets/chair_046.glb,536544,2236,2,4,512,PASS
+cupboard_009,cupboard,Storage,Cupboard 9,thumbnails/cupboard_009.webp,runtime-assets/cupboard_009.glb,553028,822,5,6,512,PASS
+cupboard_082,cupboard,Storage,Cupboard 82,thumbnails/cupboard_082.webp,runtime-assets/cupboard_082.glb,553032,822,5,6,512,PASS
+lamp_038,lamp,Lighting,Lamp 38,thumbnails/lamp_038.webp,runtime-assets/lamp_038.glb,553548,340,5,6,512,PASS
+sofa_036,sofa,Seating,Sofa 36,thumbnails/sofa_036.webp,runtime-assets/sofa_036.glb,555972,1396,2,4,512,PASS
+sofa_032,sofa,Seating,Sofa 32,thumbnails/sofa_032.webp,runtime-assets/sofa_032.glb,640372,2253,2,4,512,PASS
+prop_093,prop,Decor,Prop 93,thumbnails/prop_093.webp,runtime-assets/prop_093.glb,653392,940,6,7,512,PASS
+chair,chair,Seating,Chair,thumbnails/chair.webp,runtime-assets/chair.glb,654096,516,4,6,512,PASS
+entertainment_040,entertainment,Storage,Entertainment 40,thumbnails/entertainment_040.webp,runtime-assets/entertainment_040.glb,663776,1836,6,7,512,PASS
+sofa_038,sofa,Seating,Sofa 38,thumbnails/sofa_038.webp,runtime-assets/sofa_038.glb,670192,1112,4,6,512,PASS
+dresser_004,dresser,Storage,Dresser 4,thumbnails/dresser_004.webp,runtime-assets/dresser_004.glb,862604,184,5,9,512,PASS
