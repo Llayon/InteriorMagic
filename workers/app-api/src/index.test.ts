@@ -103,6 +103,7 @@ const makeEnv = (overrides: Partial<Record<string, unknown>> = {}): AppApiWorker
     DB: db,
     ALLOWED_ORIGIN: 'https://example.invalid',
     TELEGRAM_INIT_DATA_MAX_AGE_SECONDS: '86400',
+    SESSION_TTL_SECONDS: '2592000',
     TELEGRAM_BOT_TOKEN: BOT_TOKEN,
     ...overrides,
   } as unknown as AppApiWorkerEnv;
