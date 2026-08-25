@@ -3,7 +3,7 @@ import { expect, test as base, type Page, type Request, type Response } from '@p
 const isCriticalUrl = (url: string, page: Page) => {
   const parsed = new URL(url);
   const origin = new URL(page.url() || 'http://127.0.0.1:4173').origin;
-  return parsed.origin === origin && (parsed.pathname === '/' || /\.(?:js|css|glb|jpg|jpeg|png|svg)$/i.test(parsed.pathname) || parsed.pathname.startsWith('/src/'));
+  return parsed.origin === origin && (parsed.pathname === '/' || /\.(?:js|css|json|glb|usdz|webp|jpg|jpeg|png|svg)$/i.test(parsed.pathname) || parsed.pathname.startsWith('/src/'));
 };
 
 export const test = base.extend<{ monitoredPage: Page }>({
