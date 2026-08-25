@@ -122,4 +122,21 @@ describe('deterministic Conversation planner', () => {
     for (const finding of relationshipFindings) expect(finding.objectIds).toEqual(['sofa', 'chair']);
     expect(rearBoundaryFinding?.objectIds).toEqual(['sofa']);
   });
+
+  it('freezes the representative Conversation proposal for G2C', () => {
+    expect(planConversation(poorOneChair())).toEqual({
+      moves: [
+        { instanceId: 'sofa', position: { x: 3.4, z: 0 }, rotationY: -1.5707963267948966 },
+        { instanceId: 'chair', position: { x: 2.05, z: 1.55 }, rotationY: 2.4250509794933897 },
+      ],
+      scoreBefore: { total: 35.51118278776095 },
+      scoreAfter: { total: 93.03232401731631 },
+      findings: [
+        { ruleId: 'conversation.facing', code: 'conversation-facing-improved', severity: 'positive', objectIds: ['sofa', 'chair'], params: { before: 0.645657868868381, after: 1 } },
+        { ruleId: 'conversation.distance', code: 'conversation-distance-improved', severity: 'positive', objectIds: ['sofa', 'chair'], params: { before: 0, after: 0.8580664004947517 } },
+        { ruleId: 'conversation.rear-boundary', code: 'conversation-rear-boundary-improved', severity: 'positive', objectIds: ['sofa'], params: { before: 0, after: 0.7999999999999998 } },
+        { ruleId: 'layout.selection', code: 'layout-improved', severity: 'positive', params: { improvement: 57.52114122955536 } },
+      ],
+    });
+  });
 });
