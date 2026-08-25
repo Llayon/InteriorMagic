@@ -1,5 +1,9 @@
 # ADR: Planning Contract v1
 
+Status: superseded for native and AI producers by Planning Contract v2. Retained
+only for explicitly versioned legacy TV compatibility; see
+`planning-contract-v2.md`.
+
 ## Context
 
 InteriorMagic is preparing parallel work on deterministic planning, AI intent parsing, planner preview UX, Telegram performance, and advisor/Feng Shui research. These tracks need one small shared vocabulary without freezing the deterministic planner's rapidly evolving spatial domain.
