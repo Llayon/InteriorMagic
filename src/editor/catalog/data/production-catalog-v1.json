@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "trackBaseSha": "1c32b27bfddb1b98ac7b70c9fa642604cb4d6790",
+  "sourcePolicySha256": "3b37828938f30666fed647e8e805bd57f997d45c7185b1adef13ba4b0ad58e8e",
+  "sourcePipelineManifestSha256": "9974113eb87a1089cc287e77bc1698cf308d9a20dc80f02764848e600d793d7a",
+  "sourcePayloadManifestSha256": "7e7825f9ae45d74ed2962c3cd09630fca66682d06e597b446eb524b169e03356",
+  "pipelineVersion": "1.0.0",
+  "policyVersion": 1,
+  "assetCount": 59,
+  "byRole": {
+    "rug": 5,
+    "armchair": 7,
+    "coffeeTable": 10,
+    "console": 11,
+    "tv": 8,
+    "plant": 5,
+    "floorLamp": 5,
+    "sofa": 8
+  },
+  "assets": [
+    {
+      "assetId": "carpet_001",
+      "semanticRole": "rug"
+    },
+    {
+      "assetId": "carpet_002",
+      "semanticRole": "rug"
+    },
+    {
+      "assetId": "carpet_005",
+      "semanticRole": "rug"
+    },
+    {
+      "assetId": "carpet_010",
+      "semanticRole": "rug"
+    },
+    {
+      "assetId": "carpet_015",
+      "semanticRole": "rug"
+    },
+    {
+      "assetId": "chair_002",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "chair_005",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "chair_007",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "chair_010",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "chair_011",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "chair_030",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "chair_046",
+      "semanticRole": "armchair"
+    },
+    {
+      "assetId": "coffee_002",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "coffee_005",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "coffee_007",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "coffee_010",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "coffee_015",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "cupboard_002",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "cupboard_009",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "cupboard_015",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "cupboard_022",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "cupboard_082",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "dresser_004",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "dresser_010",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "dresser_018",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "electronics",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_032",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_036",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_037",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_040",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_046",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_047",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "electronics_049",
+      "semanticRole": "tv"
+    },
+    {
+      "assetId": "flower_001",
+      "semanticRole": "plant"
+    },
+    {
+      "assetId": "flower_005",
+      "semanticRole": "plant"
+    },
+    {
+      "assetId": "flower_010",
+      "semanticRole": "plant"
+    },
+    {
+      "assetId": "flower_015",
+      "semanticRole": "plant"
+    },
+    {
+      "assetId": "flower_019",
+      "semanticRole": "plant"
+    },
+    {
+      "assetId": "lamp_001",
+      "semanticRole": "floorLamp"
+    },
+    {
+      "assetId": "lamp_010",
+      "semanticRole": "floorLamp"
+    },
+    {
+      "assetId": "lamp_019",
+      "semanticRole": "floorLamp"
+    },
+    {
+      "assetId": "lamp_038",
+      "semanticRole": "floorLamp"
+    },
+    {
+      "assetId": "lamp_048",
+      "semanticRole": "floorLamp"
+    },
+    {
+      "assetId": "shelf_001",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "shelf_010",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "shelf_018",
+      "semanticRole": "console"
+    },
+    {
+      "assetId": "sofa_007",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_011",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_019",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_027",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_032",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_036",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_037",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "sofa_038",
+      "semanticRole": "sofa"
+    },
+    {
+      "assetId": "work_002",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "work_005",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "work_006",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "work_010",
+      "semanticRole": "coffeeTable"
+    },
+    {
+      "assetId": "work_018",
+      "semanticRole": "coffeeTable"
+    }
+  ]
+}
