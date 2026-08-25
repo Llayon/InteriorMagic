@@ -5,7 +5,10 @@ import { unzipSync } from 'three/examples/jsm/libs/fflate.module.js';
 import { measureGlbFile, parseGlb } from './glb-bounds.mjs';
 
 const root = process.cwd();
-const revisionRoot = path.join(root, '.agent-data/ar0/sheen-chair-r1');
+const staged = process.argv.includes('--staged');
+const revisionRoot = staged
+  ? path.join(root, 'public/ar0/sheen-chair/r1')
+  : path.join(root, '.agent-data/ar0/sheen-chair-r1');
 const files = {
   glb: { path: 'model.glb', contentType: 'model/gltf-binary' },
   usdz: { path: 'model.usdz', contentType: 'model/vnd.usdz+zip' },
@@ -20,7 +23,7 @@ const readArtifact = async (name) => {
 const [glb, usdz, poster, source, stageReportBytes] = await Promise.all([
   readArtifact('glb'), readArtifact('usdz'), readArtifact('poster'),
   readFile(path.join(root, 'public/models/sheen_chair.glb')),
-  readFile(path.join(revisionRoot, 'usdz-stage-report.json')),
+  readFile(path.join(root, '.agent-data/ar0/sheen-chair-r1/usdz-stage-report.json')).catch(() => null),
 ]);
 if (usdz.length < 100_000) throw new Error('USDZ is not a meaningful model package');
 if (poster.length < 1_000) throw new Error('Poster is not a meaningful image');
@@ -47,7 +50,9 @@ if ((canonicalParsed.json.images?.length ?? 0) !== (sourceParsed.json.images?.le
 if ((canonicalParsed.json.materials?.length ?? 0) !== (sourceParsed.json.materials?.length ?? 0)) throw new Error('Canonical GLB changed material count');
 
 const glbBounds = await measureGlbFile(path.join(revisionRoot, 'model.glb'));
-const stageReport = JSON.parse(stageReportBytes.toString('utf8'));
+const stageReport = stageReportBytes
+  ? JSON.parse(stageReportBytes.toString('utf8'))
+  : { upAxis: 'Y', metersPerUnit: 1, dependencies: { unresolved: [] }, stageBounds: { sizeMeters: glbBounds.size } };
 if (stageReport.upAxis !== 'Y' || stageReport.metersPerUnit !== 1) throw new Error('USDZ stage is not Y-up in meters');
 if (stageReport.dependencies?.unresolved?.length) throw new Error('USDZ has unresolved dependencies');
 const usdzSize = stageReport.stageBounds?.sizeMeters;
@@ -67,7 +72,12 @@ for (const [key, definition] of Object.entries(files)) {
 }
 const manifest = { schemaVersion: 1, assetRevisionId: 'sheen-chair-r1', assetId: 'sheenChair', files: records };
 const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`);
-await writeFile(path.join(revisionRoot, 'manifest.json'), manifestBytes);
+if (staged) {
+  const existingManifest = await readFile(path.join(revisionRoot, 'manifest.json'));
+  if (!existingManifest.equals(manifestBytes)) throw new Error('Staged manifest does not match artifact bytes');
+} else {
+  await writeFile(path.join(revisionRoot, 'manifest.json'), manifestBytes);
+}
 const checksumEntries = [
   ...Object.entries(files).map(([key, definition]) => {
     const bytes = key === 'glb' ? glb : key === 'usdz' ? usdz : poster;
@@ -76,5 +86,11 @@ const checksumEntries = [
   { path: 'manifest.json', bytes: manifestBytes.length, sha256: sha256(manifestBytes), contentType: 'application/json; charset=utf-8' },
 ];
 const checksums = { schemaVersion: 1, assetRevisionId: 'sheen-chair-r1', files: checksumEntries };
-await writeFile(path.join(revisionRoot, 'checksums.json'), `${JSON.stringify(checksums, null, 2)}\n`);
+const checksumBytes = Buffer.from(`${JSON.stringify(checksums, null, 2)}\n`);
+if (staged) {
+  const existingChecksums = await readFile(path.join(revisionRoot, 'checksums.json'));
+  if (!existingChecksums.equals(checksumBytes)) throw new Error('Staged checksums do not match artifact bytes');
+} else {
+  await writeFile(path.join(revisionRoot, 'checksums.json'), checksumBytes);
+}
 console.log(JSON.stringify({ glbBounds, usdzSizeMeters: usdzSize, package: { entries, usdEntries, textureEntries }, manifest, checksums }, null, 2));

@@ -5,6 +5,8 @@ import type { Category, FurnitureAssetDefinition } from '@/editor/model/types';
 import { useEditorStore } from '@/editor/state/store';
 import { assetCache } from '@/scene/assets/AssetCache';
 import { DISPLAY_CATEGORY_LABELS, getCatalogConfiguration, type CatalogCategoryId, type DisplayCategory } from '@/editor/catalog/CatalogRepository';
+import { buildAr0LandingUrl, getAr0RevisionForAsset } from '@/ar0/revisions';
+import { openExternalLink } from '@/platform/externalLink';
 
 const defaultTabs: [Category, string][] = [['sofas', 'Диваны'], ['chairs', 'Кресла'], ['tables', 'Столы'], ['plants', 'Растения'], ['rugs', 'Ковры'], ['lamps', 'Свет']];
 
@@ -47,6 +49,13 @@ export function Catalog() {
     <div className="sheet-title"><div><small>КАТАЛОГ</small><strong>Добавьте характер комнате</strong></div>{object && <div className="variants">{variants.map((variant) => <button key={variant.id} aria-label={`Variant ${variant.id}`} className={object.variantId === variant.id ? 'active' : ''} style={{ background: variant.color }} onClick={() => selectedId && useEditorStore.getState().changeVariant(selectedId, variant.id)} />)}</div>}</div>
     <nav className="categories">{tabs.map(([id, label]) => <button key={id} data-category-id={id} aria-label={`Category ${id}`} className={category === id ? 'active' : ''} onClick={() => useEditorStore.getState().setCatalogCategory(id)}>{label}</button>)}</nav>
     {error && <div className="catalog-error" role="alert">{error}</div>}
-    <div className="items" ref={itemsRef}>{catalogItems.map(({ assetId, asset, canPlace, displayName, thumbnailUrl }) => <button className={`item ${object?.assetId === assetId ? 'active' : ''}`} key={assetId} data-asset-id={assetId} aria-label={canPlace ? `Add ${assetId}` : `Browse ${assetId}`} aria-busy={loadingAssetId === assetId} aria-disabled={!canPlace} disabled={!canPlace} onClick={() => asset && void addAsset(asset)}>{thumbnailUrl ? <img src={thumbnailUrl} alt={`${displayName} thumbnail`} loading="lazy" width="256" height="192" /> : <span>{asset?.icon}</span>}<b>{displayName}</b><small>{canPlace ? (loadingAssetId === assetId ? 'Загрузка…' : 'Добавить') : 'Только просмотр'}</small></button>)}</div>
+    <div className="items" ref={itemsRef}>{catalogItems.map(({ assetId, asset, canPlace, displayName, thumbnailUrl }) => {
+      const arRevision = getAr0RevisionForAsset(assetId);
+      const arUrl = arRevision ? buildAr0LandingUrl(arRevision.assetRevisionId) : null;
+      return <div className={`item-shell ${arUrl ? 'has-ar' : ''}`} key={assetId}>
+        <button className={`item ${object?.assetId === assetId ? 'active' : ''}`} data-asset-id={assetId} aria-label={canPlace ? `Add ${assetId}` : `Browse ${assetId}`} aria-busy={loadingAssetId === assetId} aria-disabled={!canPlace} disabled={!canPlace} onClick={() => asset && void addAsset(asset)}>{thumbnailUrl ? <img src={thumbnailUrl} alt={`${displayName} thumbnail`} loading="lazy" width="256" height="192" /> : <span>{asset?.icon}</span>}<b>{displayName}</b><small>{canPlace ? (loadingAssetId === assetId ? 'Загрузка…' : 'Добавить') : 'Только просмотр'}</small></button>
+        {arUrl && <button className="item-ar-action" data-ar-asset-id={assetId} aria-label={`Примерить ${displayName} 1:1`} onClick={() => openExternalLink(arUrl)}>Примерить 1:1</button>}
+      </div>;
+    })}</div>
   </div>;
 }

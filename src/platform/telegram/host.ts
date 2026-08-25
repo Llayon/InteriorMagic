@@ -25,6 +25,7 @@ export interface TelegramWebAppHost {
   isVersionAtLeast?(version: string): boolean;
   requestFullscreen?(): void;
   exitFullscreen?(): void;
+  openLink?(url: string): void;
   onEvent?(event: string, listener: (payload?: unknown) => void): void;
   offEvent?(event: string, listener: (payload?: unknown) => void): void;
   /** Raw initData query string for server-side validation. Never use initDataUnsafe as authority. */
