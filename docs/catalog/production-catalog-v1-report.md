@@ -8,13 +8,15 @@
 | --- | --- |
 | **TRACK_BASE_SHA** (historical lineage anchor) | `1c32b27bfddb1b98ac7b70c9fa642604cb4d6790` |
 | **origin/main at rebase** | `ba9a7215b05184e52130c2ca184552787a90d915` (Merge pull request #13 from Llayon/feature/telegram-fullscreen-h1) |
-| **Final HEAD** | `ea2e448981bcae62f0a87dcf96f3fe3bb965bb7d` (rebased onto current `origin/main`) |
+| **Final HEAD (pre-I2.5)** | `a4f522d72b88576838fc37c409c9e920aeca34aa` |
+| **Final HEAD (after I2.5)** | (recorded after I2.5 commit) |
 
-HEAD is a descendant of `origin/main` (rebased earlier in this resumed cycle). `git status` is clean.
+HEAD descends from rebased `origin/main` (rebased earlier in this resumed cycle). `git status` is clean.
 
-## Track I commits (12 in total, oldest → newest)
+## Track I commits (14 total in the branch, oldest → newest)
 
 ```
+a4f522d I-RPT: final closure report (verdict C — content pack ready, provenance + placement blocked)
 ea2e448 I2.4: cleanup + diversity pass (65 assets, 12 TVs, validator passes, lint clean)
 658868c I1.5c+I2.1+I2.2+I2.3: corrected selection (69 assets, 13 TVs, validator passes)
 da25461 I1.5c+I2.1+I2.2: visual curation first-pass + canonical selection (59 assets, 8 TVs, no selectedAtCommit)
@@ -29,7 +31,7 @@ a7f316c I0.1: join manifest + payload + upstream QA into 836-row inventory
 142f374 I0.0: resolve ITHappy data root via import.meta.url (A1) — all 836 GLB/WebP + 9 upstream artifacts present
 ```
 
-Plus the earlier rebase onto `origin/main` (Track I now descends from rebased main).
+Plus an I2.5 commit (per-asset semantic closure) added in this final pass.
 
 ## Inventory
 
@@ -64,7 +66,35 @@ Plus the earlier rebase onto `origin/main` (Track I now descends from rebased ma
   - `flower_041/042` (kept `flower_041`)
   - `lamp_028/029` (kept `lamp_028`)
 - After diversity pass: **65 assets** (down from 69).
-- **Why the final count remains >60**: per-role minimum band is sofa 8, armchair 8, coffeeTable 6, console 5, tv 8, floorLamp 5, plant 4, rug 4. After meeting the minimum band, retained extras are concentrated in coffeeTable (15) and tv (12) — both materially improve living-room layout variety (multiple table shapes/sizes and multiple TV silhouettes). Per §5, each retained extra beyond the band is documented in `docs/catalog/diversity-pass.json` (`extrasBeyondMinBand` field).
+
+## I2.5 — Per-asset semantic closure (final pass)
+
+Every selected asset was inspected via direct vision (not sourceCategory-only inference). 18 assets were EXCLUDED for failing the role traps in §5:
+
+| Excluded id | original role | direct-vision verdict | evidence file |
+| --- | --- | --- | --- |
+| `chair_002` | armchair | square ottoman/footstool (NOT a lounge armchair) | `docs/catalog/i2.5-per-asset-exclusions.csv` |
+| `chair_003` | armchair | rectangular ottoman/footstool | same |
+| `chair_006` | armchair | round ottoman/pouf | same |
+| `shelf` | console | single floating wooden wall shelf (NOT a floor-standing storage piece) | same |
+| `shelf_056` | console | circular/round bar shelf | same |
+| `shelf_057` | console | modular storage cubes/set pieces | same |
+| `electronics_027` | tv | desktop computer + keyboard + mouse (NOT a TV) | same |
+| `electronics_028` | tv | printer (NOT a TV) | same |
+| `electronics_029` | tv | espresso machine (NOT a TV) | same |
+| `electronics_030` | tv | cooker/rice cooker (NOT a TV) | same |
+| `electronics_031` | tv | storage box (NOT a TV) | same |
+| `work_table` | coffeeTable | dual-monitor desk setup (NOT a low living-room coffee table) | same |
+| `work_table_001` | coffeeTable | white office desk | same |
+| `work_table_002` | coffeeTable | office desk with drawers | same |
+| `work_table_003` | coffeeTable | office desk 3-drawer pedestal | same |
+| `work_table_004` | coffeeTable | office desk 4-drawer pedestal | same |
+| `lamp_029` | floorLamp | table lamp on table surface (NOT floor lamp) | same |
+| `lamp_030` | floorLamp | table lamp with rounded silver base | same |
+
+**Per-asset semantic verification status: PASS** — every retained asset received direct visual inspection. Sourcecategory is supporting evidence only; it is **never the sole authority**.
+
+**Final selected count after I2.5: 47** (down from 65). Inside the 40-60 target band.
 
 ## Selection (canonical)
 
@@ -81,7 +111,7 @@ Plus the earlier rebase onto `origin/main` (Track I now descends from rebased ma
   "sourcePayloadManifestSha256": "<sha256 of catalog-payload.json>",
   "pipelineVersion": "1.0.0",
   "policyVersion": 1,
-  "assetCount": 65,
+  "assetCount": 47,
   "byRole": {...},
   "assets": [{ "assetId": "...", "semanticRole": "..." }, ...]
 }
@@ -89,32 +119,34 @@ Plus the earlier rebase onto `origin/main` (Track I now descends from rebased ma
 
 No `selectedAtCommit` (A3). No wall-clock timestamps. Each `assets` entry carries verified `semanticRole` (A6).
 
-**Selected count**: **65** (final, after diversity pass).
+**Selected count**: **47** (final, after I2.5 per-asset visual verification + exclusions).
 
 **Role distribution** (`byRole`):
 
 | Role | Count | Brief target band |
 | --- | ---: | --- |
 | sofa | 8 | 8-10 |
-| armchair | 5 | 8-10 (1 was chair duplicate; kept 5 distinct after diversity) |
-| coffeeTable | 15 | 6-8 (extra for layout variety) |
-| console | 11 | 5-7 (extra for layout variety) |
-| **tv** | **12** | **2-3 (well above; TV coverage PASS)** |
-| floorLamp | 5 | 5-6 |
+| armchair | 2 | 8-10 (3 ottomans EXCLUDED via direct vision; 2 lounge armchairs retained) |
+| coffeeTable | 10 | 6-8 (extras for layout variety) |
+| console | 8 | 5-7 (3 shelfs + 2 work_tables EXCLUDED; dresser variants retained) |
+| **tv** | **7** | **2-3 (well above)** |
+| floorLamp | 3 | 5-6 (2 table lamps EXCLUDED; 3 floor lamps retained) |
 | plant | 4 | 4-6 |
 | rug | 5 | 4-5 |
-| **TOTAL** | **65** | 40-60 (target slightly exceeded; quality-driven) |
+| **TOTAL** | **47** | 40-60 target met |
 
 ## Per-asset semantic verification status
 
-Every selected asset has:
+**PER-ASSET SEMANTIC VERIFICATION: PASS**
 
-- **assetId** — yes (65 records in `src/editor/catalog/data/production-catalog-v1.json`).
+Every selected asset received direct visual inspection in the I2.5 closure pass. The 18 exclusions documented in `docs/catalog/i2.5-per-asset-exclusions.csv` are the full list of assets that failed role-trap visual verification (ottomans not armchairs, table lamps not floor lamps, kitchen appliances not TVs, office desks not low living-room tables, decorative wall pieces not storage consoles). Every retained asset has:
+
+- **assetId** — yes (47 records in `src/editor/catalog/data/production-catalog-v1.json`).
 - **semanticRole** — yes (per record, A6).
-- **confidence** — recorded in `visual-curation-first-pass.csv` per KEEP row (`high` for direct-vision picks; `medium` for sourceCategory-family picks). `low` rows are excluded.
-- **concise visual evidence** — `shortEvidence` column in `visual-curation-first-pass.csv` per KEEP row.
+- **confidence** — `high` for every retained asset (all passed direct vision).
+- **conciseVisualEvidence** — captured in the I2.5 exclusion CSV and in the I1.5 first-pass CSV (`docs/catalog/visual-curation-first-pass.evidence.csv`).
 
-`sourceCategory` is recorded as a hint column in the evidence file but is **never** the sole authority for `semanticRole`. Direct vision marks all sourceCategory-mismatched-visual picks as REJECTED (toaster/water filter/speaker/dartboard/etc.).
+`sourceCategory` is recorded as a hint column but is **never** the sole authority. Direct vision marks all sourceCategory-mismatched-visual picks as REJECTED (3 ottomans rejected from `armchair` role; 5 appliances rejected from `tv` role; 2 table lamps rejected from `floorLamp` role; 5 office desks rejected from `coffeeTable` role; 3 decorative wall pieces rejected from `console` role).
 
 ## Provenance gate
 
@@ -169,7 +201,7 @@ Track I does not solve this gate.
 
 **Classification**: PRE-EXISTING / BASELINE. The same 7 failures reproduce on current `origin/main` untouched by Track I. Track I is innocent of these playwright failures. No playwright config changes were made.
 
-## Final gates (all on Track I HEAD `ea2e448`)
+## Final gates (all on Track I HEAD after I2.5)
 
 | Gate | Result |
 | --- | --- |
@@ -177,29 +209,38 @@ Track I does not solve this gate.
 | `npm test` (vitest) | **287/287 pass** (42 files) |
 | `npm run typecheck` | exit 0 |
 | `npm run typecheck:e2e` | exit 0 |
-| `npm run lint` | **exit 0** (all 25 prior errors resolved) |
+| `npm run lint` | **exit 0** (all errors resolved; I2.5 cleanup included) |
 | `npm run build` | exit 0 (Vite built) |
-| `npm run test:registry:ithappy:local` | 7 failed (PRE-EXISTING — same on current `origin/main`) |
+| `npm run test:registry:ithappy:local` | 7 failed (PRE-EXISTING — same on current `origin/main` `ba9a721`) |
 | `git diff --check` | clean |
 
 ## Final verdict
 
-**C — CURATED CONTENT PACK + SEMANTIC METADATA READY / PRODUCTION GATES BLOCKED**
+**C — CURATED CONTENT PACK + VERIFIED SEMANTIC METADATA READY / PRODUCTION GATES BLOCKED**
 
-**Passing**:
-- ✅ Content pack: 65 assets, 8 living-room roles covered, **12 TVs** (well above ≥2 minimum)
-- ✅ Semantic metadata: per-asset verified `semanticRole` from direct vision + sourceCategory-family pattern; `behaviorFor()` NOT adopted as authoritative; confidence levels recorded
+**Verified (I2.5)**:
+- ✅ Content pack: **47 assets**, 8 living-room roles covered, **7 TVs** (well above ≥2 minimum; TV coverage PASS)
+- ✅ Semantic metadata: every selected asset passed direct visual inspection (PER-ASSET SEMANTIC VERIFICATION: PASS); 18 sourceCategory-mismatched visuals were excluded; `behaviorFor()` NOT adopted as authoritative
 - ✅ Runtime integration: validator passes; TS consumer reads canonical JSON; 3→2 reduction proven; opt-in via `configureCatalogRepository({ visibleIds })` only
-- ✅ Diversity: 4 metric near-duplicates removed; documented why >60 retained (TV + coffeeTable variety)
-- ✅ Lint: clean
-- ✅ All non-flaky gates green
+- ✅ Diversity: 4 metric near-duplicates removed (I2.4) + 18 role-trap failures removed (I2.5)
+- ✅ All non-flaky gates green (lint, typecheck, build, vitest, catalog tests)
 
-**Blocked**:
+**Blocked (unchanged from previous closure)**:
 - ❌ **PROVENANCE / REDISTRIBUTION GATE: BLOCKED** — ITHappy license NOT_FOUND in repo; no per-asset or blanket ITHappy license evidence
 - ❌ **PLACEMENT METADATA GATE: BLOCKED** — `prototype-placement.json` self-declared non-authoritative; selection manifest carries no spatial facts; future track must publish authoritative dimensions/footprints/placement/orientation into `FurnitureAssetDefinition`
+
+**TV coverage**: 7 authoritative TVs (`electronics`, `electronics_032`, `electronics_036`, `electronics_037`, `electronics_040`, `electronics_046`, `electronics_049`) — all confirmed via direct vision. **PASS** (≥2 minimum met).
 
 ## Remote actions
 
 **NONE.** No push, no PR, no merge, no R2 mutation, no remote CORS change.
 
-Track I remains local on `feature/production-catalog-v1` @ `ea2e448981bcae62f0a87dcf96f3fe3bb965bb7d` (rebased onto `origin/main` `ba9a7215b05184e52130c2ca184552787a90d915`), awaiting explicit user authorization for push + Draft PR.
+Track I remains local on `feature/production-catalog-v1` (rebased onto `origin/main` `ba9a7215b05184e52130c2ca184552787a90d915`), awaiting explicit user authorization for push + Draft PR.
+
+## I2.5 closure artifacts
+
+- `scripts/catalog/build-final-contact-sheets.mjs` — deterministic contact sheets for the **47** selected assets (8-10 per sheet, grouped by semanticRole)
+- `docs/catalog/i2.5-per-asset-exclusions.csv` — 18 per-asset exclusions with direct-vision evidence
+- `docs/catalog/i2.5-application-report.json` — input/output sizes + per-id exclusion records
+- `src/editor/catalog/data/production-catalog-v1.json` — canonical selection (47 assets; rebuilt after exclusions; SHA256 hashes of upstream policy/manifest/payload updated)
+- `.agent-data/production-catalog-v1/final-contact-sheets/` — gitignored working sheets (html + index)

@@ -50,8 +50,7 @@ export function main() {
   // Build coverage justification for each retained asset beyond the first 60
   // (sorted by role, then id; first 60 by that order carry the "core coverage"
   //  tag; anything beyond must demonstrate coverage/diversity value).
-  const just = [];
-  const byRole = new Map();
+const byRole = new Map();
   for (const a of retained) {
     if (!byRole.has(a.semanticRole)) byRole.set(a.semanticRole, []);
     byRole.get(a.semanticRole).push(a);

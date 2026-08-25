@@ -6,15 +6,15 @@
   "sourcePayloadManifestSha256": "7e7825f9ae45d74ed2962c3cd09630fca66682d06e597b446eb524b169e03356",
   "pipelineVersion": "1.0.0",
   "policyVersion": 1,
-  "assetCount": 65,
+  "assetCount": 47,
   "byRole": {
     "rug": 5,
-    "armchair": 5,
-    "coffeeTable": 15,
-    "console": 11,
-    "tv": 12,
+    "armchair": 2,
+    "coffeeTable": 10,
+    "console": 8,
+    "tv": 7,
     "plant": 4,
-    "floorLamp": 5,
+    "floorLamp": 3,
     "sofa": 8
   },
   "assets": [
@@ -44,18 +44,6 @@
     },
     {
       "assetId": "chair_001",
-      "semanticRole": "armchair"
-    },
-    {
-      "assetId": "chair_002",
-      "semanticRole": "armchair"
-    },
-    {
-      "assetId": "chair_003",
-      "semanticRole": "armchair"
-    },
-    {
-      "assetId": "chair_006",
       "semanticRole": "armchair"
     },
     {
@@ -135,26 +123,6 @@
       "semanticRole": "tv"
     },
     {
-      "assetId": "electronics_027",
-      "semanticRole": "tv"
-    },
-    {
-      "assetId": "electronics_028",
-      "semanticRole": "tv"
-    },
-    {
-      "assetId": "electronics_029",
-      "semanticRole": "tv"
-    },
-    {
-      "assetId": "electronics_030",
-      "semanticRole": "tv"
-    },
-    {
-      "assetId": "electronics_031",
-      "semanticRole": "tv"
-    },
-    {
       "assetId": "electronics_032",
       "semanticRole": "tv"
     },
@@ -207,26 +175,6 @@
       "semanticRole": "floorLamp"
     },
     {
-      "assetId": "lamp_029",
-      "semanticRole": "floorLamp"
-    },
-    {
-      "assetId": "lamp_030",
-      "semanticRole": "floorLamp"
-    },
-    {
-      "assetId": "shelf",
-      "semanticRole": "console"
-    },
-    {
-      "assetId": "shelf_056",
-      "semanticRole": "console"
-    },
-    {
-      "assetId": "shelf_057",
-      "semanticRole": "console"
-    },
-    {
       "assetId": "sofa",
       "semanticRole": "sofa"
     },
@@ -257,26 +205,6 @@
     {
       "assetId": "sofa_032",
       "semanticRole": "sofa"
-    },
-    {
-      "assetId": "work_table",
-      "semanticRole": "coffeeTable"
-    },
-    {
-      "assetId": "work_table_001",
-      "semanticRole": "coffeeTable"
-    },
-    {
-      "assetId": "work_table_002",
-      "semanticRole": "coffeeTable"
-    },
-    {
-      "assetId": "work_table_003",
-      "semanticRole": "coffeeTable"
-    },
-    {
-      "assetId": "work_table_004",
-      "semanticRole": "coffeeTable"
     }
   ]
 }
