@@ -30,7 +30,7 @@ export type LayoutQuality = {
   components: Partial<Record<string, number>>;
 };
 
-export type SelectionOutcome = 'improved' | 'already-good' | 'improvement-too-small' | 'no-valid-plan';
+export type SelectionOutcome = 'improved' | 'already-good' | 'improvement-too-small' | 'no-valid-plan' | 'search-incomplete';
 
 export type LayoutEvaluation = {
   arrangement: Arrangement;
@@ -315,14 +315,15 @@ export const runLivingRoomLayout = (request: LayoutPlanRequest): LayoutPlanResul
   visit(0, new Map());
   const accepted = best !== undefined && best.movedCount > 0
     && best.utility - currentEvaluation.utility >= request.selectionPolicy.acceptanceThreshold - SCORE_EPSILON;
-  const selected = accepted ? best! : currentEvaluation;
-  const outcome: SelectionOutcome = accepted ? 'improved'
-    : !best ? 'no-valid-plan'
-    : bestAlternative && bestAlternative.quality.total > currentEvaluation.quality.total + SCORE_EPSILON
-      ? 'improvement-too-small'
-      : 'already-good';
+  const selected = diagnostics.stoppedByBudget ? currentEvaluation : accepted ? best! : currentEvaluation;
+  const outcome: SelectionOutcome = diagnostics.stoppedByBudget ? 'search-incomplete'
+    : accepted ? 'improved'
+      : !best ? 'no-valid-plan'
+        : bestAlternative && bestAlternative.quality.total > currentEvaluation.quality.total + SCORE_EPSILON
+          ? 'improvement-too-small'
+          : 'already-good';
   const selection: LayoutSelection = { ...selected, outcome };
-  const moves = request.activeGroup.movable.flatMap((entity) => {
+  const moves = diagnostics.stoppedByBudget ? [] : request.activeGroup.movable.flatMap((entity) => {
     const transform = selected.arrangement.get(entity.id) ?? entity.transform;
     return sameTransform(transform, entity.transform) ? [] : [{
       instanceId: roomObjectInstanceId(entity),

@@ -5,8 +5,10 @@ import {
   type Arrangement,
   type Candidate,
   type CandidateDimension,
+  type LayoutQuality,
   type LayoutPlanRequest,
   type LayoutSelectionPolicy,
+  type SelectionOutcome,
 } from './engine';
 import { PlanningError } from './errors';
 
@@ -229,6 +231,35 @@ describe('scenario-neutral living-room layout engine', () => {
 
     expect(result.diagnostics.arrangementsEvaluated).toBe(1);
     expect(result.diagnostics.stoppedByBudget).toBe(true);
+  });
+
+  it('fails closed when the search budget is exhausted before characterization completes', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    const input = scene([movable]);
+    const dimensions: CandidateDimension[] = [{
+      entity: movable,
+      // The first leaf is attractive, but it is not safe to apply a partial search result.
+      provide: () => [candidate(movable, 'improve-first', .5, 0), candidate(movable, 'current', 0, 0)],
+    }];
+    const requestWithBudget = {
+      ...request(input, [movable], dimensions, (arrangement) => [{
+        id: 'quality', quality: arrangement.get('movable')?.key === 'improve-first' ? 1 : .5,
+      }]),
+      selectionPolicy: { acceptanceThreshold: 0, movementCost: () => 0 },
+      searchLimits: { maxEvaluations: 1 },
+      buildFindings: (_before: LayoutQuality, _after: LayoutQuality, outcome: SelectionOutcome) => [{
+        ruleId: 'layout.selection', code: `layout-${outcome}`, severity: outcome === 'search-incomplete' ? 'info' as const : 'positive' as const,
+      }],
+    };
+    const first = runLivingRoomLayout(requestWithBudget);
+    const second = runLivingRoomLayout(requestWithBudget);
+
+    expect(first.diagnostics.stoppedByBudget).toBe(true);
+    expect(first.selection.outcome).toBe('search-incomplete');
+    expect(first.proposal.moves).toEqual([]);
+    expect(first.proposal.scoreAfter).toEqual(first.proposal.scoreBefore);
+    expect(first.proposal.findings).toEqual([expect.objectContaining({ code: 'layout-search-incomplete', severity: 'info' })]);
+    expect(second).toEqual(first);
   });
 
   it('reports typed errors for invalid active groups and current layouts', () => {
