@@ -1,4 +1,7 @@
-import type { PlanningIntentProviderRequest } from '../../../src/editor/planning/intent';
+import {
+  PLANNING_INTENT_CONTRACT_VERSION,
+  type PlanningIntentProviderRequest,
+} from '../../../src/editor/planning/intent';
 import { GroqIntentError, requestGroqIntent } from './groq';
 import {
   MAX_WIRE_BODY_BYTES,
@@ -81,7 +84,11 @@ export const createPlanningIntentHandler = (fetchImpl: typeof fetch = fetch.bind
         focalPoints: parsed.context.focalPoints.map((focal) => ({ ...focal })),
       };
       const output = await requestGroqIntent(providerRequest, env.GROQ_API_KEY, fetchImpl);
-      return json({ ok: true, output }, 200, responseOrigin);
+      return json({
+        ok: true,
+        contractVersion: PLANNING_INTENT_CONTRACT_VERSION,
+        output,
+      }, 200, responseOrigin);
     } catch (cause) {
       if (cause instanceof GroqIntentError) {
         const status = cause.code === 'upstream_rate_limited' ? 429 : cause.code === 'upstream_timeout' ? 504 : 502;

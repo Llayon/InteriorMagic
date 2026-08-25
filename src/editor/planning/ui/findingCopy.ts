@@ -1,5 +1,5 @@
 import type { PlanProposal, PlanningFinding } from '../contracts';
-import { parsePlanningGoal } from '../contracts/parsePlanningGoal';
+import { parsePlanningGoalV1 } from '../contracts/parsePlanningGoal';
 
 /**
  * Presentation copy for canonical Contract v1 finding codes.
@@ -188,4 +188,4 @@ export const presentScore = (total: number): number => Math.round(total);
  * Parse a fixture code defensively. Exists so tests can verify copy without
  * importing the planning-goal parse helpers.
  */
-export const parseFixtureGoal = parsePlanningGoal;
+export const parseFixtureGoal = parsePlanningGoalV1;

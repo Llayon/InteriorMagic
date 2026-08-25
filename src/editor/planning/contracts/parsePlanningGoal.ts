@@ -60,6 +60,3 @@ export const parsePlanningGoalV2 = (value: unknown): PlanningGoalV2 => {
   }
   throw new Error('Unsupported PlanningGoalV2 activity');
 };
-
-/** @deprecated Explicitly select parsePlanningGoalV1 or parsePlanningGoalV2. */
-export const parsePlanningGoal = parsePlanningGoalV1;

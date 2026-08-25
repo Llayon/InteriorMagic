@@ -4,6 +4,7 @@ import { GROQ_INTENT_MODEL, GROQ_TIMEOUT_MS, QWEN_OUTPUT_SHAPE_HINT } from './gr
 import { createPlanningIntentHandler } from './index';
 
 const wire = (text = 'Сделай просмотр телевизора удобнее') => ({
+  contractVersion: 2,
   text,
   focals: [{ id: 'room-object:tv', kind: 'tv' }],
 });
@@ -39,12 +40,12 @@ describe('planning intent Worker', () => {
   ])('passes through %s JSON as untrusted output', async (_name, output) => {
     const response = await call(wire(), vi.fn(async () => groqResponse(JSON.stringify(output))));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, output });
+    expect(await response.json()).toEqual({ ok: true, contractVersion: 2, output });
   });
 
   it('passes non-JSON model content through as untrusted output', async () => {
     const response = await call(wire(), vi.fn(async () => groqResponse('not json')));
-    expect(await response.json()).toEqual({ ok: true, output: 'not json' });
+    expect(await response.json()).toEqual({ ok: true, contractVersion: 2, output: 'not json' });
   });
 
   it.each([[429, 'upstream_rate_limited'], [500, 'upstream_unavailable'], [503, 'upstream_unavailable']])(
@@ -83,7 +84,8 @@ describe('planning intent Worker', () => {
       {},
       { ...wire(), room: { width: 4 } },
       { ...wire(), focals: [{ id: 'room-object:tv', kind: 'tv', position: { x: 1 } }] },
-      { ...wire(), focals: [] },
+      { text: 'x', focals: [] },
+      { ...wire(), contractVersion: 1 },
       { ...wire(), focals: [{ id: '', kind: 'tv' }] },
       { ...wire(), focals: [{ id: 'x', kind: 'sofa' }] },
       { ...wire(), text: 'x'.repeat(2001) },
@@ -93,6 +95,17 @@ describe('planning intent Worker', () => {
       expect(response.status).toBe(400);
     }
     expect(upstream).not.toHaveBeenCalled();
+  });
+
+  it('accepts zero TV focals for Conversation classification', async () => {
+    const response = await call(
+      { ...wire('Make this better for conversation'), focals: [] },
+      vi.fn(async () => groqResponse('{"activity":"conversation"}')),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      ok: true, contractVersion: 2, output: { activity: 'conversation' },
+    });
   });
 
   it('packages the canonical prompt, minimal context and proven Qwen hint', async () => {

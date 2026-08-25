@@ -24,7 +24,7 @@ const cloneFocalPoint = (focal: PlanningIntentFocalPoint): PlanningIntentFocalPo
 /**
  * Structural validation of the application-supplied IntentContext. Throws
  * PlanningIntentInputError before any provider invocation on malformed input.
- * This is separate from parsePlanningGoal(), which stays the structural
+ * This is separate from parsePlanningGoalV2(), which stays the structural
  * authority over model output and never inspects application state.
  */
 export const validatePlanningIntentContext = (
@@ -60,12 +60,6 @@ export const validatePlanningIntentContext = (
         ? { id: entry['id'], kind: entry['kind'] as PlanningIntentFocalKind }
         : { id: entry['id'], kind: entry['kind'] as PlanningIntentFocalKind, label: entry['label'] };
     tvFocalPoints.push(cloneFocalPoint(focal));
-  }
-
-  if (tvFocalPoints.length === 0) {
-    throw new PlanningIntentInputError(
-      'PlanningIntentContext requires at least one usable TV focal point',
-    );
   }
 
   return { tvFocalPoints };

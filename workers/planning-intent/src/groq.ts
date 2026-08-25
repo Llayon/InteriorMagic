@@ -11,8 +11,8 @@ const MAX_GROQ_RESPONSE_BYTES = 64 * 1024;
 
 export const QWEN_OUTPUT_SHAPE_HINT = [
   'Allowed output shapes (output exactly one JSON object and nothing else):',
-  'Success: {"activity":"watchTv","focalPointId":"<one supplied ID>"}',
-  'Success with priorities: {"activity":"watchTv","focalPointId":"<one supplied ID>","priorities":["viewing","circulation","conversation"]}',
+  'TV success: {"activity":"watchTv","focalPointId":"<one supplied ID>"}',
+  'Conversation success: {"activity":"conversation"}',
   'Unsupported: {"intent":"unsupported_intent"}',
   'Ambiguous: {"intent":"ambiguous_focal"}',
   'Successful goals use the key "activity", NEVER "intent".',
@@ -41,7 +41,11 @@ const userMessage = (request: PlanningIntentProviderRequest): string => {
       ? `- ${focal.id} (${focal.kind})`
       : `- ${focal.id} (${focal.kind}): ${focal.label}`,
   ).join('\n');
-  return ['User request:', request.userText, '', 'Allowed focal points:', focals, '', QWEN_OUTPUT_SHAPE_HINT].join('\n');
+  return [
+    'User request:', request.userText, '',
+    'Allowed TV focal points:', focals.length === 0 ? '(none)' : focals,
+    '', QWEN_OUTPUT_SHAPE_HINT,
+  ].join('\n');
 };
 
 export const buildGroqIntentRequest = (request: PlanningIntentProviderRequest) => ({

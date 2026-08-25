@@ -1,4 +1,4 @@
-export { parsePlanningGoal, parsePlanningGoalV1, parsePlanningGoalV2 } from './parsePlanningGoal';
+export { parsePlanningGoalV1, parsePlanningGoalV2 } from './parsePlanningGoal';
 export type {
   ConversationGoalV2,
   FindingParam,
@@ -6,8 +6,6 @@ export type {
   PlanningFinding,
   PlanningGoalV1,
   PlanningGoalV2,
-  PlanningGoal,
-  PlanningPriority,
   PlanningPriorityV1,
   PlanningScore,
   PlanProposal,

@@ -9,6 +9,7 @@ export type {
   PlanningIntentProviderSentinel,
   PlanningIntentSentinelName,
 } from './provider';
+export { PLANNING_INTENT_CONTRACT_VERSION } from './provider';
 export type {
   PlanningIntentContext,
   PlanningIntentFocalKind,

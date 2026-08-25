@@ -10,12 +10,14 @@ export const planningIntentSystemPrompt = [
   'You convert an interior design user request into a strict JSON planning goal.',
   '',
   'Rules:',
-  '- The only supported activity is "watchTv".',
-  '- If the request is not about making TV watching better, reply {"intent":"unsupported_intent"}.',
-  '- Choose "focalPointId" ONLY from the IDs listed in the context. Never invent an ID.',
-  '- If several focal points are listed and the request does not clearly identify one of them, reply {"intent":"ambiguous_focal"} instead of guessing.',
-  '- "priorities" is OPTIONAL: an ordered array of unique values from ["viewing","circulation","conversation"], most important first.',
-  '- Omit "priorities" when the request expresses no relative preference.',
+  '- The supported single activities are "watchTv" and "conversation".',
+  '- For a TV-only request, output {"activity":"watchTv","focalPointId":"<allowed ID>"}.',
+  '- For a conversation-only request, output exactly {"activity":"conversation"}. It has no focal point.',
+  '- If the request combines watchTv and conversation, reply {"intent":"unsupported_intent"}.',
+  '- If the request asks for priorities, relative preferences, planner tuning, or trade-offs, reply {"intent":"unsupported_intent"}.',
+  '- If the request is about neither supported activity, reply {"intent":"unsupported_intent"}.',
+  '- For watchTv, choose "focalPointId" ONLY from the IDs listed in the context. Never invent an ID.',
+  '- If several TV focal points are listed and the TV request does not clearly identify one, reply {"intent":"ambiguous_focal"}.',
   '- Reply with a single JSON object and nothing else. Do not explain your reasoning.',
   '- Never output coordinates, geometry, distances, numeric weights or any other planner parameters.',
 ].join('\n');
@@ -23,11 +25,11 @@ export const planningIntentSystemPrompt = [
 /**
  * Tiny JSON-Schema-shaped description of the allowed output, built from the
  * IDs explicitly supplied in the IntentContext. Track B owns this schema;
- * parsePlanningGoal() remains the final structural authority regardless of
+ * parsePlanningGoalV2() remains the final structural authority regardless of
  * what any provider-side schema enforcement does. No schema library involved.
  */
 export const buildPlanningIntentOutputSchema = (allowedFocalIds: readonly PlanningEntityId[]) => ({
-  name: 'planning_goal_v1',
+  name: 'planning_goal_v2',
   strict: true,
   schema: {
     type: 'object',
@@ -39,12 +41,14 @@ export const buildPlanningIntentOutputSchema = (allowedFocalIds: readonly Planni
         properties: {
           activity: { type: 'string', enum: ['watchTv'] },
           focalPointId: { type: 'string', enum: [...allowedFocalIds] },
-          priorities: {
-            type: 'array',
-            minItems: 1,
-            uniqueItems: true,
-            items: { type: 'string', enum: ['viewing', 'circulation', 'conversation'] },
-          },
+        },
+      },
+      {
+        type: 'object',
+        additionalProperties: false,
+        required: ['activity'],
+        properties: {
+          activity: { type: 'string', enum: ['conversation'] },
         },
       },
       {

@@ -19,11 +19,6 @@ export type ConversationGoalV2 = {
 
 export type PlanningGoalV2 = WatchTvGoalV2 | ConversationGoalV2;
 
-/** @deprecated Explicitly select PlanningGoalV1 or PlanningGoalV2. */
-export type PlanningGoal = PlanningGoalV1;
-/** @deprecated V1-only compatibility alias. */
-export type PlanningPriority = PlanningPriorityV1;
-
 export type ProposedMove = {
   instanceId: string;
   position: {

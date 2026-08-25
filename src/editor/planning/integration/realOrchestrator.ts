@@ -6,13 +6,13 @@ import {
   type PlanningIntentProvider,
   type PlanningIntentResult,
 } from '@/editor/planning/intent';
-import { planTvViewing } from '@/editor/planning/tv';
 import { projectPlanningScene, type AssetDefinitionResolver } from './projectPlanningScene';
 import { resolveSingleTvFocalId } from '@/editor/planning/tv';
 import { planningProjectFingerprint } from './projectFingerprint';
 import type { PlanningIntentAnalysisPort } from './planningIntentAnalysisPort';
 import { PlanningError, type PlanningScene } from '@/editor/planning/livingRoom';
-import type { PlanningGoal } from '@/editor/planning/contracts';
+import type { PlanningGoalV2 } from '@/editor/planning/contracts';
+import { planPlanningGoal } from './planPlanningGoal';
 
 export interface RealPlannerStorePort {
   beginAnalysis(): void;
@@ -27,7 +27,7 @@ export interface RealPlannerDependencies {
   resolveAsset?: AssetDefinitionResolver;
   beforeAnalysis?: () => Promise<void>;
   createIntentProvider?: (signal: AbortSignal) => PlanningIntentProvider;
-  plan?: typeof planTvViewing;
+  planGoal?: typeof planPlanningGoal;
 }
 
 export type RealPlannerOrchestrator = PlannerOrchestrator & PlanningIntentAnalysisPort;
@@ -74,7 +74,7 @@ export const createRealPlannerOrchestrator = ({
   resolveAsset,
   beforeAnalysis = () => Promise.resolve(),
   createIntentProvider,
-  plan = planTvViewing,
+  planGoal = planPlanningGoal,
 }: RealPlannerDependencies): RealPlannerOrchestrator => {
   let generation = 0;
   let analyzed: { proposal: PlanProposal; fingerprint: string } | null = null;
@@ -88,24 +88,24 @@ export const createRealPlannerOrchestrator = ({
     return ++generation;
   };
 
-  const prepare = (): { scene: PlanningScene; fingerprint: string; focalPointId: string } => {
+  const prepare = (): { scene: PlanningScene; fingerprint: string } => {
     const project = readProject();
     const fingerprint = planningProjectFingerprint(project);
     const scene = projectPlanningScene(project, resolveAsset);
-    return { scene, fingerprint, focalPointId: resolveSingleTvFocalId(scene) };
+    return { scene, fingerprint };
   };
 
   const publishGoal = (
     ownGeneration: number,
     scene: PlanningScene,
     fingerprint: string,
-    goal: PlanningGoal,
+    goal: PlanningGoalV2,
   ): void => {
     if (ownGeneration !== generation) return;
     if (planningProjectFingerprint(readProject()) !== fingerprint) {
       throw new PlanningError('INVALID_PROJECT', 'Project changed during analysis');
     }
-    const proposal = plan(scene, goal);
+    const proposal = planGoal(scene, goal);
     if (ownGeneration !== generation) return;
     const currentProject = readProject();
     if (planningProjectFingerprint(currentProject) !== fingerprint) {
@@ -127,7 +127,7 @@ export const createRealPlannerOrchestrator = ({
       try {
         const prepared = prepare();
         publishGoal(ownGeneration, prepared.scene, prepared.fingerprint, {
-          activity: 'watchTv', focalPointId: prepared.focalPointId,
+          activity: 'watchTv', focalPointId: resolveSingleTvFocalId(prepared.scene),
         });
       } catch (cause) {
         if (ownGeneration !== generation) return;
@@ -145,7 +145,9 @@ export const createRealPlannerOrchestrator = ({
         const controller = new AbortController();
         activeIntentRequest = controller;
         const result = await interpretPlanningIntent(text, {
-          focalPoints: [{ id: prepared.focalPointId, kind: 'tv' }],
+          focalPoints: prepared.scene.entities
+            .filter((entity) => entity.role === 'tv')
+            .map((entity) => ({ id: entity.id, kind: 'tv' as const })),
         }, createIntentProvider(controller.signal));
         if (activeIntentRequest === controller) activeIntentRequest = null;
         if (ownGeneration !== generation) return;

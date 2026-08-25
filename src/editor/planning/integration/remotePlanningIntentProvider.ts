@@ -2,6 +2,7 @@ import type {
   PlanningIntentProvider,
   PlanningIntentProviderRequest,
 } from '@/editor/planning/intent';
+import { PLANNING_INTENT_CONTRACT_VERSION } from '@/editor/planning/intent';
 
 export type RemotePlanningIntentProviderOptions = {
   endpoint: string;
@@ -22,6 +23,7 @@ export const createRemotePlanningIntentProvider = ({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        contractVersion: PLANNING_INTENT_CONTRACT_VERSION,
         text: request.userText,
         focals: request.focalPoints.map((focal) => ({ ...focal })),
       }),
@@ -33,7 +35,8 @@ export const createRemotePlanningIntentProvider = ({
     } catch {
       throw new Error('Planning intent server returned an invalid response');
     }
-    if (!response.ok || !isRecord(payload) || payload['ok'] !== true || !('output' in payload)) {
+    if (!response.ok || !isRecord(payload) || payload['ok'] !== true
+      || payload['contractVersion'] !== PLANNING_INTENT_CONTRACT_VERSION || !('output' in payload)) {
       const error = isRecord(payload) && isRecord(payload['error']) && typeof payload['error']['code'] === 'string'
         ? payload['error']['code']
         : `http-${response.status}`;
