@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { PlanningError } from '@/editor/planning/errors';
-import { resolveSingleTvFocalId } from '@/editor/planning/tv';
 import { projectPlanningScene } from './projectPlanningScene';
 import { createIntegrationProject, integrationAssetDefinitions, resolveIntegrationAsset, roomObject } from './testFixtures';
 
@@ -10,7 +9,6 @@ describe('projectPlanningScene', () => {
     const snapshot = structuredClone(project);
     const scene = projectPlanningScene(project, resolveIntegrationAsset);
     expect(scene.room).toEqual({ width: 6, depth: 6 });
-    expect(resolveSingleTvFocalId(scene)).toBe('room-object:tv');
     expect(scene.entities.find((entity) => entity.id === 'room-object:sofa')).toMatchObject({ role: 'sofa', source: { kind: 'roomObject', instanceId: 'sofa' } });
     expect(scene.entities.find((entity) => entity.id === 'room-object:cabinet')).toMatchObject({ role: 'console', collision: { group: 1, mask: 5 } });
     expect(scene.entities.find((entity) => entity.id === 'room-object:rug')).toMatchObject({ role: 'rug', collision: { group: 2, mask: 2 } });
@@ -24,13 +22,6 @@ describe('projectPlanningScene', () => {
     project.objects.push(roomObject('obvious-tv-sofa', 'suspiciousName', 2.5, 2.5));
     const scene = projectPlanningScene(project, resolveIntegrationAsset);
     expect(scene.entities.find((entity) => entity.source.kind === 'roomObject' && entity.source.instanceId === 'obvious-tv-sofa')?.role).toBe('obstacle');
-  });
-
-  it('reports zero and ambiguous authoritative TVs without guessing', () => {
-    expect(() => resolveSingleTvFocalId(projectPlanningScene(createIntegrationProject({ tv: false }), resolveIntegrationAsset)))
-      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'FOCAL_NOT_FOUND' }));
-    expect(() => resolveSingleTvFocalId(projectPlanningScene(createIntegrationProject({ secondTv: true }), resolveIntegrationAsset)))
-      .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'FOCAL_AMBIGUOUS' }));
   });
 
   it('does not enforce TV topology while projecting factual entities', () => {

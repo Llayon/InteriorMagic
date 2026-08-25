@@ -22,3 +22,22 @@ export const validateTvTopology = (scene: PlanningScene): void => {
     throw new PlanningError('UNSUPPORTED_LAYOUT', 'TV planner supports one sofa, up to two armchairs, and up to one coffee table');
   }
 };
+
+/**
+ * Validates the complete set of TV scenario preconditions for a projected
+ * scene. Projection remains factual; this policy rejects entities that the
+ * current TV candidate providers cannot move safely.
+ */
+export const validateTvApplicability = (scene: PlanningScene): void => {
+  validateTvTopology(scene);
+  const movableRoles = new Set(['sofa', 'armchair', 'coffeeTable']);
+  for (const entity of scene.entities) {
+    if (!movableRoles.has(entity.role)) continue;
+    if (entity.placementType !== 'floor') {
+      throw new PlanningError('UNSUPPORTED_PLACEMENT', `Unsupported placement type for movable entity ${entity.id}: ${entity.placementType}`);
+    }
+    if (entity.source.kind !== 'roomObject') {
+      throw new PlanningError('INVALID_ACTIVE_GROUP', `Movable entity ${entity.id} must originate from a room object`);
+    }
+  }
+};

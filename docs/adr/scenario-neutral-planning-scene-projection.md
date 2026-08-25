@@ -19,6 +19,12 @@ supports only `floor` and `wall` placement types. `surface` and `ceiling`
 placement is rejected as unsupported until a spatial representation can model
 vertical levels and support relationships without false 2D collisions.
 
+Wall placement is currently factual metadata projected into the same XZ
+rectangle representation. It does not provide vertical support, wall-contact,
+or 3D collision semantics. Consequently the TV scenario treats wall-placed
+sofas, armchairs, and coffee tables as unsupported movable entities and keeps
+the existing XZ engine limitation explicit until a richer spatial model exists.
+
 The projector does not know TV topology, focal resolution, movable selection,
 scenario applicability, weights, or findings. TV topology and focal policy stay
 in `planning/tv`. Opening and circulation zones remain empty because the

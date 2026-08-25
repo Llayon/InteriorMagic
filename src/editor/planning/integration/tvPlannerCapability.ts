@@ -1,7 +1,7 @@
 import { getAsset } from '@/editor/assets/registry';
 import type { RoomProject } from '@/editor/model/types';
 import { projectPlanningScene, type AssetDefinitionResolver } from './projectPlanningScene';
-import { resolveSingleTvFocalId, validateTvTopology } from '@/editor/planning/tv';
+import { resolveSingleTvFocalId, validateTvApplicability } from '@/editor/planning/tv';
 
 export type TvPlannerCapability =
   | { available: true; focalPointId: string }
@@ -14,7 +14,7 @@ export const resolveTvPlannerCapability = (
 ): TvPlannerCapability => {
   try {
     const scene = projectPlanningScene(project, resolveAsset);
-    validateTvTopology(scene);
+    validateTvApplicability(scene);
     return { available: true, focalPointId: resolveSingleTvFocalId(scene) };
   } catch {
     return { available: false };
