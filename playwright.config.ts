@@ -9,9 +9,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  // Dedicated AR0 projects isolate model-viewer's renderer from editor workers,
-  // so two workers remain below the software-renderer starvation boundary in CI.
-  workers: 2,
+  // CI's software renderer is resource-constrained; parallel browser contexts can
+  // starve WebGL and make the editor persistence coverage nondeterministic.
+  workers: process.env.CI ? 1 : 2,
   reporter: [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
   use: {
