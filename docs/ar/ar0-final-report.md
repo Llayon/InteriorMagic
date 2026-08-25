@@ -2,7 +2,7 @@
 
 ## Verdict
 
-**D — AR0 SOFTWARE READY / R2 PUBLISH PENDING / PHYSICAL QA PENDING**
+**D — AR0 SOFTWARE READY / R2 PUBLISH PENDING / PHYSICAL QA PENDING / PRODUCTION ACTIVATION OFF**
 
 The local immutable revision and product integration are complete. This is not a claim that production native AR has passed: neither Android Scene Viewer nor iOS Quick Look was available for physical QA, and Cloudflare authentication was unavailable.
 
@@ -40,6 +40,7 @@ USDZ and poster:
 - USDZ stage bounds in meters: `0.826557964 × 0.686247091 × 0.570265472`
 - Package: `model.usdc` plus five packaged PNG textures; no unresolved dependencies
 - Stage read: Blender-bundled `pxr.Usd/UsdGeom`; GLB/USDZ delta is below 1% on every axis
+- Committed stage evidence: `docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json`, evidence SHA256 `22655487ddba45da0fb00c565106632a4888e778dffd754008a09e96bce38a7c`; its `usdzSha256` is the exact immutable r1 hash above. Missing, malformed, stale or mismatched evidence now fails staged validation.
 - Blender USDZ bytes were not deterministic across repeated exports; the selected validated bytes are immutable by their recorded checksum. Poster bytes were deterministic.
 - Poster: `11,704` bytes, SHA256 `a70151d0eaf81ed1fd8cb7c90b34deaa68a9540dfe689710551a55b2721e226c`
 - Status: **USDZ STRUCTURALLY BUILT / IOS MATERIAL QA PENDING**
@@ -48,23 +49,24 @@ USDZ and poster:
 
 ## Product integration and delivery
 
-- `@google/model-viewer` is pinned at `4.3.1`; its Three peer is satisfied by pinned Three `0.183.0` and matching typings.
+- `@google/model-viewer` is pinned at `4.3.1`; the cross-cutting Three `0.183.0` upgrade and matching typings are intentional and required by its exact peer dependency.
 - Viewer uses canonical `src`, mandatory prebuilt `ios-src`, `ar`, `scene-viewer quick-look`, `ar-scale="fixed"`, `ar-placement="floor"` and no WebXR.
 - Dimensions shown on the landing are resolved from `getAsset('sheenChair')`: 82.7 × 68.7 × 57.1 cm.
 - `TelegramWebAppHost.openLink` and the catalog click path are synchronous. Telegram receives exactly one absolute URL; an ordinary browser uses an external-link fallback.
-- Only Sheen Chair has the `Примерить 1:1` action. The existing Add action remains separate; AR does not add furniture.
+- `VITE_AR0_ENABLED` is a deployment/release gate, not asset metadata. Absent, empty or any value other than literal `true` hides the catalog CTA and makes direct AR URLs fail closed without model-viewer. With literal `true`, only Sheen Chair has the `Примерить 1:1` action. The existing Add action remains separate; AR does not add furniture.
 - Local Vite delivery returns `model/gltf-binary` and `model/vnd.usdz+zip`.
-- R2 published: **no**. Prefix reserved: `ar0/sheen-chair/r1/`; the public preflight returned 404 and Wrangler reported no authentication. Remote MIME/CORS therefore remain unverified and pending. No existing release was overwritten.
+- R2 published: **no**. Prefix reserved: `ar0/sheen-chair/r1/`; the public preflight returned 404 and Wrangler reported no authentication. Remote MIME/CORS therefore remain unverified and pending. The verifier now fails incorrect MIME for GLB, USDZ, WebP, manifest JSON and checksums JSON, while retaining length, SHA256 and CORS checks. No existing release was overwritten.
+- Future conversion provenance reads the actual `bpy.app.version_string` from Blender's converter report, rejects malformed provenance and enforces the approved Blender 5.2 line; it no longer hardcodes a version label. The selected r1 USDZ was not regenerated.
 
 ## Verification
 
 - Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved and the branch was rebased to the base SHA above.
-- Final rebased unit suite: 370 passed across 52 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
-- AR0 E2E: 6 passed across mobile-small and desktop.
-- Full browser regression: 69 passed, 6 existing project-specific skips. The six AR0 cases run in dedicated mobile/desktop Playwright projects so model-viewer's renderer cannot starve the editor's software-rendered WebGL process; assertions and timeouts are unchanged.
+- Final fix-pass unit suite: 395 passed across 54 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
+- Dedicated AR0 E2E: 8 passed — six enabled landing/catalog cases across mobile-small and desktop plus two default-off cases.
+- Full browser regression: 71 passed, 6 existing project-specific skips (77 total). AR0 cases run in dedicated Playwright projects and origins so model-viewer's renderer cannot starve the editor's software-rendered WebGL process and the default-off deployment behavior is tested independently; assertions and timeouts are unchanged.
 - Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
 - Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
-- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Initial run [32842072976](https://github.com/Llayon/InteriorMagic/actions/runs/32842072976) passed quality and all six AR0 E2E cases, then exposed shared-process WebGL starvation in the existing persistence reload test. AR0.7 isolates model-viewer E2E in dedicated browser projects; the same 75-test suite passed locally with one worker. Follow-up CI is pending this report commit.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Previous implementation head `e7b651069d51bed47a3213d086f860711b547703` passed quality and E2E in run [32852259116](https://github.com/Llayon/InteriorMagic/actions/runs/32852259116). This bounded fix-pass is locally green with the counts above; its exact-head follow-up CI is recorded in the PR body after push.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
@@ -72,6 +74,7 @@ USDZ and poster:
 
 - Publish the exact immutable bytes to R2 when non-interactive credentials are available, then verify every object, USDZ MIME, app-origin CORS and remote model consumption.
 - Complete Android and iOS physical QA at ~1 m and ~2 m using the locked ≤3 cm tolerance; confirm fixed scale, floor contact, orientation and material fidelity.
+- Only after R2 verification, Android PASS and iOS physical/material PASS may a separate deployment decision set `VITE_AR0_ENABLED=true`; production remains default-off meanwhile.
 - Evaluate additional assets, improved reproducible USDZ packaging and WebXR only as separately approved follow-up work.
 
 There is no runtime USDZ conversion, RoomProject change, planner change, Room Geometry change, backend, Track I modification, `catalog/v1` mutation, application deployment or merge in this track.

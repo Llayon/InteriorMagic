@@ -2,6 +2,8 @@
 
 Status: **NOT RUN**. Browser automation does not validate native Scene Viewer or Quick Look.
 
+Production activation remains **OFF**. `VITE_AR0_ENABLED=true` may be considered only after R2 verification and both device sections below pass; setting the flag does not itself prove QA.
+
 ## Locked acceptance before observation
 
 - Authoritative width: **82.7 cm**.
