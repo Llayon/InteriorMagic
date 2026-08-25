@@ -17,14 +17,27 @@ export interface SessionCookiePolicy {
   path: string;
 }
 
-export function sessionCookiePolicy(env: { ALLOWED_ORIGIN?: unknown }): SessionCookiePolicy {
+export function sessionCookiePolicy(env: { ALLOWED_ORIGIN?: unknown }): SessionCookiePolicy | null {
   const raw = typeof env.ALLOWED_ORIGIN === 'string' ? env.ALLOWED_ORIGIN : '';
-  const isHttps = raw.startsWith('https://');
-  // Production HTTPS → __Host- + Secure, local HTTP → plain im_session
-  if (isHttps) {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (url.origin !== raw) return null;
+  if (url.protocol === 'https:') {
     return { name: '__Host-im_session', secure: true, sameSite: 'Lax', path: '/' };
   }
-  return { name: 'im_session', secure: false, sameSite: 'Lax', path: '/' };
+  if (url.protocol === 'http:') {
+    const host = url.hostname;
+    // Allow localhost, 127.0.0.1, ::1 (with or without brackets)
+    if (host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]') {
+      return { name: 'im_session', secure: false, sameSite: 'Lax', path: '/' };
+    }
+    return null;
+  }
+  return null;
 }
 
 function base64UrlEncode(bytes: Uint8Array): string {

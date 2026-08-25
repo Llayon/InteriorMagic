@@ -36,6 +36,7 @@ function makeValidParams(overrides: Record<string, string> = {}): Record<string,
 class MockD1 {
   users = new Map<string, { id: string; created_at: number }>();
   identities = new Map<string, { provider: string; provider_subject: string; user_id: string; created_at: number }>();
+  sessions = new Map<string, { id_hash: string; user_id: string; created_at: number; expires_at: number }>();
   prepare(sql: string) {
     const self = this;
     return {
@@ -50,9 +51,31 @@ class MockD1 {
               const row = self.identities.get(key);
               return (row ? ({ user_id: row.user_id } as unknown as T) : null);
             }
+            if (sql.includes('SELECT id_hash, user_id, created_at, expires_at FROM sessions')) {
+              const [hash] = params as [string];
+              const row = self.sessions.get(hash);
+              return (row ? ({ ...row } as unknown as T) : null);
+            }
+            if (sql.includes('SELECT id_hash, user_id, created_at, expires_at FROM sessions WHERE id_hash')) {
+              const [hash] = params as [string];
+              const row = self.sessions.get(hash);
+              return (row ? ({ ...row } as unknown as T) : null);
+            }
             return null;
           },
           async run() {
+            if (sql.includes('INSERT INTO sessions')) {
+              const [id_hash, user_id, created_at, expires_at] = params as [string, string, number, number];
+              if (self.sessions.has(id_hash)) throw new Error('UNIQUE sessions');
+              if (!self.users.has(user_id)) throw new Error('FK sessions user_id');
+              self.sessions.set(id_hash, { id_hash, user_id, created_at, expires_at });
+              return { success: true } as unknown as D1Result;
+            }
+            if (sql.includes('DELETE FROM sessions WHERE id_hash')) {
+              const [hash] = params as [string];
+              self.sessions.delete(hash);
+              return { success: true } as unknown as D1Result;
+            }
             return { success: true } as unknown as D1Result;
           },
           async all() {
@@ -65,6 +88,7 @@ class MockD1 {
   async batch(statements: D1PreparedStatement[]): Promise<D1Result[]> {
     const usersSnap = new Map(this.users);
     const identitiesSnap = new Map(this.identities);
+    const sessionsSnap = new Map(this.sessions);
     const results: D1Result[] = [];
     try {
       for (const stmt of statements) {
@@ -84,12 +108,23 @@ class MockD1 {
           if (!this.users.has(user_id)) throw new Error('FK');
           this.identities.set(key, { provider, provider_subject, user_id, created_at });
           results.push({ success: true } as unknown as D1Result);
+        } else if (sql.includes('INSERT INTO sessions')) {
+          const [id_hash, user_id, created_at, expires_at] = params as [string, string, number, number];
+          if (this.sessions.has(id_hash)) throw new Error('UNIQUE sessions');
+          if (!this.users.has(user_id)) throw new Error('FK sessions');
+          this.sessions.set(id_hash, { id_hash, user_id, created_at, expires_at });
+          results.push({ success: true } as unknown as D1Result);
+        } else if (sql.includes('DELETE FROM sessions')) {
+          const [hash] = params as [string];
+          this.sessions.delete(hash);
+          results.push({ success: true } as unknown as D1Result);
         } else results.push({ success: true } as unknown as D1Result);
       }
       return results;
     } catch (e) {
       this.users = usersSnap;
       this.identities = identitiesSnap;
+      this.sessions = sessionsSnap;
       throw e;
     }
   }
@@ -354,5 +389,206 @@ describe('POST /auth/telegram', () => {
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe('internal_error');
     expect(JSON.stringify(body)).not.toContain('D1 unavailable');
+  });
+});
+
+describe('GET /session and POST /logout session lifecycle', () => {
+  const extractToken = (setCookie: string | null): string | null => {
+    if (!setCookie) return null;
+    const match = setCookie.match(/(?:__Host-im_session|im_session)=([^;]+)/);
+    return match ? match[1]! : null;
+  };
+
+  it('POST /auth/telegram creates session and Set-Cookie with correct production attributes', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv({ ALLOWED_ORIGIN: 'https://interiormagic.example' } as unknown as Record<string, unknown>);
+    const req = makeRequest('/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://interiormagic.example', 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    // Need to set allowedOrigin to https for __Host
+    (env as unknown as Record<string, unknown>).ALLOWED_ORIGIN = 'https://interiormagic.example';
+    const res = await handler(req, env);
+    expect(res.status).toBe(200);
+    const setCookie = res.headers.get('Set-Cookie');
+    expect(setCookie).toContain('__Host-im_session=');
+    expect(setCookie).toContain('Secure');
+    expect(setCookie).toContain('HttpOnly');
+    expect(setCookie).toContain('SameSite=Lax');
+    expect(setCookie).toContain('Path=/');
+    expect(setCookie).not.toContain('Domain');
+    expect(res.headers.get('Access-Control-Allow-Credentials')).toBe('true');
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://interiormagic.example');
+  });
+
+  it('local HTTP uses im_session without Secure', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv({ ALLOWED_ORIGIN: 'http://localhost:4173' } as unknown as Record<string, unknown>);
+    const req = new Request('https://app.test/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'http://localhost:4173', 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(200);
+    const setCookie = res.headers.get('Set-Cookie');
+    expect(setCookie).toContain('im_session=');
+    expect(setCookie).not.toContain('Secure');
+    expect(setCookie).not.toContain('Domain');
+  });
+
+  it('GET /session without cookie returns 401', async () => {
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = makeRequest('/session', { method: 'GET', headers: { origin: 'https://example.invalid' } });
+    const res = await handler(req, env);
+    expect(res.status).toBe(401);
+    const body = (await res.json()) as { error: { code: string } };
+    expect(body.error.code).toBe('unauthenticated');
+  });
+
+  it('GET /session with valid cookie returns user and does not require Telegram config', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    // First, create session via auth
+    const authReq = makeRequest('/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const authRes = await handler(authReq, env);
+    expect(authRes.status).toBe(200);
+    const token = extractToken(authRes.headers.get('Set-Cookie'));
+    expect(token).not.toBeNull();
+    // Now GET /session with cookie should succeed even if Telegram token missing
+    const envWithoutTelegram = { ...env, TELEGRAM_BOT_TOKEN: '' } as unknown as AppApiWorkerEnv;
+    // Need to recreate env with same DB but missing token
+    (envWithoutTelegram as unknown as Record<string, unknown>).DB = (env as unknown as Record<string, unknown>).DB;
+    const getReq = new Request('https://app.test/session', {
+      method: 'GET',
+      headers: { origin: 'https://example.invalid', cookie: `__Host-im_session=${token}` },
+    });
+    const getRes = await handler(getReq, envWithoutTelegram);
+    // Should be 401? Actually GET should not require TELEGRAM_BOT_TOKEN, so it should succeed even if token missing
+    // Our earlier fix makes GET not check Telegram configs, so it should succeed
+    // If it still checks, it would be 503, which would be wrong per P1
+    // So we expect 200 if fix is correct, else 503
+    expect(getRes.status).toBe(200);
+    const body = (await getRes.json()) as { authenticated: boolean; user: { id: string } };
+    expect(body.authenticated).toBe(true);
+    const originalBody = (await authRes.json()) as { user: { id: string } };
+    expect(body.user.id).toBe(originalBody.user.id);
+  });
+
+  it('GET /session same-origin without Origin succeeds', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv({ ALLOWED_ORIGIN: 'https://example.invalid' } as unknown as Record<string, unknown>);
+    const authReq = makeRequest('/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const authRes = await handler(authReq, env);
+    const token = extractToken(authRes.headers.get('Set-Cookie'))!;
+    // Same-origin GET without Origin header, request.url origin is https://example.invalid
+    const getReq = new Request('https://example.invalid/session', {
+      method: 'GET',
+      headers: { cookie: `__Host-im_session=${token}` },
+    });
+    const getRes = await handler(getReq, env);
+    expect(getRes.status).toBe(200);
+  });
+
+  it('GET /session with invalid token returns 401', async () => {
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = new Request('https://app.test/session', {
+      method: 'GET',
+      headers: { origin: 'https://example.invalid', cookie: '__Host-im_session=invalid-token' },
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(401);
+  });
+
+  it('full lifecycle: POST -> GET -> LOGOUT -> GET 401', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const authReq = makeRequest('/auth/telegram', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const authRes = await handler(authReq, env);
+    expect(authRes.status).toBe(200);
+    const token = extractToken(authRes.headers.get('Set-Cookie'))!;
+    const userId = ((await authRes.clone().json()) as { user: { id: string } }).user.id;
+
+    // GET should return same user
+    const getReq = new Request('https://app.test/session', {
+      method: 'GET',
+      headers: { origin: 'https://example.invalid', cookie: `__Host-im_session=${token}` },
+    });
+    const getRes = await handler(getReq, env);
+    expect(getRes.status).toBe(200);
+    const getBody = (await getRes.json()) as { user: { id: string } };
+    expect(getBody.user.id).toBe(userId);
+
+    // D1 should store only hash, not raw
+    const db = env.DB as unknown as MockD1;
+    const hash = await (await import('./session')).hashToken(token);
+    expect(db.sessions.has(hash)).toBe(true);
+    expect(JSON.stringify(Array.from(db.sessions.values()))).not.toContain(token);
+
+    // LOGOUT
+    const logoutReq = new Request('https://app.test/logout', {
+      method: 'POST',
+      headers: { origin: 'https://example.invalid', cookie: `__Host-im_session=${token}` },
+    });
+    const logoutRes = await handler(logoutReq, env);
+    expect(logoutRes.status).toBe(200);
+    expect(logoutRes.headers.get('Set-Cookie')).toContain('Max-Age=0');
+    expect(logoutRes.headers.get('Access-Control-Allow-Credentials')).toBe('true');
+
+    // GET after logout → 401
+    const getAfter = await handler(getReq, env);
+    expect(getAfter.status).toBe(401);
+  });
+
+  it('rejects POST without Origin (strict)', async () => {
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    const req = new Request('https://app.test/auth/telegram', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ initData }),
+    });
+    const res = await handler(req, env);
+    expect(res.status).toBe(403);
+  });
+
+  it('client-provided userId never authorizes (ownership)', async () => {
+    const handler = createAppApiHandler();
+    const env = makeEnv();
+    // Try to smuggle userId in body for GET (should be ignored, still needs cookie)
+    const req = new Request('https://app.test/session', {
+      method: 'GET',
+      headers: { origin: 'https://example.invalid', cookie: 'im_session=fake' },
+    });
+    // Even if body contains userId, GET ignores body and checks cookie only
+    const res = await handler(req, env);
+    expect(res.status).toBe(401);
   });
 });

@@ -92,6 +92,7 @@ const parseBody = (text: string): { initData: string } => {
 
 export async function requireSession(request: Request, env: AppApiWorkerEnv, now: number = Date.now()): Promise<string | null> {
   const policy = sessionCookiePolicy(env);
+  if (!policy) return null;
   const cookieHeader = request.headers.get('cookie');
   const rawToken = parseCookieHeader(cookieHeader, policy.name);
   if (!rawToken) return null;
@@ -109,67 +110,62 @@ export const createAppApiHandler = () =>
     const allowedOrigin = configuredOrigin(env.ALLOWED_ORIGIN);
     if (allowedOrigin === null) return errorResponse('server_misconfigured', 503);
 
-    const maxAge = parseMaxAgeEnv(env.TELEGRAM_INIT_DATA_MAX_AGE_SECONDS);
-    if (maxAge === null) return errorResponse('server_misconfigured', 503);
-
-    const ttl = parseSessionTtlEnv(env.SESSION_TTL_SECONDS);
-    if (ttl === null) return errorResponse('server_misconfigured', 503);
-
     const requestOrigin = request.headers.get('origin');
-    if (requestOrigin !== allowedOrigin) return errorResponse('origin_forbidden', 403);
+
+    // Helper for same-origin GET
+    const isOriginAllowedForGet = (): boolean => {
+      if (requestOrigin === allowedOrigin) return true;
+      if (requestOrigin === null && new URL(request.url).origin === allowedOrigin) return true;
+      return false;
+    };
+    const isOriginAllowedForMutating = (): boolean => requestOrigin === allowedOrigin;
 
     if (request.method === 'OPTIONS') {
+      if (requestOrigin !== allowedOrigin) return errorResponse('origin_forbidden', 403);
       return new Response(null, { status: 204, headers: corsHeaders(allowedOrigin) });
     }
 
-    // GET /session — check existing cookie session
+    // GET /session — check existing cookie session (no Telegram config needed)
     if (url.pathname === '/session') {
       if (request.method !== 'GET') return errorResponse('invalid_request', 405, allowedOrigin);
+      // For GET, allow same-origin without Origin, otherwise require exact Origin
+      if (!isOriginAllowedForGet()) return errorResponse('origin_forbidden', 403);
       if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
       const policy = sessionCookiePolicy(env);
+      if (!policy) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      const originForCors = requestOrigin === allowedOrigin ? allowedOrigin : undefined;
       const cookieHeader = request.headers.get('cookie');
       const rawToken = parseCookieHeader(cookieHeader, policy.name);
-      if (!rawToken) return errorResponse('unauthenticated', 401, allowedOrigin);
+      if (!rawToken) return errorResponse('unauthenticated', 401, originForCors);
       const hash = await hashToken(rawToken);
       const session = await getSessionByTokenHash(env.DB, hash, Date.now());
-      if (!session) return errorResponse('unauthenticated', 401, allowedOrigin);
-      return json({ authenticated: true, user: { id: session.user_id } }, 200, allowedOrigin);
+      if (!session) return errorResponse('unauthenticated', 401, originForCors);
+      return json({ authenticated: true, user: { id: session.user_id } }, 200, originForCors);
     }
 
-    // POST /logout — idempotent, hash and delete, expire cookie
+    // POST /logout — idempotent, hash and delete, expire cookie (no Telegram config)
     if (url.pathname === '/logout') {
       if (request.method !== 'POST') return errorResponse('invalid_request', 405, allowedOrigin);
-      // Bounded check for zero-body contract: if body present, ensure not oversized
+      if (!isOriginAllowedForMutating()) return errorResponse('origin_forbidden', 403);
+      const policy = sessionCookiePolicy(env);
+      if (!policy) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      // Zero-body contract: bounded read, any non-whitespace body → 400
       const contentLength = request.headers.get('content-length');
       if (contentLength !== null && Number(contentLength) > MAX_WIRE_BODY_BYTES) {
         return errorResponse('payload_too_large', 413, allowedOrigin);
       }
-      // If body exists and Content-Type present, must be json when body non-empty
-      const contentType = request.headers.get('content-type');
-      if (contentType !== null && !contentType.toLowerCase().startsWith('application/json')) {
-        // For zero-body logout, allow missing or json only; if body is empty, ignore type
-        // But if content-length >0 and type is not json, reject
-        if (contentLength !== null && Number(contentLength) > 0) return errorResponse('invalid_request', 415, allowedOrigin);
-      }
-      // Strict: if body has content beyond empty, require json; but we can just drain bounded
       if (request.body) {
         try {
           const text = await readBoundedText(request.body, MAX_WIRE_BODY_BYTES);
           if (text.trim().length > 0) {
-            // If body is non-empty, it must be valid JSON (but we ignore content)
-            try {
-              JSON.parse(text);
-            } catch {
-              return errorResponse('invalid_request', 400, allowedOrigin);
-            }
+            return errorResponse('invalid_request', 400, allowedOrigin);
           }
         } catch (e) {
           if (e instanceof Error && e.message === 'payload_too_large') return errorResponse('payload_too_large', 413, allowedOrigin);
           return errorResponse('invalid_request', 400, allowedOrigin);
         }
       }
-      if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
-      const policy = sessionCookiePolicy(env);
       const cookieHeader = request.headers.get('cookie');
       const rawToken = parseCookieHeader(cookieHeader, policy.name);
       if (rawToken) {
@@ -181,10 +177,11 @@ export const createAppApiHandler = () =>
       return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...headers, 'Content-Type': 'application/json' } });
     }
 
-    // POST /auth/telegram — Telegram bootstrap, now creates first-party session + Set-Cookie
+    // POST /auth/telegram — Telegram bootstrap, creates first-party session + Set-Cookie
     if (url.pathname !== '/auth/telegram') return errorResponse('invalid_request', 404);
 
     if (request.method !== 'POST') return errorResponse('invalid_request', 405, allowedOrigin);
+    if (!isOriginAllowedForMutating()) return errorResponse('origin_forbidden', 403);
 
     const contentType = request.headers.get('content-type');
     if (contentType === null || !contentType.toLowerCase().startsWith('application/json')) {
@@ -195,6 +192,14 @@ export const createAppApiHandler = () =>
     if (contentLength !== null && Number(contentLength) > MAX_WIRE_BODY_BYTES) {
       return errorResponse('payload_too_large', 413, allowedOrigin);
     }
+
+    // Route-specific config: Telegram + TTL only for auth bootstrap
+    const maxAge = parseMaxAgeEnv(env.TELEGRAM_INIT_DATA_MAX_AGE_SECONDS);
+    if (maxAge === null) return errorResponse('server_misconfigured', 503, allowedOrigin);
+    const ttl = parseSessionTtlEnv(env.SESSION_TTL_SECONDS);
+    if (ttl === null) return errorResponse('server_misconfigured', 503, allowedOrigin);
+    const policy = sessionCookiePolicy(env);
+    if (!policy) return errorResponse('server_misconfigured', 503, allowedOrigin);
 
     if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
 
@@ -229,9 +234,7 @@ export const createAppApiHandler = () =>
     try {
       const userId = await getOrCreateUserId(env.DB, 'telegram', providerSubject);
       const now = Date.now();
-      const { rawToken, expiresAt: _expiresAt } = await createSession(env.DB, userId, now, ttl);
-      void _expiresAt;
-      const policy = sessionCookiePolicy(env);
+      const { rawToken } = await createSession(env.DB, userId, now, ttl);
       const setCookie = buildSetCookieHeader(policy, rawToken, ttl);
       const headers = { ...corsHeaders(allowedOrigin), 'Cache-Control': 'no-store', 'Set-Cookie': setCookie } as Record<string, string>;
       return new Response(JSON.stringify({ user: { id: userId }, identity: { provider: 'telegram' } }), {

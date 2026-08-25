@@ -162,15 +162,14 @@ test('H3A: existing valid session via GET /session succeeds and POST not called'
       },
     });
     const originalFetch = window.fetch.bind(window);
-    let postCalled = false;
-    (window as unknown as Record<string, unknown>).__h3aPostCalled = () => postCalled;
+    (window as unknown as Record<string, unknown>).__h3aPostCount = 0;
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
       if (url.includes('/session')) {
         return new Response(JSON.stringify({ authenticated: true, user: { id: 'existing-user' } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
       }
       if (url.includes('/auth/telegram')) {
-        postCalled = true;
+        (window as unknown as Record<string, unknown>).__h3aPostCount = ((window as unknown as Record<string, unknown>).__h3aPostCount as number) + 1;
         return new Response(JSON.stringify({ user: { id: 'should-not-be-called' } }), { status: 200 });
       }
       return originalFetch(input as Request, init);
@@ -180,7 +179,5 @@ test('H3A: existing valid session via GET /session succeeds and POST not called'
   await expect.poll(async () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getIdentitySnapshot().state), { timeout: 10_000 }).toBe('authenticated');
   const snap = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getIdentitySnapshot());
   expect(snap.userId).toBe('existing-user');
-  const postCalled = await page.evaluate(() => (window as unknown as Record<string, unknown>).__h3aPostCalled as unknown as boolean);
-  // POST should not have been called because session already valid
-  expect(postCalled).toBe(false);
+  expect(await page.evaluate(() => (window as unknown as Record<string, unknown>).__h3aPostCount as unknown as number)).toBe(0);
 });

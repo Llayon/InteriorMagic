@@ -42,7 +42,7 @@ export const bootstrapIdentity = async (): Promise<void> => {
 
   identityStore.setState('authenticating', undefined);
 
-  // 1. Try existing cookie session
+  // 1. Try existing cookie session — only 401 continues to Telegram bootstrap
   try {
     const sessionRes = await fetch(sessionUrl, {
       method: 'GET',
@@ -53,10 +53,9 @@ export const bootstrapIdentity = async (): Promise<void> => {
       try {
         data = await sessionRes.json();
       } catch {
-        // Fall through to Telegram bootstrap
-        data = null;
+        identityStore.setState('failed', undefined);
+        return;
       }
-      // Expected: { authenticated: true, user: { id } }
       if (
         typeof data === 'object' &&
         data !== null &&
@@ -68,16 +67,21 @@ export const bootstrapIdentity = async (): Promise<void> => {
           return;
         }
       }
-      // If session response is not valid authenticated, treat as unauthenticated and continue
-      if (sessionRes.status !== 401) {
-        // For non-401 but not valid, still continue to Telegram bootstrap if possible
-      }
-    } else if (sessionRes.status !== 401) {
-      // For other errors, continue to Telegram bootstrap attempt if initData available
+      // 200 but malformed → failed, do not create new session
+      identityStore.setState('failed', undefined);
+      return;
     }
-    // 401 or invalid/failed -> continue to Telegram bootstrap check
+    if (sessionRes.status === 401) {
+      // Unauthenticated → continue to Telegram bootstrap check below
+    } else {
+      // 403, 500, etc. → failed, do not create new session
+      identityStore.setState('failed', undefined);
+      return;
+    }
   } catch {
-    // Network failure on GET /session -> continue to Telegram bootstrap if possible, else anonymous
+    // Network error → failed, do not create new session
+    identityStore.setState('failed', undefined);
+    return;
   }
 
   const initData = getTelegramInitData();

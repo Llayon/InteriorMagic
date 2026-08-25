@@ -157,7 +157,7 @@ describe('session token', () => {
 
 describe('session cookie policy', () => {
   it('production HTTPS uses __Host-im_session + Secure', () => {
-    const policy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'https://interiormagic.example' });
+    const policy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'https://interiormagic.example' })!;
     expect(policy.name).toBe('__Host-im_session');
     expect(policy.secure).toBe(true);
     expect(policy.sameSite).toBe('Lax');
@@ -172,7 +172,7 @@ describe('session cookie policy', () => {
   });
 
   it('local HTTP uses im_session without Secure', () => {
-    const policy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'http://localhost:4173' });
+    const policy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'http://localhost:4173' })!;
     expect(policy.name).toBe('im_session');
     expect(policy.secure).toBe(false);
     const setCookie = buildSetCookieHeader(policy, 'tok', 2592000);
@@ -183,17 +183,22 @@ describe('session cookie policy', () => {
   });
 
   it('production never accepts im_session (policy is exclusive)', () => {
-    const prodPolicy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'https://api.interior.example' });
-    const localPolicy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'http://localhost:4173' });
+    const prodPolicy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'https://api.interior.example' })!;
+    const localPolicy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'http://localhost:4173' })!;
     expect(prodPolicy.name).not.toBe(localPolicy.name);
   });
 
   it('logout expires cookie with Max-Age 0', () => {
-    const policy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'https://example.invalid' });
+    const policy = sessionCookiePolicy({ ALLOWED_ORIGIN: 'https://example.invalid' })!;
     const expired = buildExpiredCookieHeader(policy);
     expect(expired).toContain('Max-Age=0');
     expect(expired).toContain('Expires=Thu, 01 Jan 1970');
     expect(expired).toContain(policy.name);
+  });
+
+  it('rejects non-localhost HTTP as server_misconfigured', () => {
+    expect(sessionCookiePolicy({ ALLOWED_ORIGIN: 'http://app.interiormagic.com' })).toBeNull();
+    expect(sessionCookiePolicy({ ALLOWED_ORIGIN: 'http://evil.com' })).toBeNull();
   });
 });
 
