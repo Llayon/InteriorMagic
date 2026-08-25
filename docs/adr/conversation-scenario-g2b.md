@@ -8,10 +8,10 @@ Engine. This scenario does not change Planning Contract v1 or add UI routing.
 ## Scope
 
 Conversation v1 requires exactly one floor, room-object sofa and at least one
-floor, room-object armchair. At most two armchairs are active: the nearest two
-to the sofa, sorted by distance and then lexical entity ID. Additional
-armchairs, coffee tables, and every unrelated entity remain fixed context and
-collision obstacles.
+eligible floor, room-object armchair. At most two eligible armchairs are active:
+the nearest two to the sofa, sorted by distance and then lexical entity ID.
+Ineligible and additional armchairs, coffee tables, and every unrelated entity
+remain fixed context and collision obstacles.
 
 The scenario owns applicability, active-group selection, candidate providers,
 facing/distance/rear-boundary rules, weights, findings, and selection policy.

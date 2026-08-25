@@ -63,6 +63,19 @@ describe('deterministic Conversation planner', () => {
     expect(proposal.moves.map((move) => move.instanceId)).not.toContain('chair-3');
   });
 
+  it('keeps unsupported nearer armchairs fixed and plans with eligible farther armchairs', () => {
+    const input = poorOneChair();
+    const unsupported = entity('chair-wall-nearest', 'armchair', .5, -.8);
+    unsupported.placementType = 'wall';
+    input.entities.unshift(unsupported);
+    input.entities.push(entity('chair-valid-2', 'armchair', -2.8, 2.5, Math.PI));
+
+    const proposal = planConversation(input);
+
+    expect(proposal.moves.map((move) => move.instanceId)).not.toContain('chair-wall-nearest');
+    expect(proposal.moves.map((move) => move.instanceId)).toEqual(expect.arrayContaining(['chair', 'chair-valid-2']));
+  });
+
   it('returns a deterministic no-op for an already-good group', () => {
     const input = scene([
       entity('sofa', 'sofa', 0, -1.5),
@@ -81,12 +94,12 @@ describe('deterministic Conversation planner', () => {
     expect(proposal.moves.some((move) => move.instanceId === 'cabinet')).toBe(false);
   });
 
-  it('rejects unsupported conversation topology and provenance with typed errors', () => {
+  it('rejects unsupported conversation topology and active-sofa provenance with typed errors', () => {
     expect(() => planConversation(scene([entity('sofa', 'sofa', 0, -2)])))
       .toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'UNSUPPORTED_LAYOUT' }));
     expect(() => planConversation(scene([
-      entity('sofa', 'sofa', 0, -2),
-      entity('chair', 'armchair', 2.8, 2.5, Math.PI, { kind: 'derived' }),
+      entity('sofa', 'sofa', 0, -2, 0, { kind: 'derived' }),
+      entity('chair', 'armchair', 2.8, 2.5, Math.PI),
     ]))).toThrowError(expect.objectContaining<Partial<PlanningError>>({ code: 'INVALID_ACTIVE_GROUP' }));
   });
 
@@ -96,5 +109,17 @@ describe('deterministic Conversation planner', () => {
     const first = planConversation(input);
     expect(planConversation(input)).toEqual(first);
     expect(input).toEqual(snapshot);
+  });
+
+  it('attributes relationship findings to the active group and rear-boundary findings to the sofa', () => {
+    const input = poorOneChair();
+    const proposal = planConversation(input);
+    const relationshipFindings = proposal.findings.filter((finding) =>
+      finding.ruleId === 'conversation.facing' || finding.ruleId === 'conversation.distance');
+    const rearBoundaryFinding = proposal.findings.find((finding) => finding.ruleId === 'conversation.rear-boundary');
+
+    expect(relationshipFindings.length).toBeGreaterThan(0);
+    for (const finding of relationshipFindings) expect(finding.objectIds).toEqual(['sofa', 'chair']);
+    expect(rearBoundaryFinding?.objectIds).toEqual(['sofa']);
   });
 });

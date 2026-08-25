@@ -112,7 +112,13 @@ const conversationRuleEvaluations = (
   ];
 };
 
-const findings = (before: LayoutQuality, after: LayoutQuality, outcome: SelectionOutcome, objectIds: string[]): PlanningFinding[] => {
+const findings = (
+  before: LayoutQuality,
+  after: LayoutQuality,
+  outcome: SelectionOutcome,
+  groupObjectIds: string[],
+  sofaObjectId: string,
+): PlanningFinding[] => {
   if (outcome !== 'improved') return [{
     ruleId: 'layout.selection',
     code: `layout-${outcome}`,
@@ -120,15 +126,15 @@ const findings = (before: LayoutQuality, after: LayoutQuality, outcome: Selectio
     params: { score: before.total },
   }];
   const result: PlanningFinding[] = [];
-  const add = (id: string, ruleId: string, code: string) => {
+  const add = (id: string, ruleId: string, code: string, objectIds: string[]) => {
     const from = before.components[id]; const to = after.components[id];
     if (from !== undefined && to !== undefined && to > from + SCORE_EPSILON) {
       result.push({ ruleId, code, severity: 'positive', objectIds, params: { before: from, after: to } });
     }
   };
-  add('conversation.facing', 'conversation.facing', 'conversation-facing-improved');
-  add('conversation.distance', 'conversation.distance', 'conversation-distance-improved');
-  add('conversation.rearBoundary', 'conversation.rear-boundary', 'conversation-rear-boundary-improved');
+  add('conversation.facing', 'conversation.facing', 'conversation-facing-improved', groupObjectIds);
+  add('conversation.distance', 'conversation.distance', 'conversation-distance-improved', groupObjectIds);
+  add('conversation.rearBoundary', 'conversation.rear-boundary', 'conversation-rear-boundary-improved', [sofaObjectId]);
   result.push({ ruleId: 'layout.selection', code: 'layout-improved', severity: 'positive', params: { improvement: after.total - before.total } });
   return result;
 };
@@ -155,7 +161,13 @@ export const planConversation = (scene: PlanningScene): PlanProposal => {
       { id: 'conversation.distance', weight: CONVERSATION_LAYOUT_HEURISTICS.weights.distance },
       { id: 'conversation.rearBoundary', weight: CONVERSATION_LAYOUT_HEURISTICS.weights.rearBoundary },
     ],
-    buildFindings: (before, after, outcome) => findings(before, after, outcome, [sofa, ...armchairs].map(roomObjectInstanceId)),
+    buildFindings: (before, after, outcome) => findings(
+      before,
+      after,
+      outcome,
+      [sofa, ...armchairs].map(roomObjectInstanceId),
+      roomObjectInstanceId(sofa),
+    ),
   });
   return result.proposal;
 };
