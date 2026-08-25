@@ -262,6 +262,27 @@ describe('scenario-neutral living-room layout engine', () => {
     expect(second).toEqual(first);
   });
 
+  it('applies a complete search when the configured budget covers every leaf', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    const input = scene([movable]);
+    const dimensions: CandidateDimension[] = [{
+      entity: movable,
+      provide: () => [candidate(movable, 'current', 0, 0), candidate(movable, 'improve', .5, 0)],
+    }];
+    const result = runLivingRoomLayout({
+      ...request(input, [movable], dimensions, (arrangement) => [{
+        id: 'quality', quality: arrangement.get('movable')?.key === 'improve' ? 1 : .5,
+      }]),
+      selectionPolicy: { acceptanceThreshold: 0, movementCost: () => 0 },
+      searchLimits: { maxEvaluations: 2 },
+    });
+
+    expect(result.diagnostics.arrangementsEvaluated).toBe(2);
+    expect(result.diagnostics.stoppedByBudget).toBe(false);
+    expect(result.selection.outcome).toBe('improved');
+    expect(result.proposal.moves).toEqual([{ instanceId: 'movable', position: { x: .5, z: 0 }, rotationY: 0 }]);
+  });
+
   it('reports typed errors for invalid active groups and current layouts', () => {
     const movable = entity('movable', 'sofa', 0, 0);
     expect(() => runLivingRoomLayout(request(scene([movable]), [movable, movable], [], () => [])))
