@@ -93,7 +93,7 @@ function indexToCsv(rows) {
 }
 
 function htmlForSheet(sheet, sheetId) {
-  const cells = sheet.items.map((item, i) => `
+  const cells = sheet.items.map((item) => `
     <div class="cell" data-asset-id="${escape(item.assetId)}" data-source-category="${escape(item.sourceCategory)}" data-family="${escape(sheet.family)}">
       <img src="${escape(item.thumbnailFilename)}" alt="${escape(item.assetId)}" loading="lazy" />
       <div class="label"><b>${escape(item.assetId)}</b> <span>${escape(item.sourceCategory)}</span></div>

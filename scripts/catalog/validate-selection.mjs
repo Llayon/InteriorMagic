@@ -7,7 +7,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   resolveIthappyPipelineRoot,
-  resolveIthappyCatalogBuildRoot,
   repositoryRoot,
 } from './resolve-ithappy-root.mjs';
 

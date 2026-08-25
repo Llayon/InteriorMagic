@@ -48,7 +48,7 @@ function parseCsv(text) {
   });
 }
 
-export function buildSelection({ visualPath = VISUAL, outPath = OUT } = {}) {
+export function buildSelection({ visualPath = VISUAL } = {}) {
   const rows = parseCsv(readFileSync(visualPath, 'utf8'));
   const kept = rows
     .filter((r) => r.firstPassVerdict === 'KEEP')

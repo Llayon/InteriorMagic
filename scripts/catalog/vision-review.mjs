@@ -1,7 +1,7 @@
 // scripts/catalog/vision-review.mjs
 // A10: autonomous vision-led per-asset review of technical shortlist thumbnails.
 // Each row produces a structured verdict. Low confidence / ambiguous → excluded.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveIthappyCatalogBuildRoot, repositoryRoot } from './resolve-ithappy-root.mjs';
@@ -72,14 +72,6 @@ export function buildReviewQueue() {
   }));
 }
 
-function toCsv(rows) {
-  const cols = ['assetId', 'sourceCategory', 'runtimeBytes', 'thumbnailStatus', 'visualQuality', 'silhouetteReadable', 'categoryCorrect', 'verifiedSemanticRole', 'duplicateOf', 'confidence', 'evidence', 'selected'];
-  const e = (v) => {
-    const s = String(v ?? '');
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
-  return [cols.join(','), ...rows.map((r) => cols.map((c) => e(r[c])).join(','))].join('\n') + '\n';
-}
 
 // Review a single asset via vision_analyze. The execution agent implements
 // this by invoking the vision tool. We provide the prompt template so the

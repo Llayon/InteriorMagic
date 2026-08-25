@@ -61,7 +61,6 @@ export function scanProvenance() {
 
   const refSheen = thirdParty.includes('Sheen Chair') && thirdParty.includes('CC0-1.0');
   const refKenney = thirdParty.includes('Kenney') && thirdParty.includes('CC0 1.0');
-  const refProtoUndoc = !thirdParty.toLowerCase().includes('prototype') && true;
 
   // Did the search find ANY ithappy+license/provenance co-occurrence?
   const ithappyLicenseFound = hits.length > 0;
@@ -90,7 +89,7 @@ export function scanProvenance() {
     '- `ASSET_AUDIT.md` — per-asset runtime measurements; not a license record.',
     '- `docs/`` — project docs (adr/, qa/, research/); no ITHappy license ADR found.',
     '- `scripts/research/retail/` — Track F retail research; no ITHappy license record found.',
-    '- Upstream ITHappy pipeline reports under \`.agent-data/ithappy-production-pipeline/reports/\` and \`.agent-data/ithappy-catalog-build/reports/\` — operational metrics, not license records.',
+    '- Upstream ITHappy pipeline reports under `agent-data/ithappy-production-pipeline/reports/` and `agent-data/ithappy-catalog-build/reports/` — operational metrics, not license records.',
     '',
     '## Reference-only license summary (read from existing repo docs)',
     '',

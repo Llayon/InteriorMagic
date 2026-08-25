@@ -6,14 +6,14 @@
   "sourcePayloadManifestSha256": "7e7825f9ae45d74ed2962c3cd09630fca66682d06e597b446eb524b169e03356",
   "pipelineVersion": "1.0.0",
   "policyVersion": 1,
-  "assetCount": 69,
+  "assetCount": 65,
   "byRole": {
     "rug": 5,
-    "armchair": 7,
+    "armchair": 5,
     "coffeeTable": 15,
     "console": 11,
-    "tv": 13,
-    "plant": 5,
+    "tv": 12,
+    "plant": 4,
     "floorLamp": 5,
     "sofa": 8
   },
@@ -52,14 +52,6 @@
     },
     {
       "assetId": "chair_003",
-      "semanticRole": "armchair"
-    },
-    {
-      "assetId": "chair_004",
-      "semanticRole": "armchair"
-    },
-    {
-      "assetId": "chair_005",
       "semanticRole": "armchair"
     },
     {
@@ -183,10 +175,6 @@
       "semanticRole": "tv"
     },
     {
-      "assetId": "electronics_047",
-      "semanticRole": "tv"
-    },
-    {
       "assetId": "electronics_049",
       "semanticRole": "tv"
     },
@@ -204,10 +192,6 @@
     },
     {
       "assetId": "flower_041",
-      "semanticRole": "plant"
-    },
-    {
-      "assetId": "flower_042",
       "semanticRole": "plant"
     },
     {

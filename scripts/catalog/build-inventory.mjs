@@ -7,7 +7,7 @@
 //   geometry_invariance.csv
 //   gltf_validation.csv
 //   thumbnail_inventory.csv
-import { mkdir, readFile, writeFile, stat } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {

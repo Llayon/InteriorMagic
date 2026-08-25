@@ -1,7 +1,5 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { scanProvenance } from '../../scripts/catalog/scan-provenance.mjs';
 
 test('scan returns a markdown report with explicit verdict', () => {

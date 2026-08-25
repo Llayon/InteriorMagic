@@ -20,20 +20,20 @@ test('ithappyDataRoot is exactly two levels above repositoryRoot (matches ithapp
 });
 
 test('resolveIthappyPipelineRoot honours ITHAPPY_PIPELINE_ROOT env var', () => {
-  process.env.ITHAPPY_PIPELINE_ROOT = '/custom/pipeline';
+  globalThis.process.env.ITHAPPY_PIPELINE_ROOT = '/custom/pipeline';
   try {
     assert.equal(resolveIthappyPipelineRoot(), path.resolve('/custom/pipeline'));
   } finally {
-    delete process.env.ITHAPPY_PIPELINE_ROOT;
+    delete globalThis.process.env.ITHAPPY_PIPELINE_ROOT;
   }
 });
 
 test('resolveIthappyCatalogBuildRoot honours ITHAPPY_CATALOG_BUILD_ROOT env var', () => {
-  process.env.ITHAPPY_CATALOG_BUILD_ROOT = '/custom/build';
+  globalThis.process.env.ITHAPPY_CATALOG_BUILD_ROOT = '/custom/build';
   try {
     assert.equal(resolveIthappyCatalogBuildRoot(), path.resolve('/custom/build'));
   } finally {
-    delete process.env.ITHAPPY_CATALOG_BUILD_ROOT;
+    delete globalThis.process.env.ITHAPPY_CATALOG_BUILD_ROOT;
   }
 });
 
