@@ -1,0 +1,6 @@
+# Copy to workers/app-api/.dev.vars and provide local-only values. Never commit real secrets.
+TELEGRAM_BOT_TOKEN=
+# Non-secret exact browser origin used for local controlled testing.
+ALLOWED_ORIGIN=http://localhost:4173
+# Temporary development freshness policy (seconds). Review before production session.
+TELEGRAM_INIT_DATA_MAX_AGE_SECONDS=86400
