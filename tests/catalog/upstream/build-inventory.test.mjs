@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildInventory } from '../../scripts/catalog/build-inventory.mjs';
+import { buildInventory } from '../../../scripts/catalog/build-inventory.mjs';
 
 test('inventory has exactly 836 rows', async () => {
   const rows = await buildInventory();
