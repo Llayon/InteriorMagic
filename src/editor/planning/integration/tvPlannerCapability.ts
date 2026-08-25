@@ -1,6 +1,7 @@
 import { getAsset } from '@/editor/assets/registry';
 import type { RoomProject } from '@/editor/model/types';
-import { planningRoomObjectEntityId, type AssetDefinitionResolver } from './buildPlanningScene';
+import { projectPlanningScene, type AssetDefinitionResolver } from './projectPlanningScene';
+import { resolveSingleTvFocalId, validateTvApplicability } from '@/editor/planning/tv';
 
 export type TvPlannerCapability =
   | { available: true; focalPointId: string }
@@ -11,16 +12,11 @@ export const resolveTvPlannerCapability = (
   project: RoomProject,
   resolveAsset: AssetDefinitionResolver = getAsset,
 ): TvPlannerCapability => {
-  const focalIds: string[] = [];
   try {
-    for (const object of project.objects) {
-      const asset = resolveAsset(object.assetId);
-      if (asset.semantic?.role !== 'tv') continue;
-      if (asset.placement.anchor !== 'floor' && asset.placement.anchor !== 'wall') return { available: false };
-      focalIds.push(planningRoomObjectEntityId(object.instanceId));
-    }
+    const scene = projectPlanningScene(project, resolveAsset);
+    validateTvApplicability(scene);
+    return { available: true, focalPointId: resolveSingleTvFocalId(scene) };
   } catch {
     return { available: false };
   }
-  return focalIds.length === 1 ? { available: true, focalPointId: focalIds[0]! } : { available: false };
 };

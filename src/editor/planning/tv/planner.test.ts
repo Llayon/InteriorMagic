@@ -29,6 +29,15 @@ describe('deterministic TV planner', () => {
     expect(TV_SELECTION_POLICY.movementCost({ movedCount: 10, translation: 10, rotation: Math.PI * 4 })).toBe(20);
   });
 
+  it('keeps TV topology policy in the TV facade after scene projection', () => {
+    const input = scene({ entities: [
+      ...scene().entities,
+      entity('chair-2', 'armchair', 1.6, -.5, -Math.PI / 2, .8, .8),
+      entity('chair-3', 'armchair', 2.2, .5, -Math.PI / 2, .8, .8),
+    ] });
+    expect(() => planTvViewing(input, goal)).toThrowError(expect.objectContaining({ code: 'UNSUPPORTED_LAYOUT' }));
+  });
+
   it('repairs a badly oriented sofa and reports pure quality', () => {
     const input = scene();
     input.entities.find((item) => item.role === 'sofa')!.transform.rotationY = Math.PI;
