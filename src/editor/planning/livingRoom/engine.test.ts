@@ -190,6 +190,15 @@ describe('scenario-neutral living-room layout engine', () => {
     expect(result.diagnostics.arrangementsEvaluated).toBe(1);
   });
 
+  it('reports no-valid-plan when a candidate dimension has no valid leaf', () => {
+    const movable = entity('movable', 'sofa', 0, 0);
+    const result = runLivingRoomLayout(request(scene([movable]), [movable], [{ entity: movable, provide: () => [] }], () => [{ id: 'quality', quality: .5 }]));
+
+    expect(result.selection.outcome).toBe('no-valid-plan');
+    expect(result.proposal.moves).toEqual([]);
+    expect(result.proposal.scoreAfter).toEqual(result.proposal.scoreBefore);
+  });
+
   it('keeps repeated tie proposals identical across multiple dimensions', () => {
     const first = entity('first', 'sofa', -1, 0);
     const second = entity('second', 'armchair', 1, 0);
