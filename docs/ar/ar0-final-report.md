@@ -1,0 +1,75 @@
+# AR0 final report — prebuilt true-scale Sheen Chair AR
+
+## Verdict
+
+**D — AR0 SOFTWARE READY / R2 PUBLISH PENDING / PHYSICAL QA PENDING**
+
+The local immutable revision and product integration are complete. This is not a claim that production native AR has passed: neither Android Scene Viewer nor iOS Quick Look was available for physical QA, and Cloudflare authentication was unavailable.
+
+## Source and revision evidence
+
+- Base SHA: `ba9a7215b05184e52130c2ca184552787a90d915`
+- Branch: `feature/ar0-prebuilt-sheen-chair`
+- Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
+- Head SHA: `PENDING_FINAL_HEAD`
+- Asset revision: `sheen-chair-r1` for `sheenChair`
+- Local origin: same-origin `${BASE_URL}ar0/sheen-chair/r1/`
+- AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
+
+Raw GLB (`public/models/sheen_chair.glb`):
+
+- Bounds: width `0.826557978`, height `0.686247078`, depth `0.570265459` m
+- minY `-0.000069778`, centerX `-0.000743411`, centerZ `0.008407630` m
+- SHA256: `f0af2a2b102d28d540236306ae19f8fb36842df76bd38cf76f063f9bd2853399`
+- Result: rejected as canonical because centerZ exceeds 1 mm
+
+Canonical derivative (`model.glb`):
+
+- Bounds: width `0.826557978`, height `0.686247078`, depth `0.570265459` m
+- minY `0`, centerX `0`, centerZ `0`
+- Baked translation: `[0.000743411, 0.000069778, -0.0084076295]` m; no scale or rotation repair
+- SHA256: `a38f20af9f527b1d1cef1220ce5d19489498f7b2cd0ca0ca6ea35f82b0cb8f22`
+- Geometry/BIN chunks, seven embedded GLB images, six materials and `KHR_materials_sheen` were preserved
+
+USDZ and poster:
+
+- Converter: Blender 5.2.0 LTS, `D:\Programms\Blender\5.2\blender.exe`
+- Route: canonical GLB → Blender glTF import in meters → USDZ export with Y-up, +Z forward, `metersPerUnit=1`
+- Command: Blender `--background --factory-startup --python scripts/ar0/export-usdz.py -- --input <canonical model.glb> --output <model.usdz> --poster <poster.webp> --report <converter-report.json>`
+- USDZ: `4,897,846` bytes, SHA256 `4b0bec120f9db100b888b7083a8e2d7873d7c2f56d5343b65eb4c8fc69330618`
+- USDZ stage bounds in meters: `0.826557964 × 0.686247091 × 0.570265472`
+- Package: `model.usdc` plus five packaged PNG textures; no unresolved dependencies
+- Stage read: Blender-bundled `pxr.Usd/UsdGeom`; GLB/USDZ delta is below 1% on every axis
+- Blender USDZ bytes were not deterministic across repeated exports; the selected validated bytes are immutable by their recorded checksum. Poster bytes were deterministic.
+- Poster: `11,704` bytes, SHA256 `a70151d0eaf81ed1fd8cb7c90b34deaa68a9540dfe689710551a55b2721e226c`
+- Status: **USDZ STRUCTURALLY BUILT / IOS MATERIAL QA PENDING**
+- Manifest SHA256: `47f8edceeead1c89995ffb9344923e6e11b3b3ac6cc53668dbc0ec3cb151e289`
+- Checksums SHA256: `63c1b2d12dee29a3ff828f95e1e9d764ddb488c05dd18b29839284e67fe6a82d`
+
+## Product integration and delivery
+
+- `@google/model-viewer` is pinned at `4.3.1`; its Three peer is satisfied by pinned Three `0.183.0` and matching typings.
+- Viewer uses canonical `src`, mandatory prebuilt `ios-src`, `ar`, `scene-viewer quick-look`, `ar-scale="fixed"`, `ar-placement="floor"` and no WebXR.
+- Dimensions shown on the landing are resolved from `getAsset('sheenChair')`: 82.7 × 68.7 × 57.1 cm.
+- `TelegramWebAppHost.openLink` and the catalog click path are synchronous. Telegram receives exactly one absolute URL; an ordinary browser uses an external-link fallback.
+- Only Sheen Chair has the `Примерить 1:1` action. The existing Add action remains separate; AR does not add furniture.
+- Local Vite delivery returns `model/gltf-binary` and `model/vnd.usdz+zip`.
+- R2 published: **no**. Prefix reserved: `ar0/sheen-chair/r1/`; the public preflight returned 404 and Wrangler reported no authentication. Remote MIME/CORS therefore remain unverified and pending. No existing release was overwritten.
+
+## Verification
+
+- Baseline at base SHA: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed.
+- AR0/unit suite: 290 tests passed in the latest targeted run.
+- Targeted desktop AR0 E2E: 3 passed.
+- Full regression gates: `PENDING_FINAL_GATES`.
+- Draft PR and CI: `PENDING_PR_CI`.
+- Android physical QA: **NOT RUN**.
+- iOS physical QA: **NOT RUN**.
+
+## Remaining AR1 work
+
+- Publish the exact immutable bytes to R2 when non-interactive credentials are available, then verify every object, USDZ MIME, app-origin CORS and remote model consumption.
+- Complete Android and iOS physical QA at ~1 m and ~2 m using the locked ≤3 cm tolerance; confirm fixed scale, floor contact, orientation and material fidelity.
+- Evaluate additional assets, improved reproducible USDZ packaging and WebXR only as separately approved follow-up work.
+
+There is no runtime USDZ conversion, RoomProject change, planner change, Room Geometry change, backend, Track I modification, `catalog/v1` mutation, application deployment or merge in this track.

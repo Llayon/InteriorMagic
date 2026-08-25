@@ -71,7 +71,9 @@ export const parseGlb = (buffer) => {
   }
   const jsonChunk = chunks.find((chunk) => chunk.type === JSON_CHUNK);
   if (!jsonChunk) throw new Error('GLB JSON chunk is missing');
-  const json = JSON.parse(jsonChunk.data.toString('utf8').replace(/[\u0000 ]+$/u, ''));
+  let jsonText = jsonChunk.data.toString('utf8');
+  while (jsonText.length && jsonText.charCodeAt(jsonText.length - 1) <= 0x20) jsonText = jsonText.slice(0, -1);
+  const json = JSON.parse(jsonText);
   return { json, chunks };
 };
 
