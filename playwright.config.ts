@@ -9,9 +9,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  // The editor and model-viewer both create WebGL contexts. Keep local
-  // concurrency below the software-renderer starvation boundary; CI remains 1.
-  workers: process.env.CI ? 1 : 2,
+  // Dedicated AR0 projects isolate model-viewer's renderer from editor workers,
+  // so two workers remain below the software-renderer starvation boundary in CI.
+  workers: 2,
   reporter: [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
   use: {
@@ -28,7 +28,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-small',
-      testIgnore: /(?:ar0|planner-(?:preview|integration|intent))\.spec\.ts/,
+      testIgnore: /(?:ar0(?:-disabled)?|planner-(?:preview|integration|intent))\.spec\.ts/,
       use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
@@ -38,7 +38,7 @@ export default defineConfig({
     },
     {
       name: 'desktop',
-      testIgnore: /(?:ar0|interactions-touch|planner-(?:preview|integration|intent))\.spec\.ts/,
+      testIgnore: /(?:ar0(?:-disabled)?|interactions-touch|planner-(?:preview|integration|intent))\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     // Native-AR landing tests instantiate model-viewer, which owns a separate
