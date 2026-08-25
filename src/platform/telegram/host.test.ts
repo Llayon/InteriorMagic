@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getTelegramSnapshot, subscribeTelegramLifecycle } from './host';
+import { getTelegramInitData, getTelegramSnapshot, subscribeTelegramLifecycle } from './host';
 
 type Listener = () => void;
 
@@ -87,6 +87,25 @@ describe('getTelegramSnapshot', () => {
       expect(payload).toEqual({ error: 'UNSUPPORTED' });
     });
     events.get('fullscreenFailed')?.({ error: 'UNSUPPORTED' });
+  });
+});
+
+describe('getTelegramInitData', () => {
+  it('returns raw initData when present', () => {
+    vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData: 'query_id=abc&user=%7B%22id%22%3A1%7D&hash=xyz' } } });
+    expect(getTelegramInitData()).toBe('query_id=abc&user=%7B%22id%22%3A1%7D&hash=xyz');
+  });
+  it('returns null outside Telegram', () => {
+    vi.stubGlobal('window', {});
+    expect(getTelegramInitData()).toBeNull();
+  });
+  it('returns null when initData is empty', () => {
+    vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData: '' } } });
+    expect(getTelegramInitData()).toBeNull();
+  });
+  it('does not expose initData via snapshot (privacy)', () => {
+    vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData: 'raw', version: '8.0' } } });
+    expect(getTelegramSnapshot()).not.toHaveProperty('initData');
   });
 });
 

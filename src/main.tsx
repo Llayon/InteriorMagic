@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
 import { initTelegram } from '@/telegram/telegram';
+import { initIdentity } from '@/platform/identity/client';
 import '@/app/styles.css';
 import { installTestDiagnostics, registerPlanningIntentAnalysisPort } from '@/test/diagnostics';
 import { createBeautifulRoomProject } from '@/app/demo/beautifulRoom';
@@ -24,6 +25,7 @@ import {
 } from '@/editor/planning/integration';
 
 initTelegram();
+initIdentity();
 installTestDiagnostics();
 
 const bootstrap = async () => {

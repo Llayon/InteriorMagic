@@ -10,6 +10,8 @@ import { getCatalogConfiguration } from '@/editor/catalog/CatalogRepository';
 import { usePlannerStore, classifyProposalOutcome, type ProposalOutcome } from '@/editor/planning/ui';
 import type { PlannerApplyFailureReason } from '@/editor/planning/integration';
 import type { PlanningIntentAnalysisPort } from '@/editor/planning/integration';
+import { getIdentitySnapshot as getIdentitySnapshotImpl } from '@/platform/identity/store';
+import type { IdentitySnapshot } from '@/platform/identity/types';
 
 type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
@@ -102,6 +104,7 @@ export interface InteriorMagicTestApi {
   replaceProjectForTest(project: RoomProject): void;
   hasPlanningIntentAnalysis(): boolean;
   beginPlanningIntentAnalysis(text: string): Promise<void>;
+  getIdentitySnapshot(): IdentitySnapshot;
 }
 
 const api: InteriorMagicTestApi = {
@@ -183,6 +186,7 @@ const api: InteriorMagicTestApi = {
     if (!planningIntentAnalysisPort) throw new Error('Planning intent analysis is not configured');
     await planningIntentAnalysisPort.beginAnalysisFromText(text);
   },
+  getIdentitySnapshot: () => getIdentitySnapshotImpl(),
 };
 
 declare global { interface Window { __INTERIOR_MAGIC_TEST__?: InteriorMagicTestApi } }

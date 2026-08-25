@@ -27,6 +27,8 @@ export interface TelegramWebAppHost {
   exitFullscreen?(): void;
   onEvent?(event: string, listener: (payload?: unknown) => void): void;
   offEvent?(event: string, listener: (payload?: unknown) => void): void;
+  /** Raw initData query string for server-side validation. Never use initDataUnsafe as authority. */
+  initData?: string;
 }
 
 declare global { interface Window { Telegram?: { WebApp?: TelegramWebAppHost } } }
@@ -67,6 +69,12 @@ export const getTelegramSnapshot = (): TelegramSnapshot => {
     safeAreaInset: app.safeAreaInset,
     contentSafeAreaInset: app.contentSafeAreaInset,
   };
+};
+
+export const getTelegramInitData = (): string | null => {
+  const app = getTelegramWebApp();
+  if (!app || typeof app.initData !== 'string' || app.initData.length === 0) return null;
+  return app.initData;
 };
 
 export type TelegramLifecycleEvent = 'activated' | 'deactivated';
