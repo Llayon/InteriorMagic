@@ -8,10 +8,10 @@ The local immutable revision and product integration are complete. This is not a
 
 ## Source and revision evidence
 
-- Base SHA: `ba9a7215b05184e52130c2ca184552787a90d915`
+- Base SHA: `4d3a7c33043e5db51e0552690a9dc35081d60d0e`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Head SHA: `PENDING_FINAL_HEAD`
+- Tested implementation SHA before this report-only update: `1c99cd4b10928e2761e1f7842327e914e99edc03`
 - Asset revision: `sheen-chair-r1` for `sheenChair`
 - Local origin: same-origin `${BASE_URL}ar0/sheen-chair/r1/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
@@ -58,10 +58,12 @@ USDZ and poster:
 
 ## Verification
 
-- Baseline at base SHA: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed.
-- AR0/unit suite: 290 tests passed in the latest targeted run.
-- Targeted desktop AR0 E2E: 3 passed.
-- Full regression gates: `PENDING_FINAL_GATES`.
+- Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved and the branch was rebased to the base SHA above.
+- Final rebased unit suite: 362 passed across 50 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
+- AR0 E2E: 6 passed across mobile-small and desktop.
+- Full browser regression: 69 passed, 6 existing project-specific skips.
+- Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
+- Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
 - Draft PR and CI: `PENDING_PR_CI`.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
