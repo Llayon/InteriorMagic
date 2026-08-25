@@ -20,10 +20,17 @@ export const validateUsdzEvidence = (evidence, expected) => {
 
   const minimum = requireFiniteVector(evidence.stageBounds?.min, 'USDZ stageBounds.min');
   const maximum = requireFiniteVector(evidence.stageBounds?.max, 'USDZ stageBounds.max');
+  const size = requireFiniteVector(evidence.stageBounds?.size, 'USDZ stageBounds.size');
   const sizeMeters = requireFiniteVector(evidence.stageBounds?.sizeMeters, 'USDZ stageBounds.sizeMeters');
-  if (sizeMeters.some((entry) => entry <= 0)) throw new Error('USDZ stage bounds must be positive');
+  if (size.some((entry) => entry <= 0) || sizeMeters.some((entry) => entry <= 0)) throw new Error('USDZ stage bounds must be positive');
   for (let axis = 0; axis < 3; axis += 1) {
     if (maximum[axis] <= minimum[axis]) throw new Error(`USDZ stage bounds are invalid on axis ${axis}`);
+    const derivedSize = maximum[axis] - minimum[axis];
+    const sizeTolerance = Math.max(1e-9, Math.abs(derivedSize) * 1e-9);
+    if (Math.abs(size[axis] - derivedSize) > sizeTolerance) throw new Error(`USDZ stage bounds size is inconsistent on axis ${axis}`);
+    const meterSize = size[axis] * evidence.metersPerUnit;
+    const meterTolerance = Math.max(1e-9, Math.abs(meterSize) * 1e-9);
+    if (Math.abs(sizeMeters[axis] - meterSize) > meterTolerance) throw new Error(`USDZ stage meter size is inconsistent on axis ${axis}`);
     const glbSize = expected.glbSize[axis];
     if (!Number.isFinite(glbSize) || glbSize <= 0) throw new Error(`Canonical GLB bounds are invalid on axis ${axis}`);
     const delta = Math.abs(glbSize - sizeMeters[axis]) / glbSize;

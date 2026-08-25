@@ -4,6 +4,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { assertRemoteMediaType } from './remote-media-type.mjs';
+import { loadValidatedReleaseObjects } from './release-files.mjs';
+import { planImmutableUpload } from './immutable-upload-plan.mjs';
 
 const root = process.cwd();
 const revisionRoot = path.join(root, 'public/ar0/sheen-chair/r1');
@@ -28,12 +30,19 @@ const run = (args) => new Promise((resolve) => {
   child.once('exit', (code) => resolve({ code, stdout, stderr }));
 });
 
-const checksumsBytes = await readFile(path.join(revisionRoot, 'checksums.json'));
-const checksums = JSON.parse(checksumsBytes.toString('utf8'));
-const objects = [
-  ...checksums.files.map((file) => ({ ...file, localFile: path.join(revisionRoot, file.path) })),
-  { path: 'checksums.json', bytes: checksumsBytes.length, sha256: sha256(checksumsBytes), contentType: 'application/json; charset=utf-8', localFile: path.join(revisionRoot, 'checksums.json') },
-];
+const { objects } = await loadValidatedReleaseObjects(revisionRoot);
+
+const validateLocalStage = () => new Promise((resolve, reject) => {
+  const child = spawn(process.execPath, [path.join(root, 'scripts/ar0/validate-revision.mjs'), '--staged'], {
+    cwd: root,
+    stdio: 'ignore',
+    windowsHide: true,
+  });
+  child.once('error', reject);
+  child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`Staged AR0 validation failed with code ${code}`)));
+});
+
+await validateLocalStage();
 
 if (!upload && !verify) {
   console.log(JSON.stringify({ bucket, prefix, mode: 'dry-run', objects: objects.map((object) => ({ path: object.path, bytes: object.bytes, sha256: object.sha256, contentType: object.contentType })) }, null, 2));
@@ -43,20 +52,20 @@ if (upload && !hasNonInteractiveAuth) throw new Error('R2 PUBLISH PENDING: non-i
 
 if (upload) {
   await mkdir(cacheRoot, { recursive: true });
-  const missing = [];
+  const statuses = [];
   for (const object of objects) {
     const remoteFile = path.join(cacheRoot, object.path.replaceAll('/', '_'));
     const result = await run(['r2', 'object', 'get', `${bucket}/${prefix}/${object.path}`, '--file', remoteFile, '--remote']);
     if (result.code === 0) {
       const remoteBytes = await readFile(remoteFile);
-      if (sha256(remoteBytes) !== object.sha256) throw new Error(`Immutable R2 conflict at ${prefix}/${object.path}; choose a new revision`);
+      statuses.push({ path: object.path, exists: true, identical: remoteBytes.length === object.bytes && sha256(remoteBytes) === object.sha256 });
     } else if (/not found|does not exist|no such key|10007/iu.test(`${result.stdout}\n${result.stderr}`)) {
-      missing.push(object);
+      statuses.push({ path: object.path, exists: false, identical: false });
     } else {
       throw new Error(`Could not preflight ${prefix}/${object.path}: ${result.stderr || result.stdout}`);
     }
   }
-  const ordered = [...missing.filter((object) => object.path !== 'checksums.json'), ...missing.filter((object) => object.path === 'checksums.json')];
+  const ordered = planImmutableUpload(objects, statuses);
   for (const object of ordered) {
     const result = await run(['r2', 'object', 'put', `${bucket}/${prefix}/${object.path}`, '--file', object.localFile, '--content-type', object.contentType, '--cache-control', 'public, max-age=31536000, immutable', '--storage-class', 'Standard', '--remote']);
     if (result.code !== 0) throw new Error(`R2 PUT failed for ${prefix}/${object.path}: ${result.stderr || result.stdout}`);

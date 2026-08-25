@@ -41,6 +41,7 @@ USDZ and poster:
 - Package: `model.usdc` plus five packaged PNG textures; no unresolved dependencies
 - Stage read: Blender-bundled `pxr.Usd/UsdGeom`; GLB/USDZ delta is below 1% on every axis
 - Committed stage evidence: `docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json`, evidence SHA256 `22655487ddba45da0fb00c565106632a4888e778dffd754008a09e96bce38a7c`; its `usdzSha256` is the exact immutable r1 hash above. Missing, malformed, stale or mismatched evidence now fails staged validation.
+- Evidence validation also rejects internally inconsistent `min`/`max`/`size`/`sizeMeters` values, rather than trusting only the GLB comparison vector.
 - Blender USDZ bytes were not deterministic across repeated exports; the selected validated bytes are immutable by their recorded checksum. Poster bytes were deterministic.
 - Poster: `11,704` bytes, SHA256 `a70151d0eaf81ed1fd8cb7c90b34deaa68a9540dfe689710551a55b2721e226c`
 - Status: **USDZ STRUCTURALLY BUILT / IOS MATERIAL QA PENDING**
@@ -56,17 +57,18 @@ USDZ and poster:
 - `VITE_AR0_ENABLED` is a deployment/release gate, not asset metadata. Absent, empty or any value other than literal `true` hides the catalog CTA and makes direct AR URLs fail closed without model-viewer. With literal `true`, only Sheen Chair has the `Примерить 1:1` action. The existing Add action remains separate; AR does not add furniture.
 - Local Vite delivery returns `model/gltf-binary` and `model/vnd.usdz+zip`.
 - R2 published: **no**. Prefix reserved: `ar0/sheen-chair/r1/`; the public preflight returned 404 and Wrangler reported no authentication. Remote MIME/CORS therefore remain unverified and pending. The verifier now fails incorrect MIME for GLB, USDZ, WebP, manifest JSON and checksums JSON, while retaining length, SHA256 and CORS checks. No existing release was overwritten.
+- The publisher now verifies local bytes against checksums and refuses an incomplete prefix where `checksums.json` exists without a payload; no R2 mutation occurred.
 - Future conversion provenance reads the actual `bpy.app.version_string` from Blender's converter report, rejects malformed provenance and enforces the approved Blender 5.2 line; it no longer hardcodes a version label. The selected r1 USDZ was not regenerated.
 
 ## Verification
 
 - Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved and the branch was rebased to the base SHA above.
-- Final fix-pass unit suite: 395 passed across 54 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
+- Final fix-pass unit suite: 400 passed across 54 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
 - Dedicated AR0 E2E: 8 passed — six enabled landing/catalog cases across mobile-small and desktop plus two default-off cases.
 - Full browser regression: 71 passed, 6 existing project-specific skips (77 total). AR0 cases run in dedicated Playwright projects and origins so model-viewer's renderer cannot starve the editor's software-rendered WebGL process and the default-off deployment behavior is tested independently; assertions and timeouts are unchanged.
 - Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
 - Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
-- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Previous implementation head `e7b651069d51bed47a3213d086f860711b547703` passed quality and E2E in run [32852259116](https://github.com/Llayon/InteriorMagic/actions/runs/32852259116). This bounded fix-pass is locally green with the counts above; its exact-head follow-up CI is recorded in the PR body after push.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). CI checkout is explicitly pinned to the PR head SHA for pull requests and verifies `git rev-parse HEAD`; the exact run and counts are recorded in the PR body after push.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
