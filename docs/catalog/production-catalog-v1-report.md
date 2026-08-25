@@ -294,3 +294,59 @@ Applied at HEAD `74f6804` (commits on top of `3220727e`):
 | `node scripts/catalog/validate-selection.mjs` (real data) | **passed: true**, 0 violations, all 3 hash checks match |
 | `git diff --check` | clean |
 
+## Post-merge Catalog Gate Hardening (separate PR)
+
+Hardening branch based on merge commit `cfaf3064555e1f61823c49533037cf4bc78092c6` (Track I merge / PR #17 MERGED). Track I final feature head: `6e3ee97e01aa565b2c291aaefba291a7db20be70`.
+
+The Track I final-state facts in this report (47 selected, 7 TVs, 47 retained direct-vision verification records, 18 exclusions, 65 total I2.5 inputs) are unchanged by hardening. No semantic recuration. No runtime activation. No R2 mutation.
+
+### Pure validation architecture
+
+The Track I validator was extended into a two-layer architecture:
+
+1. `validateInventoryEvidence(row, assetId)` — pure per-row evidence gate. No filesystem, no global state.
+2. `validateSelectionEvidence({ selection, inventory, actualSourceHashes })` — pure selection-level gate. Performs manifest shape, all three hash checks, asset array integrity, assetCount, byRole, membership, and per-row evidence. No filesystem.
+3. `validateSelection()` — thin wrapper that reads the manifest, awaits `buildInventory()`, recomputes actual SHA256s of the upstream policy / runtime catalog / catalog payload, and delegates to the pure layer.
+
+### Test split
+
+The pre-hardening catalog tests under `tests/catalog/` mixed two categories: CI-hermetic characterizations and tests requiring external ITHappy `.agent-data` artifacts. The hardening split them:
+
+- **`tests/catalog/*.test.mjs`** (CI-hermetic) — runs in `npm run test:catalog`. No upstream I/O. **41/41 pass** with zero environment variables.
+- **`tests/catalog/upstream/*.test.mjs`** (real-upstream) — runs in `npm run test:catalog:upstream`. Requires `ITHAPPY_PIPELINE_ROOT` / `ITHAPPY_CATALOG_BUILD_ROOT` pointing at the developer's local `.agent-data` tree. **23/23 pass** on a machine that has the upstream artifacts.
+
+Combined local catalog evidence after hardening: **64/64 pass**.
+
+GitHub CI enforces the 41 hermetic tests only. The 23 upstream tests remain a local/release evidence gate because they depend on the developer's external ITHappy pipeline artifacts.
+
+### Direct per-branch characterization
+
+Each per-row FAIL branch in `validateInventoryEvidence` now has a direct exact-code test that mutates only the field under characterization:
+
+| Branch | Exact violation code |
+| --- | --- |
+| `runtimePolicyStatus !== 'PASS'` | `runtimePolicyStatus_not_PASS` |
+| `geometryInvarianceStatus !== 'PASS'` | `geometryInvarianceStatus_not_PASS` |
+| `gltfValidationStatus !== 'PASS'` | `gltfValidationStatus_not_PASS` |
+| `conversionStatus !== 'built'` | `conversionStatus_not_built` |
+| `thumbnailBytes <= 0` | `thumbnailBytes_invalid` |
+| `thumbnailStatus` empty | `thumbnailStatus_empty` |
+| `policyVersion !== 1` | `policyVersion_not_1` |
+| `maxTextureDimension > 512` | `maxTextureDimension_over_512` |
+
+Deleting any one of these branches in production causes the corresponding catalog test to fail.
+
+## License wording (limited correction)
+
+Track I's historical verdict:
+
+> ITHappy per-asset license evidence: **NOT_FOUND** (per `docs/catalog/provenance-scan.md`).
+
+remains a correct snapshot of what was findable in the repository at Track I closure. An ITHappy Standard EULA was identified externally after Track I. Track I's original repository scan correctly reported that no ITHappy license ledger was present in the repository at that time.
+
+- License source: ITHappy Standard EULA identified externally after Track I.
+- Commercial application use: Standard EULA evidence identified.
+- Repository evidence capture and delivery-specific rights treatment are handled outside Catalog Gate Hardening.
+
+This PR does NOT make a final determination about raw GLB redistribution, raw USDZ redistribution, CDN delivery policy, generative AI input rights, or asset gateway architecture. Those belong to later delivery/rights work.
+

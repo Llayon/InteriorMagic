@@ -18,6 +18,8 @@
     "lint": "eslint .",
     "test": "vitest run src workers/planning-intent workers/app-api",
     "test:server": "vitest run workers/planning-intent workers/app-api",
+    "test:catalog": "node --test tests/catalog/*.test.mjs",
+    "test:catalog:upstream": "node --test tests/catalog/upstream/*.test.mjs",
     "worker:intent:types": "wrangler types workers/planning-intent/worker-configuration.d.ts --config workers/planning-intent/wrangler.jsonc --env-interface PlanningIntentWorkerEnv",
     "worker:intent:check": "wrangler deploy --dry-run --config workers/planning-intent/wrangler.jsonc --outdir .wrangler/tmp/planning-intent",
     "worker:app-api:types": "wrangler types workers/app-api/worker-configuration.d.ts --config workers/app-api/wrangler.jsonc --env-interface AppApiWorkerEnv",

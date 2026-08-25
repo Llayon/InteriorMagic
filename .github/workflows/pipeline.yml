@@ -28,6 +28,8 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
+      - name: Test catalog
+        run: npm run test:catalog
       - name: Typecheck
         run: npm run typecheck
       - name: Typecheck E2E
