@@ -5,6 +5,7 @@ interface __BaseEnv_AppApiWorkerEnv {
 	DB: D1Database;
 	ALLOWED_ORIGIN: "https://example.invalid";
 	TELEGRAM_INIT_DATA_MAX_AGE_SECONDS: "86400";
+	SESSION_TTL_SECONDS: "2592000";
 	TELEGRAM_BOT_TOKEN: string;
 }
 declare namespace Cloudflare {
@@ -15,7 +16,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ALLOWED_ORIGIN" | "TELEGRAM_INIT_DATA_MAX_AGE_SECONDS">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ALLOWED_ORIGIN" | "TELEGRAM_INIT_DATA_MAX_AGE_SECONDS" | "SESSION_TTL_SECONDS">> {}
 }
 
 // Begin runtime types
