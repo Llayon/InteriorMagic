@@ -37,6 +37,11 @@
     "test:registry:ithappy:preview-production": "node scripts/run-ithappy-production-preview.mjs",
     "playwright:install": "playwright install chromium",
     "assets:generate": "node scripts/generate-fixture-glbs.mjs",
+    "assets:ar0:canonicalize": "node scripts/ar0/build-canonical-glb.mjs",
+    "assets:ar0:convert": "node scripts/ar0/run-blender-conversion.mjs",
+    "assets:ar0:validate": "node scripts/ar0/validate-revision.mjs",
+    "assets:ar0:stage": "node scripts/ar0/stage-release.mjs",
+    "assets:ar0:build": "npm run assets:ar0:canonicalize && npm run assets:ar0:convert && npm run assets:ar0:validate && npm run assets:ar0:stage",
     "format": "prettier --write ."
   },
   "dependencies": {

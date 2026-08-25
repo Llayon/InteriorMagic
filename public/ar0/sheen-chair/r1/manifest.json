@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "assetRevisionId": "sheen-chair-r1",
+  "assetId": "sheenChair",
+  "files": {
+    "glb": {
+      "path": "model.glb",
+      "sha256": "a38f20af9f527b1d1cef1220ce5d19489498f7b2cd0ca0ca6ea35f82b0cb8f22"
+    },
+    "usdz": {
+      "path": "model.usdz",
+      "sha256": "4b0bec120f9db100b888b7083a8e2d7873d7c2f56d5343b65eb4c8fc69330618"
+    },
+    "poster": {
+      "path": "poster.webp",
+      "sha256": "a70151d0eaf81ed1fd8cb7c90b34deaa68a9540dfe689710551a55b2721e226c"
+    }
+  }
+}
