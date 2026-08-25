@@ -142,6 +142,12 @@ describe('initTelegram bootstrap policy', () => {
     expect(host.ready).toHaveBeenCalledTimes(1);
     expect(host.expand).toHaveBeenCalledTimes(1);
     expect(host.requestFullscreen).toHaveBeenCalledTimes(1);
+    // Freeze ordering: ready → expand → requestFullscreen
+    const readyOrder = host.ready.mock.invocationCallOrder[0]!;
+    const expandOrder = host.expand.mock.invocationCallOrder[0]!;
+    const fullscreenOrder = host.requestFullscreen!.mock.invocationCallOrder[0]!;
+    expect(readyOrder).toBeLessThan(expandOrder);
+    expect(expandOrder).toBeLessThan(fullscreenOrder);
   });
 
   it('already fullscreen does not request again', () => {

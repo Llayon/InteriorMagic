@@ -62,7 +62,7 @@ export const initTelegram = () => {
   }
 };
 
-/** Test-only: resets per-host fullscreen guard and active subscriptions. */
+/** Test-only: resets active subscriptions. */
 export const __resetTelegramForTests = () => {
   if (activeCleanup) {
     // Keep offEvent handling best-effort for test stubs that may already be gone.
@@ -75,5 +75,3 @@ export const __resetTelegramForTests = () => {
   }
   // WeakSet has no clear(); callers should use a fresh host object per test.
 };
-
-export const __getTelegramTestState = () => ({ hasActiveSubscriptions: activeCleanup !== null });

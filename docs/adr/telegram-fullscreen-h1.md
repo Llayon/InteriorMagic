@@ -13,7 +13,7 @@ Official behavior: https://core.telegram.org/bots/webapps — `isFullscreen`, `r
 - Extend the typed host boundary only: `isExpanded`, `viewportHeight`, `isFullscreen`, `isVersionAtLeast`, `requestFullscreen`, `exitFullscreen`, `fullscreenChanged`/`fullscreenFailed` events. No general SDK wrapper.
 - Preserve `ready()` and `expand()` order. Avoid duplicate `expand()` when `isExpanded === true`.
 - Fullscreen is **distinct from expanded** and **best-effort**:
-  - Request at most once per `TelegramWebAppHost` instance (`WeakSet` guard, not a global boolean — survives HMR, test host swaps, and re-bootstrap of the same SPA shell).
+  - Request at most once per `TelegramWebAppHost` instance (`WeakSet` guard, not a plain global boolean — scopes the request to the host object so a re-bootstrap of the same SPA shell or a test host swap does not trigger a second request for the same instance; a new host object may request again).
   - Gate on `insideTelegram && isVersionAtLeast('8.0') && requestFullscreen && !isFullscreen && !alreadyRequestedForThisHost`.
   - On older/unsupported hosts remain expand-only.
 - `fullscreenFailed` (e.g. `UNSUPPORTED`) is non-fatal: keep expanded fallback, do not retry, do not fail bootstrap, do not show UI.
