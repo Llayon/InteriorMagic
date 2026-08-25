@@ -8,10 +8,10 @@ The local immutable revision and product integration are complete. This is not a
 
 ## Source and revision evidence
 
-- Base SHA: `4d3a7c33043e5db51e0552690a9dc35081d60d0e`
+- Base SHA: `cfaf3064555e1f61823c49533037cf4bc78092c6`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Tested implementation SHA before this report-only update: `1c99cd4b10928e2761e1f7842327e914e99edc03`
+- Tested implementation SHA before this report-only update: `2209428ff3d32a53c6f64bc4fdbfdd5ba37a7444`
 - Asset revision: `sheen-chair-r1` for `sheenChair`
 - Local origin: same-origin `${BASE_URL}ar0/sheen-chair/r1/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
@@ -59,12 +59,12 @@ USDZ and poster:
 ## Verification
 
 - Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved and the branch was rebased to the base SHA above.
-- Final rebased unit suite: 362 passed across 50 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
+- Final rebased unit suite: 370 passed across 52 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
 - AR0 E2E: 6 passed across mobile-small and desktop.
-- Full browser regression: 69 passed, 6 existing project-specific skips.
+- Full browser regression: 69 passed, 6 existing project-specific skips. The six AR0 cases run in dedicated mobile/desktop Playwright projects so model-viewer's renderer cannot starve the editor's software-rendered WebGL process; assertions and timeouts are unchanged.
 - Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
 - Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
-- Draft PR and CI: `PENDING_PR_CI`.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Initial run [32842072976](https://github.com/Llayon/InteriorMagic/actions/runs/32842072976) passed quality and all six AR0 E2E cases, then exposed shared-process WebGL starvation in the existing persistence reload test. AR0.7 isolates model-viewer E2E in dedicated browser projects; the same 75-test suite passed locally with one worker. Follow-up CI is pending this report commit.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
