@@ -6,11 +6,12 @@ import { describe, expect, it } from 'vitest';
 import { measureGlbFile } from '../../scripts/ar0/glb-bounds.mjs';
 import { readApprovedBlenderVersion } from '../../scripts/ar0/blender-provenance.mjs';
 import { assertRemoteMediaType } from '../../scripts/ar0/remote-media-type.mjs';
+import { assertRemoteCors, requireRemoteVerificationOrigins } from '../../scripts/ar0/remote-verification.mjs';
 import { loadValidatedReleaseObjects } from '../../scripts/ar0/release-files.mjs';
 import { planImmutableUpload } from '../../scripts/ar0/immutable-upload-plan.mjs';
 import { AR0_REVISION_ID, validateUsdzEvidence } from '../../scripts/ar0/usdz-evidence.mjs';
 
-const revisionRoot = path.resolve('public/ar0/sheen-chair/r1');
+const revisionRoot = path.resolve('artifacts/ar0/sheen-chair/r1');
 const evidencePath = path.resolve('docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json');
 const sha256 = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
 
@@ -98,6 +99,19 @@ describe('remote AR0 MIME validation', () => {
 
   it.each(artifacts)('rejects a wrong media type for %s', (file, _actual, expected) => {
     expect(() => assertRemoteMediaType(file, 'application/octet-stream', expected)).toThrow(file);
+  });
+});
+
+describe('remote AR0 verification boundary', () => {
+  it('requires both the public asset origin and actual app origin', () => {
+    expect(() => requireRemoteVerificationOrigins({ publicOrigin: 'https://assets.test', appOrigin: '' })).toThrow(/AR0_APP_ORIGIN/u);
+    expect(requireRemoteVerificationOrigins({ publicOrigin: ' https://assets.test/ ', appOrigin: ' https://app.test ' })).toEqual({ publicOrigin: 'https://assets.test/', appOrigin: 'https://app.test' });
+  });
+
+  it('accepts exact-origin or wildcard CORS and rejects missing authorization', () => {
+    expect(() => assertRemoteCors('https://app.test', 'https://app.test')).not.toThrow();
+    expect(() => assertRemoteCors('*', 'https://app.test')).not.toThrow();
+    expect(() => assertRemoteCors('https://other.test', 'https://app.test')).toThrow(/CORS/u);
   });
 });
 

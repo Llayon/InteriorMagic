@@ -8,7 +8,7 @@ import { measureGlbFile } from '../../scripts/ar0/glb-bounds.mjs';
 import { getAr0Revision } from './revisions';
 import { parseAr0Manifest } from './manifest';
 
-const revisionRoot = path.resolve('public/ar0/sheen-chair/r1');
+const revisionRoot = path.resolve('artifacts/ar0/sheen-chair/r1');
 const sha256 = (value: Buffer) => createHash('sha256').update(value).digest('hex');
 
 describe('AR0 immutable Sheen Chair assets', () => {

@@ -8,7 +8,7 @@ import { AR0_REVISION_ID, validateUsdzEvidence } from './usdz-evidence.mjs';
 const root = process.cwd();
 const staged = process.argv.includes('--staged');
 const revisionRoot = staged
-  ? path.join(root, 'public/ar0/sheen-chair/r1')
+  ? path.join(root, 'artifacts/ar0/sheen-chair/r1')
   : path.join(root, '.agent-data/ar0/sheen-chair-r1');
 const stageEvidencePath = staged
   ? path.join(root, 'docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json')

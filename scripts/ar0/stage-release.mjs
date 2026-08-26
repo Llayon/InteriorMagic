@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const sourceRoot = path.join(root, '.agent-data/ar0/sheen-chair-r1');
-const destinationRoot = path.join(root, 'public/ar0/sheen-chair/r1');
+const destinationRoot = path.join(root, 'artifacts/ar0/sheen-chair/r1');
 const payload = ['model.glb', 'model.usdz', 'poster.webp', 'manifest.json'];
 
 await mkdir(destinationRoot, { recursive: true });
