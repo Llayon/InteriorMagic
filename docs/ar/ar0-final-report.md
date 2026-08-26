@@ -11,7 +11,7 @@ The local immutable revision and product integration are complete. This is not a
 - Base SHA: `cfaf3064555e1f61823c49533037cf4bc78092c6`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Tested implementation SHA before this report-only update: `2209428ff3d32a53c6f64bc4fdbfdd5ba37a7444`
+- Tested implementation SHA: `e422365d5d9d6316aa87b8c10a591a24a266cf1f`
 - Asset revision: `sheen-chair-r1` for `sheenChair`
 - Local origin: same-origin `${BASE_URL}ar0/sheen-chair/r1/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
@@ -68,7 +68,7 @@ USDZ and poster:
 - Full browser regression: 71 passed, 6 existing project-specific skips (77 total). AR0 cases run in dedicated Playwright projects and origins so model-viewer's renderer cannot starve the editor's software-rendered WebGL process and the default-off deployment behavior is tested independently; assertions and timeouts are unchanged.
 - Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
 - Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
-- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Browser and planner jobs explicitly checkout and verify the PR head SHA with `git rev-parse HEAD`. The quality job remains a merge-context gate because current `main` has an independent catalog gate and has advanced beyond the AR0 base; no Track I compatibility changes were added. Exact run and counts are recorded in the PR body.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Browser and planner jobs explicitly checkout and verify the PR head SHA with `git rev-parse HEAD`. The quality job remains a merge-context gate because current `main` has an independent catalog gate and has advanced beyond the AR0 base; no Track I compatibility changes were added. Exact run and counts are recorded in the PR body. The latest rerun passed quality, planner and Chromium; Chromium reported 70 passed, 6 skipped and 1 flaky retry in the unrelated persistence reload test.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
