@@ -1,4 +1,4 @@
-import type { PlanningGoal } from '../contracts';
+import type { PlanningGoalV2 } from '../contracts';
 import type { PlanningIntentEvalCase } from './evalCases';
 import { createFakePlanningIntentProvider } from './fakeProvider';
 import { interpretPlanningIntent } from './interpreter';
@@ -40,17 +40,14 @@ const isProviderErrorStep = (value: unknown): value is ProviderErrorStep => {
 /**
  * Outcome-category match. Reasons on non-success outcomes are provider-specific
  * free text, so only the category is compared; success additionally requires an
- * exact PlanningGoal match (activity, focalPointId, ordered priorities).
+ * exact PlanningGoalV2 match.
  */
 const matchesExpectation = (actual: PlanningIntentResult, expected: PlanningIntentResult): boolean => {
   if (actual.outcome !== expected.outcome) return false;
   if (actual.outcome === 'success' && expected.outcome === 'success') {
-    const actualGoal: PlanningGoal = actual.goal;
-    const expectedGoal: PlanningGoal = expected.goal;
-    return (
-      actualGoal.focalPointId === expectedGoal.focalPointId &&
-      JSON.stringify(actualGoal.priorities ?? null) === JSON.stringify(expectedGoal.priorities ?? null)
-    );
+    const actualGoal: PlanningGoalV2 = actual.goal;
+    const expectedGoal: PlanningGoalV2 = expected.goal;
+    return JSON.stringify(actualGoal) === JSON.stringify(expectedGoal);
   }
   return true;
 };

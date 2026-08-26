@@ -9,14 +9,18 @@ export const GROQ_CHAT_COMPLETIONS_ENDPOINT = 'https://api.groq.com/openai/v1/ch
 export const GROQ_TIMEOUT_MS = 15_000;
 const MAX_GROQ_RESPONSE_BYTES = 64 * 1024;
 
-export const QWEN_OUTPUT_SHAPE_HINT = [
+export const buildQwenOutputShapeHint = (focalCount: number): string => [
   'Allowed output shapes (output exactly one JSON object and nothing else):',
-  'Success: {"activity":"watchTv","focalPointId":"<one supplied ID>"}',
-  'Success with priorities: {"activity":"watchTv","focalPointId":"<one supplied ID>","priorities":["viewing","circulation","conversation"]}',
+  ...(focalCount === 0
+    ? []
+    : ['TV success: {"activity":"watchTv","focalPointId":"<one supplied ID>"}']),
+  'Conversation success: {"activity":"conversation"}',
   'Unsupported: {"intent":"unsupported_intent"}',
-  'Ambiguous: {"intent":"ambiguous_focal"}',
+  ...(focalCount <= 1 ? [] : ['Ambiguous: {"intent":"ambiguous_focal"}']),
   'Successful goals use the key "activity", NEVER "intent".',
-  'The key "intent" is reserved ONLY for unsupported_intent / ambiguous_focal.',
+  focalCount <= 1
+    ? 'The key "intent" is reserved ONLY for unsupported_intent.'
+    : 'The key "intent" is reserved ONLY for unsupported_intent / ambiguous_focal.',
 ].join('\n');
 
 export type GroqFailureCode =
@@ -41,7 +45,11 @@ const userMessage = (request: PlanningIntentProviderRequest): string => {
       ? `- ${focal.id} (${focal.kind})`
       : `- ${focal.id} (${focal.kind}): ${focal.label}`,
   ).join('\n');
-  return ['User request:', request.userText, '', 'Allowed focal points:', focals, '', QWEN_OUTPUT_SHAPE_HINT].join('\n');
+  return [
+    'User request:', request.userText, '',
+    'Allowed TV focal points:', focals.length === 0 ? '(none)' : focals,
+    '', buildQwenOutputShapeHint(request.focalPoints.length),
+  ].join('\n');
 };
 
 export const buildGroqIntentRequest = (request: PlanningIntentProviderRequest) => ({

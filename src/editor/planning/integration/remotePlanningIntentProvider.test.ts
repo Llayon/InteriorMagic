@@ -14,12 +14,13 @@ describe('RemotePlanningIntentProvider', () => {
       endpoint: 'https://intent.example/planning-intent',
       fetchImpl: vi.fn(async (_input, init) => {
         calls.push(init ?? {});
-        return Response.json({ ok: true, output });
+        return Response.json({ ok: true, contractVersion: 2, output });
       }),
     });
     expect(await provider.interpret(request)).toEqual(output);
     const body = String(calls[0]?.body);
     expect(JSON.parse(body)).toEqual({
+      contractVersion: 2,
       text: request.userText,
       focals: [{ id: 'room-object:tv', kind: 'tv' }],
     });
@@ -31,7 +32,7 @@ describe('RemotePlanningIntentProvider', () => {
   it('does not repair malformed model output', async () => {
     const provider = createRemotePlanningIntentProvider({
       endpoint: '/planning-intent',
-      fetchImpl: vi.fn(async () => Response.json({ ok: true, output: { intent: 'watchTv', focal: 'tv' } })),
+      fetchImpl: vi.fn(async () => Response.json({ ok: true, contractVersion: 2, output: { intent: 'watchTv', focal: 'tv' } })),
     });
     expect(await provider.interpret(request)).toEqual({ intent: 'watchTv', focal: 'tv' });
   });
@@ -44,6 +45,18 @@ describe('RemotePlanningIntentProvider', () => {
       endpoint: '/planning-intent', fetchImpl: vi.fn(async () => Response.json(payload, { status })),
     });
     await expect(provider.interpret(request)).rejects.toThrow(/Planning intent provider failed/);
+  });
+
+  it('fails closed on a missing or mismatched planning intent contract version', async () => {
+    for (const payload of [
+      { ok: true, output: { activity: 'conversation' } },
+      { ok: true, contractVersion: 1, output: { activity: 'conversation' } },
+    ]) {
+      const provider = createRemotePlanningIntentProvider({
+        endpoint: '/planning-intent', fetchImpl: vi.fn(async () => Response.json(payload)),
+      });
+      await expect(provider.interpret(request)).rejects.toThrow(/Planning intent provider failed/);
+    }
   });
 
   it('forwards AbortSignal to fetch', async () => {

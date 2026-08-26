@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { PlanningGoal } from '../contracts/types';
-import { planTvViewing } from './planner';
+import type { WatchTvGoalV2 } from '../contracts/types';
+import { planTvViewing, planTvViewingWithLegacyPriorities } from './planner';
 import type { PlanningEntity, PlanningScene } from './PlanningScene';
 import { PlanningError } from '@/editor/planning/errors';
 import { TV_SELECTION_POLICY } from './constants';
@@ -20,7 +20,7 @@ const scene = (overrides: Partial<PlanningScene> = {}): PlanningScene => ({
   ],
   ...overrides,
 });
-const goal: PlanningGoal = { activity: 'watchTv', focalPointId: 'tv' };
+const goal: WatchTvGoalV2 = { activity: 'watchTv', focalPointId: 'tv' };
 
 describe('deterministic TV planner', () => {
   it('keeps the characterized TV selection policy values', () => {
@@ -49,7 +49,7 @@ describe('deterministic TV planner', () => {
 
   it('moves a circulation-obstructing table', () => {
     const input = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
-    const proposal = planTvViewing(input, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] });
+    const proposal = planTvViewingWithLegacyPriorities(input, goal, ['circulation', 'viewing', 'conversation']);
     expect(proposal.moves.some((move) => move.instanceId === 'source-table')).toBe(true);
     expect(proposal.findings).toEqual(expect.arrayContaining([expect.objectContaining({ ruleId: 'room.circulation', code: 'circulation-improved' })]));
   });
@@ -58,7 +58,7 @@ describe('deterministic TV planner', () => {
     const input = scene();
     const chair = input.entities.find((item) => item.role === 'armchair')!;
     chair.transform.position = { x: 2.5, z: 2.3 }; chair.transform.rotationY = 0;
-    const proposal = planTvViewing(input, { ...goal, priorities: ['conversation', 'viewing', 'circulation'] });
+    const proposal = planTvViewingWithLegacyPriorities(input, goal, ['conversation', 'viewing', 'circulation']);
     expect(proposal.moves.some((move) => move.instanceId === 'source-chair')).toBe(true);
   });
 
@@ -108,17 +108,17 @@ describe('deterministic TV planner', () => {
 
   it('uses priority order to reassign fixed weight slots', () => {
     const input = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
-    const circulationFirst = planTvViewing(input, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] });
+    const circulationFirst = planTvViewingWithLegacyPriorities(input, goal, ['circulation', 'viewing', 'conversation']);
     const viewingFirst = planTvViewing(input, goal);
     expect(circulationFirst.scoreBefore.total).not.toBeCloseTo(viewingFirst.scoreBefore.total);
   });
 
   it('appends omitted default priorities after an explicit ordered subset', () => {
     const input = scene({ circulationZones: [{ id: 'path', center: { x: 0, z: -.9 }, bounds: { width: 1.2, depth: 1.2 } }] });
-    expect(planTvViewing(input, { ...goal, priorities: ['circulation'] }))
-      .toEqual(planTvViewing(input, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] }));
-    expect(planTvViewing(input, { ...goal, priorities: ['conversation', 'viewing'] }))
-      .toEqual(planTvViewing(input, { ...goal, priorities: ['conversation', 'viewing', 'circulation'] }));
+    expect(planTvViewingWithLegacyPriorities(input, goal, ['circulation']))
+      .toEqual(planTvViewingWithLegacyPriorities(input, goal, ['circulation', 'viewing', 'conversation']));
+    expect(planTvViewingWithLegacyPriorities(input, goal, ['conversation', 'viewing']))
+      .toEqual(planTvViewingWithLegacyPriorities(input, goal, ['conversation', 'viewing', 'circulation']));
   });
 
   it('rejects an invalid current arrangement and incompatible placement candidates', () => {
@@ -197,7 +197,7 @@ describe('deterministic TV planner', () => {
 
     const representative = {
       orientation: planTvViewing(orientation, goal),
-      circulation: planTvViewing(circulation, { ...goal, priorities: ['circulation', 'viewing', 'conversation'] }),
+      circulation: planTvViewingWithLegacyPriorities(circulation, goal, ['circulation', 'viewing', 'conversation']),
       alreadyGood: planTvViewing(alreadyGood, goal),
     };
     expect(representative).toEqual({

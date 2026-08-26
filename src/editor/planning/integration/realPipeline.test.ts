@@ -50,7 +50,7 @@ describe('real deterministic planner pipeline', () => {
       applyMoves: (moves, fingerprint) => editor.getState().applyPlanningMovesAtomic(moves, fingerprint),
       createIntentProvider: () => ({
         interpret: async () => ({
-          activity: 'watchTv', focalPointId: 'room-object:test-tv', priorities: ['circulation', 'viewing'],
+          activity: 'watchTv', focalPointId: 'room-object:test-tv',
         }),
       }),
     });
@@ -68,5 +68,31 @@ describe('real deterministic planner pipeline', () => {
     expect(editor.getState().project).toEqual(initial);
     editor.getState().redo();
     expect(editor.getState().project).toEqual(applied);
+  });
+
+  it('applies a focal-free Conversation proposal in a zero-TV room', async () => {
+    installPlannerIntegrationTestAssets();
+    const initial = createPlannerIntegrationProject('no-tv');
+    const editor = createEditorStore(initial, storage);
+    usePlannerStore.getState().reset();
+    const orchestrator = createRealPlannerOrchestrator({
+      readProject: () => editor.getState().project,
+      store: {
+        beginAnalysis: () => usePlannerStore.getState().beginAnalysis(),
+        receiveProposal: (proposal) => usePlannerStore.getState().receiveProposal(proposal),
+        failAnalysis: (error) => usePlannerStore.getState().failAnalysis(error),
+      },
+      applyMoves: (moves, fingerprint) => editor.getState().applyPlanningMovesAtomic(moves, fingerprint),
+      createIntentProvider: () => ({ interpret: async () => ({ activity: 'conversation' }) }),
+    });
+    await orchestrator.beginAnalysisFromText('Conversation');
+    expect(usePlannerStore.getState().status).toBe('ready');
+    expect(usePlannerStore.getState().proposal?.findings.some((finding) => finding.ruleId === 'conversation.facing')).toBe(true);
+    usePlannerStore.getState().enterPreview();
+    expect(editor.getState().project).toEqual(initial);
+    expect(orchestrator.applyCurrentProposal?.()).toEqual({ ok: true });
+    expect(editor.getState().project).not.toEqual(initial);
+    editor.getState().undo();
+    expect(editor.getState().project).toEqual(initial);
   });
 });

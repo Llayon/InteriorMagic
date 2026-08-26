@@ -1,4 +1,4 @@
-import type { PlanningEntityId, PlanningGoal } from '../contracts';
+import type { PlanningEntityId, PlanningGoalV2 } from '../contracts';
 
 /**
  * Internal Track B input describing ONLY the focal entities the model is
@@ -24,7 +24,7 @@ export type PlanningIntentContext = {
  * {@link PlanningIntentInputError} BEFORE any provider invocation.
  */
 export type PlanningIntentResult =
-  | { outcome: 'success'; goal: PlanningGoal }
+  | { outcome: 'success'; goal: PlanningGoalV2 }
   | { outcome: 'unsupported_intent' }
   | { outcome: 'ambiguous_focal'; candidateIds: PlanningEntityId[] }
   | { outcome: 'invalid_model_output'; reason: string }

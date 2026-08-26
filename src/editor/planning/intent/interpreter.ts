@@ -1,5 +1,5 @@
-import { parsePlanningGoal } from '../contracts';
-import type { PlanningGoal } from '../contracts';
+import { parsePlanningGoalV2 } from '../contracts';
+import type { PlanningGoalV2 } from '../contracts';
 import { validatePlanningIntentContext } from './context';
 import { PlanningIntentInputError } from './inputError';
 import type { PlanningIntentProvider, PlanningIntentProviderRequest } from './provider';
@@ -41,7 +41,7 @@ const describeError = (error: unknown): string =>
  * The provider output is treated as untrusted external input:
  * 1. Track B sentinels ({intent: ...}) are recognized only as single-field
  *    objects;
- * 2. everything else must pass parsePlanningGoal() (structural authority,
+ * 2. everything else must pass parsePlanningGoalV2() (structural authority,
  *    unknown fields strictly rejected);
  * 3. focalPointId must then exist exactly once among the TV focal points
  *    explicitly supplied in the IntentContext (contextual validation).
@@ -80,6 +80,12 @@ export const interpretPlanningIntent = async (
       return { outcome: 'unsupported_intent' };
     }
     if (providerOutput['intent'] === 'ambiguous_focal') {
+      if (validated.tvFocalPoints.length <= 1) {
+        return {
+          outcome: 'invalid_model_output',
+          reason: 'ambiguous_focal requires multiple TV focal points',
+        };
+      }
       return {
         outcome: 'ambiguous_focal',
         candidateIds: validated.tvFocalPoints.map((focal) => focal.id),
@@ -91,18 +97,27 @@ export const interpretPlanningIntent = async (
     };
   }
 
-  let goal: PlanningGoal;
+  let goal: PlanningGoalV2;
   try {
-    goal = parsePlanningGoal(providerOutput);
+    goal = parsePlanningGoalV2(providerOutput);
   } catch (error) {
     return { outcome: 'invalid_model_output', reason: describeError(error) };
   }
 
-  const matches = validated.tvFocalPoints.filter((focal) => focal.id === goal.focalPointId);
-  const match = matches[0];
-  if (matches.length !== 1 || match === undefined || match.kind !== 'tv') {
-    return { outcome: 'unknown_focal_id', focalPointId: goal.focalPointId };
+  switch (goal.activity) {
+    case 'watchTv': {
+      const matches = validated.tvFocalPoints.filter((focal) => focal.id === goal.focalPointId);
+      const match = matches[0];
+      if (matches.length !== 1 || match === undefined || match.kind !== 'tv') {
+        return { outcome: 'unknown_focal_id', focalPointId: goal.focalPointId };
+      }
+      return { outcome: 'success', goal };
+    }
+    case 'conversation':
+      return { outcome: 'success', goal };
+    default: {
+      const unreachable: never = goal;
+      return unreachable;
+    }
   }
-
-  return { outcome: 'success', goal };
 };
