@@ -1,4 +1,5 @@
 import {
+  MAX_PLANNING_INTENT_FOCALS,
   MAX_PLANNING_INTENT_TEXT_LENGTH,
   PLANNING_INTENT_CONTRACT_VERSION,
   validatePlanningIntentContext,
@@ -6,7 +7,6 @@ import {
 } from '../../../src/editor/planning/intent';
 
 export const MAX_WIRE_BODY_BYTES = 16 * 1024;
-export const MAX_WIRE_FOCALS = 8;
 export const MAX_WIRE_FOCAL_ID_LENGTH = 256;
 export const MAX_WIRE_FOCAL_LABEL_LENGTH = 120;
 
@@ -41,7 +41,7 @@ export const parsePlanningIntentWireRequest = (value: unknown): {
     throw new PlanningIntentTransportError('text length is outside the allowed range');
   }
   const entries = value['focals'];
-  if (!Array.isArray(entries) || entries.length > MAX_WIRE_FOCALS) {
+  if (!Array.isArray(entries) || entries.length > MAX_PLANNING_INTENT_FOCALS) {
     throw new PlanningIntentTransportError('focals count is outside the allowed range');
   }
 

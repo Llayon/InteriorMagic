@@ -40,7 +40,7 @@ describe('Planning Contract v2 provider instructions', () => {
     ]);
   });
 
-  it('rejects tuning and multi-activity requests instead of silently dropping intent', () => {
+  it('instructs the provider to classify unsupported tuning and multi-activity requests', () => {
     expect(planningIntentSystemPrompt).toContain('priorities, relative preferences, planner tuning, or trade-offs');
     expect(planningIntentSystemPrompt).toContain('combines watchTv and conversation');
     for (const forbidden of ['coordinates', 'numeric weights']) {

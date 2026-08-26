@@ -23,6 +23,23 @@ describe('planning intent input and context hygiene', () => {
     expect(provider.requests).toEqual([]);
   });
 
+  it('enforces the shared focal-count bound before provider invocation', async () => {
+    const provider = providerFor({ activity: 'conversation' });
+    const eightTvContext: PlanningIntentContext = {
+      focalPoints: Array.from({ length: 8 }, (_, index) => ({ id: `tv-${index}`, kind: 'tv' as const })),
+    };
+    await expect(interpretPlanningIntent('x', eightTvContext, provider)).resolves.toEqual({
+      outcome: 'success', goal: { activity: 'conversation' },
+    });
+
+    const nineTvContext: PlanningIntentContext = {
+      focalPoints: Array.from({ length: 9 }, (_, index) => ({ id: `tv-${index}`, kind: 'tv' as const })),
+    };
+    await expect(interpretPlanningIntent('x', nineTvContext, provider)).rejects.toThrow(
+      'cannot contain more than 8 focal points',
+    );
+  });
+
   it('rejects blank, duplicate, and unsupported focal entries', async () => {
     const provider = providerFor({ activity: 'conversation' });
     const contexts = [

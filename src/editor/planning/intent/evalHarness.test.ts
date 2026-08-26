@@ -34,13 +34,13 @@ describe('planning intent eval harness (deterministic fake provider only)', () =
 
   it('reports per-case failures with expected vs actual outcome categories', async () => {
     const corrupted = planningIntentEvalCases.map((evalCase) =>
-      evalCase.id === 'e1-bedroom-ru'
+      evalCase.id === 'e1-provider-selected-a'
         ? {
             ...evalCase,
-            modelOutput: { activity: 'watchTv', focalPointId: 'tv-living' },
+            modelOutput: { activity: 'watchTv', focalPointId: 'tv-b' },
             expected: {
               outcome: 'success',
-              goal: { activity: 'watchTv', focalPointId: 'tv-bedroom' },
+              goal: { activity: 'watchTv', focalPointId: 'tv-a' },
             } as const,
           }
         : evalCase,
@@ -48,10 +48,10 @@ describe('planning intent eval harness (deterministic fake provider only)', () =
     const report = await runPlanningIntentEvals(corrupted);
     expect(report.failed).toBe(1);
     expect(report.failures).toHaveLength(1);
-    expect(report.failures[0]).toMatchObject({
-      id: 'e1-bedroom-ru',
+      expect(report.failures[0]).toMatchObject({
+      id: 'e1-provider-selected-a',
       group: 'multi_focal',
-      language: 'ru',
+      language: 'en',
       passed: false,
       expectedOutcome: 'success',
       actualOutcome: 'success',

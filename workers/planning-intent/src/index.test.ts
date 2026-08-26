@@ -108,6 +108,20 @@ describe('planning intent Worker', () => {
     });
   });
 
+  it('accepts the shared maximum of eight TV focals', async () => {
+    const response = await call(
+      {
+        ...wire('Classify this request'),
+        focals: Array.from({ length: 8 }, (_, index) => ({ id: `tv-${index}`, kind: 'tv' })),
+      },
+      vi.fn(async () => groqResponse('{"activity":"conversation"}')),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      ok: true, contractVersion: 2, output: { activity: 'conversation' },
+    });
+  });
+
   it('packages the canonical prompt, minimal context and proven Qwen hint', async () => {
     const bodies: Record<string, unknown>[] = [];
     const upstream = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {

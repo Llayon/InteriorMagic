@@ -21,10 +21,10 @@ export type PlanningIntentEvalCase = {
 
 const singleTv: PlanningIntentContext = { focalPoints: [{ id: 'tv-main', kind: 'tv' }] };
 const noTv: PlanningIntentContext = { focalPoints: [] };
-const livingBedroom: PlanningIntentContext = {
+const twoTvFocals: PlanningIntentContext = {
   focalPoints: [
-    { id: 'tv-living', kind: 'tv', label: 'Телевизор в гостиной' },
-    { id: 'tv-bedroom', kind: 'tv', label: 'Телевизор в спальне' },
+    { id: 'tv-a', kind: 'tv' },
+    { id: 'tv-b', kind: 'tv' },
   ],
 };
 const tvGoal = (focalPointId: string) => ({ activity: 'watchTv', focalPointId } as const);
@@ -32,7 +32,12 @@ const tvSuccess = (focalPointId: string): PlanningIntentResult => ({ outcome: 's
 const conversationSuccess: PlanningIntentResult = { outcome: 'success', goal: { activity: 'conversation' } };
 const unsupported: PlanningIntentResult = { outcome: 'unsupported_intent' };
 
-/** Deterministic Contract v2 corpus; model classification itself is evaluated separately. */
+/**
+ * Deterministic Contract v2 corpus; model classification itself is evaluated
+ * separately. Multi-focal cases characterize provider-selected supplied IDs,
+ * membership validation and ambiguity handling only. They do not establish
+ * semantic natural-language disambiguation between rooms.
+ */
 export const planningIntentEvalCases: readonly PlanningIntentEvalCase[] = [
   { id: 'a1-default-tv-ru', group: 'default_tv', text: 'Улучши просмотр телевизора.', context: singleTv, modelOutput: tvGoal('tv-main'), expected: tvSuccess('tv-main') },
   { id: 'a2-default-tv-en', group: 'default_tv', text: 'Improve the TV seating.', context: singleTv, modelOutput: tvGoal('tv-main'), expected: tvSuccess('tv-main') },
@@ -45,10 +50,10 @@ export const planningIntentEvalCases: readonly PlanningIntentEvalCase[] = [
   { id: 'd2-conversation-en', group: 'conversation', text: 'Make the seating better for conversation.', context: singleTv, modelOutput: { activity: 'conversation' }, expected: conversationSuccess },
   { id: 'd3-mixed-ru', group: 'conversation', text: 'Сделай удобно и смотреть телевизор, и разговаривать.', context: singleTv, modelOutput: { intent: 'unsupported_intent' }, expected: unsupported },
   { id: 'd4-conversation-ru', group: 'conversation', text: 'Подготовь кресла для беседы.', context: noTv, modelOutput: { activity: 'conversation' }, expected: conversationSuccess },
-  { id: 'e1-bedroom-ru', group: 'multi_focal', text: 'Улучши телевизор в спальне.', context: livingBedroom, modelOutput: tvGoal('tv-bedroom'), expected: tvSuccess('tv-bedroom') },
-  { id: 'e2-living-en', group: 'multi_focal', text: 'Improve TV watching in the living room.', context: livingBedroom, modelOutput: tvGoal('tv-living'), expected: tvSuccess('tv-living') },
-  { id: 'f1-ambiguous-ru', group: 'ambiguous_focal', text: 'Сделай телевизор удобнее.', context: livingBedroom, modelOutput: { intent: 'ambiguous_focal' }, expected: { outcome: 'ambiguous_focal', candidateIds: ['tv-living', 'tv-bedroom'] } },
-  { id: 'f2-ambiguous-en', group: 'ambiguous_focal', text: 'Make the TV nicer.', context: livingBedroom, modelOutput: { intent: 'ambiguous_focal' }, expected: { outcome: 'ambiguous_focal', candidateIds: ['tv-living', 'tv-bedroom'] } },
+  { id: 'e1-provider-selected-a', group: 'multi_focal', text: 'Improve one of the supplied TVs.', context: twoTvFocals, modelOutput: tvGoal('tv-a'), expected: tvSuccess('tv-a') },
+  { id: 'e2-provider-selected-b', group: 'multi_focal', text: 'Improve the other supplied TV.', context: twoTvFocals, modelOutput: tvGoal('tv-b'), expected: tvSuccess('tv-b') },
+  { id: 'f1-ambiguous-ru', group: 'ambiguous_focal', text: 'Сделай телевизор удобнее.', context: twoTvFocals, modelOutput: { intent: 'ambiguous_focal' }, expected: { outcome: 'ambiguous_focal', candidateIds: ['tv-a', 'tv-b'] } },
+  { id: 'f2-ambiguous-en', group: 'ambiguous_focal', text: 'Make the TV nicer.', context: twoTvFocals, modelOutput: { intent: 'ambiguous_focal' }, expected: { outcome: 'ambiguous_focal', candidateIds: ['tv-a', 'tv-b'] } },
   { id: 'g1-unsupported-ru', group: 'unsupported', text: 'Расставь кровать по фэншуй.', context: noTv, modelOutput: { intent: 'unsupported_intent' }, expected: unsupported },
   { id: 'g2-unsupported-ru', group: 'unsupported', text: 'Организуй рабочее место.', context: singleTv, modelOutput: { intent: 'unsupported_intent' }, expected: unsupported },
   { id: 'g3-unsupported-en', group: 'unsupported', text: 'Create an open-space circulation plan.', context: singleTv, modelOutput: { intent: 'unsupported_intent' }, expected: unsupported },

@@ -65,11 +65,30 @@ requires explicit contract and routing review; compile-time exhaustiveness must
 fail until its route is implemented.
 
 The AI emits bounded intent only. Pure TV and pure Conversation requests are
-representable. A request that combines activities or asks for relative planner
-preferences/tuning returns `unsupported_intent`; it is not silently reduced to
-a weaker goal. `ambiguous_focal` is TV-specific. Conversation proceeds with an
-empty TV-focal context, and deterministic Conversation applicability remains
-downstream of intent classification.
+representable. The provider is instructed to classify a request that combines
+activities or asks for relative planner preferences/tuning as
+`unsupported_intent`. This is a model-quality expectation, not a structural
+guarantee: a model could emit a structurally valid TV goal after silently
+ignoring part of a natural-language request, and Contract v2 cannot prove that
+omission. Such semantic classification quality must be evaluated separately;
+the deterministic fake-provider corpus does not establish it.
+
+`ambiguous_focal` is TV-specific and is valid only when multiple TV focal
+points are supplied. Conversation proceeds with an empty TV-focal context, and
+deterministic Conversation applicability remains downstream of intent
+classification.
+
+G2D does not establish semantic natural-language disambiguation between
+multiple TVs. Production focal descriptors currently use opaque technical IDs
+and do not provide authoritative room descriptions. The deterministic
+multi-focal cases therefore characterize a provider-selected supplied ID,
+contextual membership validation and ambiguity handling only. They do not
+prove that a request such as “TV in the bedroom” resolves to the correct TV.
+
+Planning intent context is bounded to at most eight focal descriptors. This is
+one shared application/Worker invariant; an oversized application context
+fails before provider invocation, and the Worker retains the same defensive
+wire validation. Focal descriptors are never silently truncated.
 
 `PlanProposal` remains unchanged:
 

@@ -5,6 +5,9 @@ import type { PlanningIntentContext, PlanningIntentFocalPoint } from './types';
 
 const supportedFocalKinds: ReadonlySet<string> = new Set<PlanningIntentFocalKind>(['tv']);
 
+/** Shared upper bound for the focal descriptors sent through planning intent. */
+export const MAX_PLANNING_INTENT_FOCALS = 8;
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -32,6 +35,12 @@ export const validatePlanningIntentContext = (
 ): ValidatedPlanningIntentContext => {
   if (!isRecord(context) || !Array.isArray(context['focalPoints'])) {
     throw new PlanningIntentInputError('PlanningIntentContext must contain a focalPoints array');
+  }
+
+  if (context['focalPoints'].length > MAX_PLANNING_INTENT_FOCALS) {
+    throw new PlanningIntentInputError(
+      `PlanningIntentContext cannot contain more than ${MAX_PLANNING_INTENT_FOCALS} focal points`,
+    );
   }
 
   const seenIds = new Set<PlanningEntityId>();

@@ -1,4 +1,4 @@
-export { validatePlanningIntentContext } from './context';
+export { MAX_PLANNING_INTENT_FOCALS, validatePlanningIntentContext } from './context';
 export type { ValidatedPlanningIntentContext } from './context';
 export { interpretPlanningIntent, MAX_PLANNING_INTENT_TEXT_LENGTH } from './interpreter';
 export { PlanningIntentInputError } from './inputError';
