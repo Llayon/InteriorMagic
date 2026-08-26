@@ -11,7 +11,7 @@ The local immutable revision and product integration are complete. This is not a
 - Base SHA: `cfaf3064555e1f61823c49533037cf4bc78092c6`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Tested implementation SHA: `5eed0e7` (fix-pass implementation head; this report commit follows)
+- Tested implementation SHA: `06cd5a7` (fix-pass implementation head; this report commit follows)
 - Asset revision: `sheen-chair-r1` for `sheenChair`
 - Local origin: Vite test/development middleware serves the committed `artifacts/ar0/sheen-chair/r1/` revision at same-origin `${BASE_URL}ar0/sheen-chair/r1/`; production Pages builds do not copy `artifacts/` into `dist/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
@@ -69,7 +69,7 @@ USDZ and poster:
 - Global browser/planner jobs use the default merge-context checkout again. A PR-only `ar0-evidence` job checks the exact PR head, runs staged AR0 verification and the dedicated AR0 suite.
 - Planner fixture E2E: **22 passed**; planner-real: **14 passed**; planner-intent: **4 passed**.
 - Typecheck, E2E typecheck, lint, production build (including the `dist/ar0` boundary check), staged AR0 verifier and `git diff --check`: passed.
-- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Quality, Chromium and planner jobs retain merge-context coverage; exact-head AR0 evidence is isolated to the PR-only job. Exact CI run/counts must be appended after the push.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Quality, Chromium and planner jobs retain merge-context coverage; exact-head AR0 evidence is isolated to the PR-only job.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
@@ -84,7 +84,7 @@ There is no runtime USDZ conversion, RoomProject change, planner change, Room Ge
 
 ## Landing-quality fix-pass handoff
 
-- Pushed head: `8cfdbac4e6678d132a2357248467dd249662ddce`.
-- Commits: `369a1de` (artifact/public boundary), `9fdbc26` (release verification and activation gates), `f41fdd7` (evidence report), `5eed0e7` (lazy editor bootstrap/planner import race), `8cfdbac` (final counts).
-- CI is pending for this exact head. The required checks are `quality`, `e2e-chromium`, `e2e-planner`, plus the PR-only `ar0-evidence` job.
+- Pushed implementation head: `06cd5a713405136dccf3a208319c3c2af6a920f4`.
+- Commits: `369a1de` (artifact/public boundary), `9fdbc26` (release verification and activation gates), `f41fdd7` (evidence report), `5eed0e7` (lazy editor bootstrap/planner import race), `8cfdbac` (final counts), `0bcb4d2` (PR handoff), `06cd5a7` (restore planner bootstrap timing).
+- Exact-head PR CI run `32994194582` completed with `quality` SUCCESS, `e2e-chromium` SUCCESS, `e2e-planner` SUCCESS, and PR-only `ar0-evidence` SUCCESS. The run tested exactly `06cd5a713405136dccf3a208319c3c2af6a920f4`; Pages build/deploy remained skipped for the pull request.
 - No R2 upload or remote verification, Pages deployment, merge, catalog/v1 mutation, or immutable r1 replacement occurred.
