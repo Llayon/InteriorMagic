@@ -11,7 +11,7 @@ The local immutable revision and product integration are complete. This is not a
 - Base SHA: `cfaf3064555e1f61823c49533037cf4bc78092c6`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Tested implementation SHA: `641739b` (fix-pass implementation and final verification head; this report-only correction follows)
+- Tested implementation/report SHA: `e9ee05ed7d5c8a95e6b83ee706159242d2b8c7cd` (fix-pass implementation plus report-only correction)
 - Asset revision: `sheen-chair-r1` for `sheenChair`
 - Local origin: Vite test/development middleware serves the committed `artifacts/ar0/sheen-chair/r1/` revision at same-origin `${BASE_URL}ar0/sheen-chair/r1/`; production Pages builds do not copy `artifacts/` into `dist/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
@@ -84,7 +84,7 @@ There is no runtime USDZ conversion, RoomProject change, planner change, Room Ge
 
 ## Landing-quality fix-pass handoff
 
-- Pushed implementation head: `641739b73b168d21272d0fc85c4145e1a06ab5c1`.
-- Commits: `369a1de` (artifact/public boundary), `9fdbc26` (release verification and activation gates), `f41fdd7` (evidence report), `5eed0e7` (lazy editor bootstrap/planner import race), `8cfdbac` (final counts), `0bcb4d2` (PR handoff), `06cd5a7` (restore planner bootstrap timing), `641739b` (final CI verification report).
-- Exact-head PR CI run `32995381463` completed with `quality` SUCCESS, `e2e-chromium` SUCCESS, `e2e-planner` SUCCESS, and PR-only `ar0-evidence` SUCCESS. The run tested exactly `641739b73b168d21272d0fc85c4145e1a06ab5c1`; Pages build/deploy remained skipped for the pull request.
+- Pushed implementation/report head: `e9ee05ed7d5c8a95e6b83ee706159242d2b8c7cd`.
+- Commits: `369a1de` (artifact/public boundary), `9fdbc26` (release verification and activation gates), `f41fdd7` (evidence report), `5eed0e7` (lazy editor bootstrap/planner import race), `8cfdbac` (final counts), `0bcb4d2` (PR handoff), `06cd5a7` (restore planner bootstrap timing), `641739b` (final CI verification report), `e9ee05e` (report head alignment).
+- Exact-head PR CI run `32996790892` completed with `quality` SUCCESS, `e2e-chromium` SUCCESS, `e2e-planner` SUCCESS, and PR-only `ar0-evidence` SUCCESS. The run tested exactly `e9ee05ed7d5c8a95e6b83ee706159242d2b8c7cd`; Pages build/deploy remained skipped for the pull request.
 - No R2 upload or remote verification, Pages deployment, merge, catalog/v1 mutation, or immutable r1 replacement occurred.
