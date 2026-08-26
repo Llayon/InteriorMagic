@@ -1,14 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initTelegram } from '@/telegram/telegram';
-import { initIdentity } from '@/platform/identity/client';
-import { installTestDiagnostics } from '@/test/diagnostics';
-import { bootstrapEditor } from '@/app/bootstrapEditor';
 import { isAr0Enabled } from '@/ar0/releaseGate';
 import '@/app/styles.css';
 
 initTelegram();
-initIdentity();
 
 const query = new URLSearchParams(window.location.search);
 const requestedArRevision = query.has('ar') ? (query.get('ar') ?? '') : null;
@@ -29,8 +25,8 @@ const bootstrap = async () => {
     );
     return;
   }
-  installTestDiagnostics();
   document.getElementById('root')!.innerHTML = '<main data-testid="app-root" aria-busy="true"></main>';
+  const { bootstrapEditor } = await import('@/app/bootstrapEditor');
   await bootstrapEditor();
 };
 

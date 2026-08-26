@@ -2,7 +2,7 @@
 
 Status: **NOT RUN**. Browser automation does not validate native Scene Viewer or Quick Look.
 
-Production activation remains **OFF**. `VITE_AR0_ENABLED=true` may be considered only after R2 verification and both device sections below pass; setting the flag does not itself prove QA.
+Production activation remains **OFF**. `VITE_AR0_ENABLED=true` may be considered only after R2 verification and both device sections below pass; setting the flag does not itself prove QA. The staged revision is not copied into Pages `dist/`; remote R2 publication remains a separate, explicitly authorized step.
 
 ## Locked acceptance before observation
 

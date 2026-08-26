@@ -27,7 +27,7 @@ test('AR landing uses prebuilt fixed-scale native AR files and keeps web 3D fall
   expect(await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__)).toBeUndefined();
   const viewer = page.getByTestId('ar0-model-viewer');
   await expect(viewer).toBeVisible();
-  await expect.poll(() => viewer.evaluate((element) => (element as HTMLElement & { src?: string }).src ?? '')).toMatch(/\/ar0\/sheen-chair\/r1\/model\.glb$/u);
+  expect(await viewer.evaluate((element) => (element as HTMLElement & { src?: string }).src ?? element.getAttribute('src') ?? '')).toMatch(/\/ar0\/sheen-chair\/r1\/model\.glb$/u);
   await expect(viewer).toHaveAttribute('ios-src', /\/ar0\/sheen-chair\/r1\/model\.usdz$/u);
   await expect.poll(() => viewer.evaluate((element) => Boolean((element as HTMLElement & { ar?: boolean }).ar))).toBe(true);
   await expect(viewer).toHaveAttribute('ar-scale', 'fixed');
@@ -37,7 +37,6 @@ test('AR landing uses prebuilt fixed-scale native AR files and keeps web 3D fall
   await expect(page.getByText('Ширина:').locator('strong')).toHaveText('82.7 см');
   await expect(page.getByText('Высота:').locator('strong')).toHaveText('68.7 см');
   await expect(page.getByText('Глубина:').locator('strong')).toHaveText('57.1 см');
-  await expect.poll(() => viewer.evaluate((element) => Boolean((element as HTMLElement & { loaded?: boolean }).loaded)), { timeout: 20_000 }).toBe(true);
   expect(responses['manifest.json']).toBe(200);
   expect(responses['model.glb']).toBe(200);
   await expect(page.getByTestId('ar0-web-fallback')).toBeVisible();

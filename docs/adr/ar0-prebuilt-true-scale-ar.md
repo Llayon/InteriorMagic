@@ -9,7 +9,7 @@ Status: Accepted for Track AR0.
 - GLB and USDZ belong to one immutable `sheen-chair-r1` revision. The runtime manifest owns file identity and SHA256 only.
 - `FurnitureAssetDefinition`, resolved through `getAsset(assetId)`, remains authoritative for dimensions, footprint, placement and semantic role. These facts are not copied into the revision manifest.
 - Native AR is fixed physical scale, floor placement only, using Android Scene Viewer and iOS Quick Look through prebuilt `ios-src`. WebXR is deferred.
-- Publication uses a new immutable `ar0/sheen-chair/r1/` R2 prefix. Existing `catalog/v1/**` objects are outside this contract and must remain untouched.
+- Publication, when separately authorized, uses a new immutable `ar0/sheen-chair/r1/` R2 prefix. The committed revision is staged under `artifacts/ar0/sheen-chair/r1/`, outside Vite's `public/` tree, so a normal Pages build cannot publish AR payloads. The current publisher is fail-closed and does not upload; existing `catalog/v1/**` objects are outside this contract and must remain untouched.
 - RoomPlan, scanning, full-room/multi-object AR, RoomProject integration and planner/Room Geometry changes are deferred.
 - Staged USDZ validation is fail-closed. CI requires committed `pxr.Usd/UsdGeom` evidence whose `assetRevisionId` and SHA256 match the exact immutable USDZ, with Y-up meter units, no unresolved dependencies, finite positive bounds and no axis differing from the canonical GLB by more than 1%.
 - Evidence bounds are internally checked: `size` must equal `max - min`, and `sizeMeters` must equal `size * metersPerUnit` within a numeric tolerance.
@@ -17,7 +17,7 @@ Status: Accepted for Track AR0.
 - A separate activation decision may set `VITE_AR0_ENABLED=true` only after R2 verification, Android physical QA and iOS physical/material QA pass. The flag is not evidence that those gates passed.
 - Conversion provenance takes Blender's actual version from `converter-report.json` and enforces the approved 5.2 line. Remote verification compares the normalized MIME of every immutable object, in addition to bytes, SHA256 and CORS.
 - Three `0.183.0` is an intentional cross-cutting dependency update required by pinned `@google/model-viewer` `4.3.1`.
-- Publication is fail-closed before remote access: local bytes must match `checksums.json`, incomplete immutable prefixes are rejected, and `checksums.json` is uploaded only after every missing payload.
+- Publication is fail-closed before remote access: local bytes must match `checksums.json`, incomplete immutable prefixes are rejected, `--verify` requires both the public R2 origin and the actual app origin, every artifact's normalized MIME/length/SHA256/CORS is checked, and `--upload` remains disabled until a conditional create-only publisher is available. No remote mutation occurs in this fix-pass.
 
 ## Consequences
 

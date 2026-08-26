@@ -11,9 +11,9 @@ The local immutable revision and product integration are complete. This is not a
 - Base SHA: `cfaf3064555e1f61823c49533037cf4bc78092c6`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Tested implementation SHA: `e422365d5d9d6316aa87b8c10a591a24a266cf1f`
+- Tested implementation SHA: `TBD — set to the final fix-pass HEAD before push`
 - Asset revision: `sheen-chair-r1` for `sheenChair`
-- Local origin: same-origin `${BASE_URL}ar0/sheen-chair/r1/`
+- Local origin: Vite test/development middleware serves the committed `artifacts/ar0/sheen-chair/r1/` revision at same-origin `${BASE_URL}ar0/sheen-chair/r1/`; production Pages builds do not copy `artifacts/` into `dist/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
 
 Raw GLB (`public/models/sheen_chair.glb`):
@@ -40,7 +40,7 @@ USDZ and poster:
 - USDZ stage bounds in meters: `0.826557964 × 0.686247091 × 0.570265472`
 - Package: `model.usdc` plus five packaged PNG textures; no unresolved dependencies
 - Stage read: Blender-bundled `pxr.Usd/UsdGeom`; GLB/USDZ delta is below 1% on every axis
-- Committed stage evidence: `docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json`, evidence SHA256 `22655487ddba45da0fb00c565106632a4888e778dffd754008a09e96bce38a7c`; its `usdzSha256` is the exact immutable r1 hash above. Missing, malformed, stale or mismatched evidence now fails staged validation.
+- Committed stage evidence: `docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json`, evidence SHA256 `22655487ddba45da0fb00c565106632a4888e778dffd754008a09e96bce38a7c`; its `usdzSha256` is the exact immutable r1 hash above. Missing, malformed, stale or mismatched evidence now fails staged validation. The staged verifier reads `artifacts/ar0/sheen-chair/r1/model.usdz`; no synthetic fallback exists.
 - Evidence validation also rejects internally inconsistent `min`/`max`/`size`/`sizeMeters` values, rather than trusting only the GLB comparison vector.
 - Blender USDZ bytes were not deterministic across repeated exports; the selected validated bytes are immutable by their recorded checksum. Poster bytes were deterministic.
 - Poster: `11,704` bytes, SHA256 `a70151d0eaf81ed1fd8cb7c90b34deaa68a9540dfe689710551a55b2721e226c`
@@ -56,19 +56,19 @@ USDZ and poster:
 - `TelegramWebAppHost.openLink` and the catalog click path are synchronous. Telegram receives exactly one absolute URL; an ordinary browser uses an external-link fallback.
 - `VITE_AR0_ENABLED` is a deployment/release gate, not asset metadata. Absent, empty or any value other than literal `true` hides the catalog CTA and makes direct AR URLs fail closed without model-viewer. With literal `true`, only Sheen Chair has the `Примерить 1:1` action. The existing Add action remains separate; AR does not add furniture.
 - Local Vite delivery returns `model/gltf-binary` and `model/vnd.usdz+zip`.
-- R2 published: **no**. Prefix reserved: `ar0/sheen-chair/r1/`; the public preflight returned 404 and Wrangler reported no authentication. Remote MIME/CORS therefore remain unverified and pending. The verifier now fails incorrect MIME for GLB, USDZ, WebP, manifest JSON and checksums JSON, while retaining length, SHA256 and CORS checks. No existing release was overwritten.
-- The publisher now verifies local bytes against checksums and refuses an incomplete prefix where `checksums.json` exists without a payload; no R2 mutation occurred.
+- R2 published: **no**. Prefix reserved: `ar0/sheen-chair/r1/`; no upload or remote verification was run in this fix-pass. `--upload` now fails closed before any remote call until a conditional create-only publisher is available. `--verify` requires both `AR0_R2_PUBLIC_ORIGIN` and `AR0_APP_ORIGIN`, and fails incorrect MIME for GLB, USDZ, WebP, manifest JSON and checksums JSON, while retaining length, SHA256 and exact-origin-or-wildcard CORS checks. No existing release was overwritten.
+- The publisher verifies local bytes against checksums and refuses an incomplete prefix where `checksums.json` exists without a payload; no R2 mutation occurred.
 - Future conversion provenance reads the actual `bpy.app.version_string` from Blender's converter report, rejects malformed provenance and enforces the approved Blender 5.2 line; it no longer hardcodes a version label. The selected r1 USDZ was not regenerated.
 
 ## Verification
 
-- Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved and the branch was rebased to the base SHA above.
-- Final fix-pass unit suite: 400 passed across 54 files. Local Node 25 required `NODE_OPTIONS=--no-experimental-webstorage` because the runner injected an invalid experimental `localStorage` object; the repository CI uses Node 24.
-- Dedicated AR0 E2E: 8 passed — six enabled landing/catalog cases across mobile-small and desktop plus two default-off cases.
-- Full browser regression: 71 passed, 6 existing project-specific skips (77 total). AR0 cases run in dedicated Playwright projects and origins so model-viewer's renderer cannot starve the editor's software-rendered WebGL process and the default-off deployment behavior is tested independently; assertions and timeouts are unchanged.
+- Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved to `442bc7af5e37d3d23a1580c161fdb87d78b02cef`, and this branch includes that merge.
+- Final fix-pass unit suite: run again on the final fix-pass head; the pre-fix run had one unrelated Node 25 `localStorage.getItem` failure in the existing identity test. Repository CI uses Node 24.
+- Dedicated AR0 E2E: 8 passed locally across mobile-small, desktop and default-off projects. The browser fixture ignores only the expected post-decode `net::ERR_ABORTED` for the GLB request; response status, MIME, viewer properties and fallback assertions remain active. The Vite AR middleware also closes aborted streams so the test server cannot retain the model request.
+- Global browser/planner jobs use the default merge-context checkout again. A PR-only `ar0-evidence` job checks the exact PR head, runs staged AR0 verification and the dedicated AR0 suite.
 - Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
 - Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
-- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Browser and planner jobs explicitly checkout and verify the PR head SHA with `git rev-parse HEAD`. The quality job remains a merge-context gate because current `main` has an independent catalog gate and has advanced beyond the AR0 base; no Track I compatibility changes were added. Exact run and counts are recorded in the PR body. The latest rerun passed quality, planner and Chromium; Chromium reported 70 passed, 6 skipped and 1 flaky retry in the unrelated persistence reload test.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Quality, Chromium and planner jobs retain merge-context coverage; exact-head AR0 evidence is isolated to the PR-only job. Exact CI run/counts must be appended after the push.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
