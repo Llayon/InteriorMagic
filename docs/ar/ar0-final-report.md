@@ -11,7 +11,7 @@ The local immutable revision and product integration are complete. This is not a
 - Base SHA: `cfaf3064555e1f61823c49533037cf4bc78092c6`
 - Branch: `feature/ar0-prebuilt-sheen-chair`
 - Worktree: `C:\Users\Max\InteriorMagic\.worktrees\ar0-prebuilt-sheen-chair`
-- Tested implementation SHA: `9fdbc26` (fix-pass implementation head; final documentation commit follows)
+- Tested implementation SHA: `5eed0e7` (fix-pass implementation head; this report commit follows)
 - Asset revision: `sheen-chair-r1` for `sheenChair`
 - Local origin: Vite test/development middleware serves the committed `artifacts/ar0/sheen-chair/r1/` revision at same-origin `${BASE_URL}ar0/sheen-chair/r1/`; production Pages builds do not copy `artifacts/` into `dist/`
 - AR URL: absolute application URL under `BASE_URL`, query `?ar=sheen-chair-r1`
@@ -65,8 +65,9 @@ USDZ and poster:
 - Initial baseline at the then-current `ba9a721`: 279 unit tests passed; typecheck, E2E typecheck, lint and build passed. Main later moved to `442bc7af5e37d3d23a1580c161fdb87d78b02cef`, and this branch includes that merge.
 - Final fix-pass unit suite: **461 passed across 57 files** with `NODE_OPTIONS=--no-experimental-webstorage` on local Node 25. The option only compensates for the runner's invalid experimental localStorage object; repository CI uses Node 24.
 - Dedicated AR0 E2E: 8 passed locally across mobile-small, desktop and default-off projects. The browser fixture ignores only the expected post-decode `net::ERR_ABORTED` for the GLB request; response status, MIME, viewer properties and fallback assertions remain active. The Vite AR middleware also closes aborted streams so the test server cannot retain the model request.
+- Full browser regression: **73 passed, 6 existing project-specific skips (79 total)**; AR0 cases remain isolated in dedicated projects and the default-off deployment behavior is covered independently.
 - Global browser/planner jobs use the default merge-context checkout again. A PR-only `ar0-evidence` job checks the exact PR head, runs staged AR0 verification and the dedicated AR0 suite.
-- Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
+- Planner fixture E2E: **22 passed**; planner-real: **14 passed**; planner-intent: **4 passed**.
 - Typecheck, E2E typecheck, lint, production build (including the `dist/ar0` boundary check), staged AR0 verifier and `git diff --check`: passed.
 - Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Quality, Chromium and planner jobs retain merge-context coverage; exact-head AR0 evidence is isolated to the PR-only job. Exact CI run/counts must be appended after the push.
 - Android physical QA: **NOT RUN**.
