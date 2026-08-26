@@ -68,7 +68,7 @@ USDZ and poster:
 - Full browser regression: 71 passed, 6 existing project-specific skips (77 total). AR0 cases run in dedicated Playwright projects and origins so model-viewer's renderer cannot starve the editor's software-rendered WebGL process and the default-off deployment behavior is tested independently; assertions and timeouts are unchanged.
 - Planner fixture E2E: 22 passed; planner-real: 14 passed; planner-intent: 2 passed.
 - Typecheck, E2E typecheck, lint, production build, staged AR0 verifier and `git diff --check`: passed.
-- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). CI checkout is explicitly pinned to the PR head SHA for pull requests and verifies `git rev-parse HEAD`; the exact run and counts are recorded in the PR body after push.
+- Draft PR: [#18](https://github.com/Llayon/InteriorMagic/pull/18). Browser and planner jobs explicitly checkout and verify the PR head SHA with `git rev-parse HEAD`. The quality job remains a merge-context gate because current `main` has an independent catalog gate and has advanced beyond the AR0 base; no Track I compatibility changes were added. Exact run and counts are recorded in the PR body.
 - Android physical QA: **NOT RUN**.
 - iOS physical QA: **NOT RUN**.
 
