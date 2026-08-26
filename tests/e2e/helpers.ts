@@ -2,10 +2,17 @@ import { expect, type CDPSession, type Page } from '@playwright/test';
 
 export type Point = { x: number; y: number };
 
+export async function waitForEditorReady(page: Page) {
+  await expect.poll(
+    () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady()),
+    { timeout: 15_000 },
+  ).toBe(true);
+}
+
 export async function openApp(page: Page) {
   await page.goto('/');
   await expect(page.getByTestId('app-root')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady()), { timeout: 15_000 }).toBe(true);
+  await waitForEditorReady(page);
 }
 
 export async function project(page: Page) {
