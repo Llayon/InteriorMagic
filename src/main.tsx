@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initTelegram } from '@/telegram/telegram';
+import { bootstrapEditor } from '@/app/bootstrapEditor';
 import { isAr0Enabled } from '@/ar0/releaseGate';
 import '@/app/styles.css';
 
@@ -26,15 +27,6 @@ const bootstrap = async () => {
     return;
   }
   document.getElementById('root')!.innerHTML = '<main data-testid="app-root" aria-busy="true"></main>';
-  const editorBootstrap = import('@/app/bootstrapEditor');
-  const requestedPlanningRoom = query.get('planning-test-room');
-  if (requestedPlanningRoom === 'improved' || requestedPlanningRoom === 'already-good' || requestedPlanningRoom === 'no-tv') {
-    // Warm the test-only integration fixture in parallel with the editor chunk;
-    // this keeps the standalone AR route isolated while avoiding a nested Vite
-    // dev-server import race in planner integration browsers.
-    await import('@/app/demo/plannerIntegrationRoom');
-  }
-  const { bootstrapEditor } = await editorBootstrap;
   await bootstrapEditor();
 };
 
