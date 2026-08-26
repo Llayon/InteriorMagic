@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { renderInventoryMarkdown } from '../../scripts/catalog/render-inventory-md.mjs';
+import { renderInventoryMarkdown } from '../../../scripts/catalog/render-inventory-md.mjs';
 import { readFile } from 'node:fs/promises';
 
 test('rendered markdown contains the seven required headings', () => {

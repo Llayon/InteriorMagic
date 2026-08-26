@@ -104,7 +104,7 @@ describe('real planner orchestrator', () => {
       store: ui.port,
       resolveAsset: resolveIntegrationAsset,
       applyMoves: () => ({ ok: true }),
-      plan: () => { throw new PlanningError(code, 'internal planning detail'); },
+      planGoal: () => { throw new PlanningError(code, 'internal planning detail'); },
     });
 
     await orchestrator.beginAnalysis();
@@ -121,7 +121,7 @@ describe('real planner orchestrator', () => {
       store: ui.port,
       resolveAsset: resolveIntegrationAsset,
       applyMoves: () => ({ ok: true }),
-      plan: () => { throw new Error('internal planning detail'); },
+      planGoal: () => { throw new Error('internal planning detail'); },
     });
 
     await orchestrator.beginAnalysis();

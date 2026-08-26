@@ -47,10 +47,19 @@ describe('bootstrapIdentity', () => {
   it('remains anonymous outside Telegram (no initData)', async () => {
     vi.stubEnv('VITE_APP_API_ENDPOINT', 'https://example.invalid');
     vi.stubGlobal('window', {});
-    globalThis.fetch = vi.fn() as unknown as typeof fetch;
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        return new Response(JSON.stringify({ ok: false, error: { code: 'unauthenticated' } }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({ ok: false }), { status: 404 });
+    }) as unknown as typeof fetch;
     await bootstrapIdentity();
     expect(getIdentitySnapshot()).toEqual({ state: 'anonymous' });
-    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const firstCall = (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]! as [string, RequestInit];
+    expect(firstCall[0]).toContain('/session');
+    expect(firstCall[1]?.credentials).toBe('include');
   });
 
   it('remains anonymous when endpoint missing (feature disabled)', async () => {
@@ -70,14 +79,27 @@ describe('bootstrapIdentity', () => {
     const initData = await signInitData(params, BOT_TOKEN);
     vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData } } });
     const mockUserId = 'user-uuid-123';
-    globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ user: { id: mockUserId }, identity: { provider: 'telegram' } }) } as Response) as unknown as typeof fetch;
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        return new Response(JSON.stringify({ ok: false, error: { code: 'unauthenticated' } }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (url.includes('/auth/telegram')) {
+        // Check credentials include
+        expect(init?.credentials).toBe('include');
+        return new Response(JSON.stringify({ user: { id: mockUserId }, identity: { provider: 'telegram' } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
+      return new Response('', { status: 404 });
+    }) as unknown as typeof fetch;
     await bootstrapIdentity();
     expect(getIdentitySnapshot()).toEqual({ state: 'authenticated', userId: mockUserId });
-    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
-    const fetchCall = (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
-    expect(fetchCall[0]).toContain('/auth/telegram');
-    expect(fetchCall[1].body).toBe(JSON.stringify({ initData }));
-    // raw initData not persisted in store beyond request
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+    const calls = (globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls as Array<[string, RequestInit]>;
+    expect(calls[0]![0]).toContain('/session');
+    expect(calls[0]![1]?.credentials).toBe('include');
+    expect(calls[1]![0]).toContain('/auth/telegram');
+    expect(calls[1]![1]?.credentials).toBe('include');
+    expect(calls[1]![1]?.body).toBe(JSON.stringify({ initData }));
     expect(getIdentitySnapshot().userId).toBe(mockUserId);
   });
 
@@ -86,10 +108,18 @@ describe('bootstrapIdentity', () => {
     const params = makeValidParams();
     const initData = await signInitData(params, BOT_TOKEN);
     vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData } } });
-    globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401, json: async () => ({ ok: false, error: { code: 'invalid_init_data' } }) } as Response) as unknown as typeof fetch;
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        return new Response(JSON.stringify({ ok: false, error: { code: 'unauthenticated' } }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (url.includes('/auth/telegram')) {
+        return new Response(JSON.stringify({ ok: false, error: { code: 'invalid_init_data' } }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+      }
+      return new Response('', { status: 404 });
+    }) as unknown as typeof fetch;
     await bootstrapIdentity();
     expect(getIdentitySnapshot()).toEqual({ state: 'failed' });
-    // editor still usable: check editor store not corrupted
     const { useEditorStore } = await import('@/editor/state/store');
     expect(useEditorStore.getState().project.version).toBe(1);
   });
@@ -99,12 +129,76 @@ describe('bootstrapIdentity', () => {
     const params = makeValidParams();
     const initData = await signInitData(params, BOT_TOKEN);
     vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData } } });
-    globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ user: { id: 'u1' } }) } as Response) as unknown as typeof fetch;
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        return new Response(JSON.stringify({ ok: false, error: { code: 'unauthenticated' } }), { status: 401 });
+      }
+      if (url.includes('/auth/telegram')) {
+        return new Response(JSON.stringify({ user: { id: 'u1' } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
+      return new Response('', { status: 404 });
+    }) as unknown as typeof fetch;
     await bootstrapIdentity();
-    // store only has userId, not initData
     const snap = getIdentitySnapshot();
     expect(snap).not.toHaveProperty('initData');
-    // ensure localStorage not used for initData if present
     if (typeof localStorage !== 'undefined') expect(localStorage.getItem('initData')).toBeNull();
+  });
+
+  it('existing valid session: GET /session succeeds and POST not called', async () => {
+    vi.stubEnv('VITE_APP_API_ENDPOINT', 'https://example.invalid');
+    vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData: 'query_id=abc&user=%7B%22id%22%3A1%7D&auth_date=1&hash=abc' } } });
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        return new Response(JSON.stringify({ authenticated: true, user: { id: 'existing-user' } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      }
+      return new Response('', { status: 404 });
+    }) as unknown as typeof fetch;
+    await bootstrapIdentity();
+    expect(getIdentitySnapshot()).toEqual({ state: 'authenticated', userId: 'existing-user' });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    expect((globalThis.fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0]![0]).toContain('/session');
+  });
+
+  it('no session + Telegram initData: GET 401 then POST', async () => {
+    vi.stubEnv('VITE_APP_API_ENDPOINT', 'https://example.invalid');
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData } } });
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        return new Response(JSON.stringify({ ok: false, error: { code: 'unauthenticated' } }), { status: 401 });
+      }
+      if (url.includes('/auth/telegram')) {
+        return new Response(JSON.stringify({ user: { id: 'new-user' } }), { status: 200 });
+      }
+      return new Response('', { status: 404 });
+    }) as unknown as typeof fetch;
+    await bootstrapIdentity();
+    expect(getIdentitySnapshot()).toEqual({ state: 'authenticated', userId: 'new-user' });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses credentials:include for both requests', async () => {
+    vi.stubEnv('VITE_APP_API_ENDPOINT', 'https://example.invalid');
+    const params = makeValidParams();
+    const initData = await signInitData(params, BOT_TOKEN);
+    vi.stubGlobal('window', { Telegram: { WebApp: { platform: 'ios', initData } } });
+    globalThis.fetch = vi.fn().mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+      if (url.includes('/session')) {
+        expect(init?.credentials).toBe('include');
+        return new Response(JSON.stringify({ ok: false, error: { code: 'unauthenticated' } }), { status: 401 });
+      }
+      if (url.includes('/auth/telegram')) {
+        expect(init?.credentials).toBe('include');
+        return new Response(JSON.stringify({ user: { id: 'u1' } }), { status: 200 });
+      }
+      return new Response('', { status: 404 });
+    }) as unknown as typeof fetch;
+    await bootstrapIdentity();
+    expect(getIdentitySnapshot().state).toBe('authenticated');
   });
 });

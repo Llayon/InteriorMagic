@@ -122,7 +122,7 @@ const findings = (
   if (outcome !== 'improved') return [{
     ruleId: 'layout.selection',
     code: `layout-${outcome}`,
-    severity: outcome === 'no-valid-plan' ? 'warning' : 'info',
+    severity: outcome === 'no-valid-plan' || outcome === 'search-incomplete' ? 'warning' : 'info',
     params: { score: before.total },
   }];
   const result: PlanningFinding[] = [];

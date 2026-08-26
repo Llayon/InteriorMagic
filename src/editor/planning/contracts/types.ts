@@ -1,12 +1,23 @@
 export type PlanningEntityId = string;
 
-export type PlanningPriority = 'viewing' | 'circulation' | 'conversation';
+export type PlanningPriorityV1 = 'viewing' | 'circulation' | 'conversation';
 
-export type PlanningGoal = {
+export type PlanningGoalV1 = {
   activity: 'watchTv';
   focalPointId: PlanningEntityId;
-  priorities?: PlanningPriority[];
+  priorities?: PlanningPriorityV1[];
 };
+
+export type WatchTvGoalV2 = {
+  activity: 'watchTv';
+  focalPointId: PlanningEntityId;
+};
+
+export type ConversationGoalV2 = {
+  activity: 'conversation';
+};
+
+export type PlanningGoalV2 = WatchTvGoalV2 | ConversationGoalV2;
 
 export type ProposedMove = {
   instanceId: string;

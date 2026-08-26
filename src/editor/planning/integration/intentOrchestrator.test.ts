@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { PlanProposal, PlanningGoal } from '@/editor/planning/contracts';
+import type { PlanProposal, PlanningGoalV2 } from '@/editor/planning/contracts';
 import { createRealPlannerOrchestrator } from './realOrchestrator';
 import { createIntegrationProject, resolveIntegrationAsset } from './testFixtures';
 
@@ -26,21 +26,37 @@ describe('real planner intent analysis port', () => {
     const project = createIntegrationProject();
     const snapshot = structuredClone(project);
     const ui = uiPort();
-    let receivedGoal: PlanningGoal | null = null;
+    let receivedGoal: PlanningGoalV2 | null = null;
     const orchestrator = createRealPlannerOrchestrator({
       readProject: () => project, store: ui.port, resolveAsset: resolveIntegrationAsset,
       applyMoves: () => ({ ok: true }),
       createIntentProvider: outputProvider({
-        activity: 'watchTv', focalPointId: 'room-object:tv', priorities: ['circulation', 'viewing'],
+        activity: 'watchTv', focalPointId: 'room-object:tv',
       }),
-      plan: (scene, goal) => { receivedGoal = goal; return { moves: [], findings: [], scoreBefore: { total: 1 }, scoreAfter: { total: 1 } }; },
+      planGoal: (scene, goal) => { receivedGoal = goal; return { moves: [], findings: [], scoreBefore: { total: 1 }, scoreAfter: { total: 1 } }; },
     });
     await orchestrator.beginAnalysisFromText('Главное — проход');
     expect(receivedGoal).toEqual({
-      activity: 'watchTv', focalPointId: 'room-object:tv', priorities: ['circulation', 'viewing'],
+      activity: 'watchTv', focalPointId: 'room-object:tv',
     });
     expect(ui.state.status).toBe('ready');
     expect(project).toEqual(snapshot);
+  });
+
+  it('routes Conversation in a room with zero TVs without focal validation', async () => {
+    const project = createIntegrationProject({ tv: false });
+    const ui = uiPort();
+    const orchestrator = createRealPlannerOrchestrator({
+      readProject: () => project,
+      store: ui.port,
+      resolveAsset: resolveIntegrationAsset,
+      applyMoves: () => ({ ok: true }),
+      createIntentProvider: outputProvider({ activity: 'conversation' }),
+    });
+    await orchestrator.beginAnalysisFromText('Сделай удобнее для общения с гостями');
+    expect(ui.state.status).toBe('ready');
+    expect(ui.state.proposal?.moves.length).toBeGreaterThan(0);
+    expect(ui.state.proposal?.findings.some((finding) => finding.ruleId === 'conversation.facing')).toBe(true);
   });
 
   it.each([
@@ -54,7 +70,7 @@ describe('real planner intent analysis port', () => {
     const plan = vi.fn();
     const orchestrator = createRealPlannerOrchestrator({
       readProject: () => project, store: ui.port, resolveAsset: resolveIntegrationAsset,
-      applyMoves: () => ({ ok: true }), createIntentProvider: outputProvider(output), plan,
+      applyMoves: () => ({ ok: true }), createIntentProvider: outputProvider(output), planGoal: plan,
     });
     await orchestrator.beginAnalysisFromText('request');
     expect(ui.state.status).toBe('error');
@@ -84,7 +100,7 @@ describe('real planner intent analysis port', () => {
     const orchestrator = createRealPlannerOrchestrator({
       readProject: () => project, store: ui.port, resolveAsset: resolveIntegrationAsset,
       applyMoves: () => ({ ok: true }),
-      createIntentProvider: outputProvider({ activity: 'watchTv', focalPointId: 'room-object:tv' }, wait), plan,
+      createIntentProvider: outputProvider({ activity: 'watchTv', focalPointId: 'room-object:tv' }, wait), planGoal: plan,
     });
     const pending = orchestrator.beginAnalysisFromText('request');
     await vi.waitFor(() => expect(ui.state.status).toBe('loading'));

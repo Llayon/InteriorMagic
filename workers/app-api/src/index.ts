@@ -1,4 +1,15 @@
 import { getOrCreateUserId } from './db';
+import {
+  buildExpiredCookieHeader,
+  buildSetCookieHeader,
+  createSession,
+  deleteSessionByTokenHash,
+  getSessionByTokenHash,
+  hashToken,
+  parseCookieHeader,
+  parseSessionTtlEnv,
+  sessionCookiePolicy,
+} from './session';
 import { parseMaxAgeEnv, TelegramVerificationError, verifyTelegramInitData } from './telegram';
 
 export const MAX_WIRE_BODY_BYTES = 16 * 1024;
@@ -10,12 +21,14 @@ export type WorkerErrorCode =
   | 'invalid_init_data'
   | 'init_data_expired'
   | 'payload_too_large'
-  | 'internal_error';
+  | 'internal_error'
+  | 'unauthenticated';
 
 const corsHeaders = (origin: string) => ({
   'Access-Control-Allow-Origin': origin,
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Credentials': 'true',
   Vary: 'Origin',
 });
 
@@ -77,28 +90,102 @@ const parseBody = (text: string): { initData: string } => {
   return { initData };
 };
 
+export async function requireSession(request: Request, env: AppApiWorkerEnv, now: number = Date.now()): Promise<string | null> {
+  const policy = sessionCookiePolicy(env);
+  if (!policy) return null;
+  const cookieHeader = request.headers.get('cookie');
+  const rawToken = parseCookieHeader(cookieHeader, policy.name);
+  if (!rawToken) return null;
+  if (!env.DB) return null;
+  const hash = await hashToken(rawToken);
+  const row = await getSessionByTokenHash(env.DB, hash, now);
+  if (!row) return null;
+  return row.user_id;
+}
+
 export const createAppApiHandler = () =>
   async (request: Request, env: AppApiWorkerEnv): Promise<Response> => {
     const url = new URL(request.url);
-    if (url.pathname !== '/auth/telegram') return errorResponse('invalid_request', 404);
 
     const allowedOrigin = configuredOrigin(env.ALLOWED_ORIGIN);
     if (allowedOrigin === null) return errorResponse('server_misconfigured', 503);
 
-    const maxAge = parseMaxAgeEnv(env.TELEGRAM_INIT_DATA_MAX_AGE_SECONDS);
-    if (maxAge === null) return errorResponse('server_misconfigured', 503);
-
     const requestOrigin = request.headers.get('origin');
-    if (requestOrigin !== allowedOrigin) return errorResponse('origin_forbidden', 403);
+
+    // Helper for same-origin GET
+    const isOriginAllowedForGet = (): boolean => {
+      if (requestOrigin === allowedOrigin) return true;
+      if (requestOrigin === null && new URL(request.url).origin === allowedOrigin) return true;
+      return false;
+    };
+    const isOriginAllowedForMutating = (): boolean => requestOrigin === allowedOrigin;
 
     if (request.method === 'OPTIONS') {
+      if (requestOrigin !== allowedOrigin) return errorResponse('origin_forbidden', 403);
       return new Response(null, { status: 204, headers: corsHeaders(allowedOrigin) });
     }
 
+    // GET /session — check existing cookie session (no Telegram config needed)
+    if (url.pathname === '/session') {
+      if (request.method !== 'GET') return errorResponse('invalid_request', 405, allowedOrigin);
+      // For GET, allow same-origin without Origin, otherwise require exact Origin
+      if (!isOriginAllowedForGet()) return errorResponse('origin_forbidden', 403);
+      if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      const policy = sessionCookiePolicy(env);
+      if (!policy) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      const originForCors = requestOrigin === allowedOrigin ? allowedOrigin : undefined;
+      const cookieHeader = request.headers.get('cookie');
+      const rawToken = parseCookieHeader(cookieHeader, policy.name);
+      if (!rawToken) return errorResponse('unauthenticated', 401, originForCors);
+      const hash = await hashToken(rawToken);
+      const session = await getSessionByTokenHash(env.DB, hash, Date.now());
+      if (!session) return errorResponse('unauthenticated', 401, originForCors);
+      return json({ authenticated: true, user: { id: session.user_id } }, 200, originForCors);
+    }
+
+    // POST /logout — idempotent, hash and delete, expire cookie (no Telegram config)
+    if (url.pathname === '/logout') {
+      if (request.method !== 'POST') return errorResponse('invalid_request', 405, allowedOrigin);
+      if (!isOriginAllowedForMutating()) return errorResponse('origin_forbidden', 403);
+      const policy = sessionCookiePolicy(env);
+      if (!policy) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      // Zero-body contract: bounded read, any non-whitespace body → 400
+      const contentLength = request.headers.get('content-length');
+      if (contentLength !== null && Number(contentLength) > MAX_WIRE_BODY_BYTES) {
+        return errorResponse('payload_too_large', 413, allowedOrigin);
+      }
+      if (request.body) {
+        try {
+          const text = await readBoundedText(request.body, MAX_WIRE_BODY_BYTES);
+          if (text.trim().length > 0) {
+            return errorResponse('invalid_request', 400, allowedOrigin);
+          }
+        } catch (e) {
+          if (e instanceof Error && e.message === 'payload_too_large') return errorResponse('payload_too_large', 413, allowedOrigin);
+          return errorResponse('invalid_request', 400, allowedOrigin);
+        }
+      }
+      const cookieHeader = request.headers.get('cookie');
+      const rawToken = parseCookieHeader(cookieHeader, policy.name);
+      if (rawToken) {
+        const hash = await hashToken(rawToken);
+        await deleteSessionByTokenHash(env.DB, hash);
+      }
+      const headers = { ...corsHeaders(allowedOrigin), 'Cache-Control': 'no-store' } as Record<string, string>;
+      headers['Set-Cookie'] = buildExpiredCookieHeader(policy);
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...headers, 'Content-Type': 'application/json' } });
+    }
+
+    // POST /auth/telegram — Telegram bootstrap, creates first-party session + Set-Cookie
+    if (url.pathname !== '/auth/telegram') return errorResponse('invalid_request', 404);
+
     if (request.method !== 'POST') return errorResponse('invalid_request', 405, allowedOrigin);
+    if (!isOriginAllowedForMutating()) return errorResponse('origin_forbidden', 403);
 
     const contentType = request.headers.get('content-type');
-    if (contentType === null || !contentType.toLowerCase().startsWith('application/json')) {
+    const mediaType = contentType?.split(';', 1)[0]?.trim().toLowerCase();
+    if (mediaType !== 'application/json') {
       return errorResponse('invalid_request', 415, allowedOrigin);
     }
 
@@ -107,11 +194,19 @@ export const createAppApiHandler = () =>
       return errorResponse('payload_too_large', 413, allowedOrigin);
     }
 
+    // Route-specific config: Telegram + TTL only for auth bootstrap
+    const maxAge = parseMaxAgeEnv(env.TELEGRAM_INIT_DATA_MAX_AGE_SECONDS);
+    if (maxAge === null) return errorResponse('server_misconfigured', 503, allowedOrigin);
+    const ttl = parseSessionTtlEnv(env.SESSION_TTL_SECONDS);
+    if (ttl === null) return errorResponse('server_misconfigured', 503, allowedOrigin);
+    const policy = sessionCookiePolicy(env);
+    if (!policy) return errorResponse('server_misconfigured', 503, allowedOrigin);
+
     if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
 
-    const rawToken = (env as unknown as { TELEGRAM_BOT_TOKEN?: unknown }).TELEGRAM_BOT_TOKEN;
-    if (typeof rawToken !== 'string' || rawToken.trim().length === 0) return errorResponse('server_misconfigured', 503, allowedOrigin);
-    const botToken = rawToken.trim();
+    const rawTokenSecret = (env as unknown as { TELEGRAM_BOT_TOKEN?: unknown }).TELEGRAM_BOT_TOKEN;
+    if (typeof rawTokenSecret !== 'string' || rawTokenSecret.trim().length === 0) return errorResponse('server_misconfigured', 503, allowedOrigin);
+    const botToken = rawTokenSecret.trim();
 
     let initData: string;
     try {
@@ -139,7 +234,14 @@ export const createAppApiHandler = () =>
 
     try {
       const userId = await getOrCreateUserId(env.DB, 'telegram', providerSubject);
-      return json({ user: { id: userId }, identity: { provider: 'telegram' } }, 200, allowedOrigin);
+      const now = Date.now();
+      const { rawToken } = await createSession(env.DB, userId, now, ttl);
+      const setCookie = buildSetCookieHeader(policy, rawToken, ttl);
+      const headers = { ...corsHeaders(allowedOrigin), 'Cache-Control': 'no-store', 'Set-Cookie': setCookie } as Record<string, string>;
+      return new Response(JSON.stringify({ user: { id: userId }, identity: { provider: 'telegram' } }), {
+        status: 200,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
     } catch {
       return errorResponse('internal_error', 500, allowedOrigin);
     }

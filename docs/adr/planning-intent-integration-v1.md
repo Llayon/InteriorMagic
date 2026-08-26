@@ -1,6 +1,7 @@
 # Planning intent integration v1
 
-Status: ready for controlled server deployment; not publicly exposed.
+Status: superseded by the versioned Planning Contract v2 intent transport; this
+document remains historical context.
 
 ## Authority boundaries
 

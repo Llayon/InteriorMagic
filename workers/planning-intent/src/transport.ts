@@ -1,11 +1,12 @@
 import {
+  MAX_PLANNING_INTENT_FOCALS,
   MAX_PLANNING_INTENT_TEXT_LENGTH,
+  PLANNING_INTENT_CONTRACT_VERSION,
   validatePlanningIntentContext,
   type PlanningIntentContext,
 } from '../../../src/editor/planning/intent';
 
 export const MAX_WIRE_BODY_BYTES = 16 * 1024;
-export const MAX_WIRE_FOCALS = 8;
 export const MAX_WIRE_FOCAL_ID_LENGTH = 256;
 export const MAX_WIRE_FOCAL_LABEL_LENGTH = 120;
 
@@ -26,8 +27,11 @@ export const parsePlanningIntentWireRequest = (value: unknown): {
   text: string;
   context: PlanningIntentContext;
 } => {
-  if (!isRecord(value) || !hasExactKeys(value, ['text', 'focals'])) {
-    throw new PlanningIntentTransportError('Request must contain only text and focals');
+  if (!isRecord(value) || !hasExactKeys(value, ['contractVersion', 'text', 'focals'])) {
+    throw new PlanningIntentTransportError('Request must contain only contractVersion, text and focals');
+  }
+  if (value['contractVersion'] !== PLANNING_INTENT_CONTRACT_VERSION) {
+    throw new PlanningIntentTransportError('contractVersion is unsupported');
   }
   if (typeof value['text'] !== 'string') {
     throw new PlanningIntentTransportError('text must be a string');
@@ -37,7 +41,7 @@ export const parsePlanningIntentWireRequest = (value: unknown): {
     throw new PlanningIntentTransportError('text length is outside the allowed range');
   }
   const entries = value['focals'];
-  if (!Array.isArray(entries) || entries.length === 0 || entries.length > MAX_WIRE_FOCALS) {
+  if (!Array.isArray(entries) || entries.length > MAX_PLANNING_INTENT_FOCALS) {
     throw new PlanningIntentTransportError('focals count is outside the allowed range');
   }
 

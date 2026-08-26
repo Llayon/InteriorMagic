@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { planningIntentSystemPrompt } from '../../../src/editor/planning/intent';
-import { GROQ_INTENT_MODEL, GROQ_TIMEOUT_MS, QWEN_OUTPUT_SHAPE_HINT } from './groq';
+import { buildQwenOutputShapeHint, GROQ_INTENT_MODEL, GROQ_TIMEOUT_MS } from './groq';
 import { createPlanningIntentHandler } from './index';
 
 const wire = (text = 'Сделай просмотр телевизора удобнее') => ({
+  contractVersion: 2,
   text,
   focals: [{ id: 'room-object:tv', kind: 'tv' }],
 });
@@ -39,12 +40,12 @@ describe('planning intent Worker', () => {
   ])('passes through %s JSON as untrusted output', async (_name, output) => {
     const response = await call(wire(), vi.fn(async () => groqResponse(JSON.stringify(output))));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ ok: true, output });
+    expect(await response.json()).toEqual({ ok: true, contractVersion: 2, output });
   });
 
   it('passes non-JSON model content through as untrusted output', async () => {
     const response = await call(wire(), vi.fn(async () => groqResponse('not json')));
-    expect(await response.json()).toEqual({ ok: true, output: 'not json' });
+    expect(await response.json()).toEqual({ ok: true, contractVersion: 2, output: 'not json' });
   });
 
   it.each([[429, 'upstream_rate_limited'], [500, 'upstream_unavailable'], [503, 'upstream_unavailable']])(
@@ -83,7 +84,8 @@ describe('planning intent Worker', () => {
       {},
       { ...wire(), room: { width: 4 } },
       { ...wire(), focals: [{ id: 'room-object:tv', kind: 'tv', position: { x: 1 } }] },
-      { ...wire(), focals: [] },
+      { text: 'x', focals: [] },
+      { ...wire(), contractVersion: 1 },
       { ...wire(), focals: [{ id: '', kind: 'tv' }] },
       { ...wire(), focals: [{ id: 'x', kind: 'sofa' }] },
       { ...wire(), text: 'x'.repeat(2001) },
@@ -93,6 +95,31 @@ describe('planning intent Worker', () => {
       expect(response.status).toBe(400);
     }
     expect(upstream).not.toHaveBeenCalled();
+  });
+
+  it('accepts zero TV focals for Conversation classification', async () => {
+    const response = await call(
+      { ...wire('Make this better for conversation'), focals: [] },
+      vi.fn(async () => groqResponse('{"activity":"conversation"}')),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      ok: true, contractVersion: 2, output: { activity: 'conversation' },
+    });
+  });
+
+  it('accepts the shared maximum of eight TV focals', async () => {
+    const response = await call(
+      {
+        ...wire('Classify this request'),
+        focals: Array.from({ length: 8 }, (_, index) => ({ id: `tv-${index}`, kind: 'tv' })),
+      },
+      vi.fn(async () => groqResponse('{"activity":"conversation"}')),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      ok: true, contractVersion: 2, output: { activity: 'conversation' },
+    });
   });
 
   it('packages the canonical prompt, minimal context and proven Qwen hint', async () => {
@@ -118,12 +145,35 @@ describe('planning intent Worker', () => {
     const userContent = typeof user === 'object' && user !== null && 'content' in user
       ? (user as Record<string, unknown>)['content']
       : '';
-    expect(userContent).toContain(QWEN_OUTPUT_SHAPE_HINT);
+    expect(userContent).toContain(buildQwenOutputShapeHint(1));
     expect(serialized).toContain('Главное — проход');
     expect(serialized).toContain('room-object:tv');
     for (const forbidden of ['position', 'rotation', 'footprint', 'room dimensions', 'collision']) {
       expect(serialized).not.toContain(forbidden);
     }
+  });
+
+  it.each([
+    [0, false, false],
+    [1, true, false],
+    [2, true, true],
+  ])('advertises only cardinality-valid output shapes for %i TV focals', async (count, hasTv, hasAmbiguous) => {
+    const bodies: Record<string, unknown>[] = [];
+    const upstream = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+      return groqResponse('{"activity":"conversation"}');
+    });
+    await call({
+      ...wire('Classify this request'),
+      focals: Array.from({ length: count }, (_, index) => ({ id: `tv-${index}`, kind: 'tv' })),
+    }, upstream);
+    const messages = bodies[0]?.['messages'];
+    const user = Array.isArray(messages) ? messages[1] : null;
+    const content = typeof user === 'object' && user !== null && 'content' in user
+      ? String((user as Record<string, unknown>)['content'])
+      : '';
+    expect(content.includes('TV success:')).toBe(hasTv);
+    expect(content.includes('Ambiguous:')).toBe(hasAmbiguous);
   });
 
   it('fails closed without the server secret and never echoes it', async () => {

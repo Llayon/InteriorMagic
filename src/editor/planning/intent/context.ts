@@ -5,6 +5,9 @@ import type { PlanningIntentContext, PlanningIntentFocalPoint } from './types';
 
 const supportedFocalKinds: ReadonlySet<string> = new Set<PlanningIntentFocalKind>(['tv']);
 
+/** Shared upper bound for the focal descriptors sent through planning intent. */
+export const MAX_PLANNING_INTENT_FOCALS = 8;
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -24,7 +27,7 @@ const cloneFocalPoint = (focal: PlanningIntentFocalPoint): PlanningIntentFocalPo
 /**
  * Structural validation of the application-supplied IntentContext. Throws
  * PlanningIntentInputError before any provider invocation on malformed input.
- * This is separate from parsePlanningGoal(), which stays the structural
+ * This is separate from parsePlanningGoalV2(), which stays the structural
  * authority over model output and never inspects application state.
  */
 export const validatePlanningIntentContext = (
@@ -32,6 +35,12 @@ export const validatePlanningIntentContext = (
 ): ValidatedPlanningIntentContext => {
   if (!isRecord(context) || !Array.isArray(context['focalPoints'])) {
     throw new PlanningIntentInputError('PlanningIntentContext must contain a focalPoints array');
+  }
+
+  if (context['focalPoints'].length > MAX_PLANNING_INTENT_FOCALS) {
+    throw new PlanningIntentInputError(
+      `PlanningIntentContext cannot contain more than ${MAX_PLANNING_INTENT_FOCALS} focal points`,
+    );
   }
 
   const seenIds = new Set<PlanningEntityId>();
@@ -60,12 +69,6 @@ export const validatePlanningIntentContext = (
         ? { id: entry['id'], kind: entry['kind'] as PlanningIntentFocalKind }
         : { id: entry['id'], kind: entry['kind'] as PlanningIntentFocalKind, label: entry['label'] };
     tvFocalPoints.push(cloneFocalPoint(focal));
-  }
-
-  if (tvFocalPoints.length === 0) {
-    throw new PlanningIntentInputError(
-      'PlanningIntentContext requires at least one usable TV focal point',
-    );
   }
 
   return { tvFocalPoints };
