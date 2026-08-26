@@ -3,6 +3,10 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { encodeGlb, measureGlbJson, parseGlb } from './glb-bounds.mjs';
 
+// Legacy/audit-only writer for the frozen Sheen Chair r1 derivative. Runtime
+// verification uses the parser and bounds reader; this script must not run in
+// production or mutate committed immutable artifacts.
+
 const root = process.cwd();
 const sourceFile = path.join(root, 'public/models/sheen_chair.glb');
 const outputRoot = path.join(root, '.agent-data/ar0/sheen-chair-r1');
@@ -30,7 +34,7 @@ await mkdir(outputRoot, { recursive: true });
 await writeFile(outputFile, canonical);
 await writeFile(reportFile, `${JSON.stringify({
   schemaVersion: 1,
-  assetRevisionId: 'sheen-chair-r1',
+  arRevisionId: 'sheen-chair-r1',
   source: { path: 'public/models/sheen_chair.glb', bytes: source.length, sha256: sha256(source), bounds: rawBounds },
   canonical: { path: '.agent-data/ar0/sheen-chair-r1/model.glb', bytes: canonical.length, sha256: sha256(canonical), bounds: canonicalBounds },
   bakedTranslation: translation,

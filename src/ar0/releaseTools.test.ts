@@ -23,7 +23,7 @@ const loadCurrentEvidence = async () => {
   ]);
   return {
     evidence: JSON.parse(evidenceBytes.toString('utf8')),
-    expected: { assetRevisionId: AR0_REVISION_ID, usdzSha256: sha256(usdzBytes), glbSize: glbBounds.size },
+    expected: { arRevisionId: AR0_REVISION_ID, usdzSha256: sha256(usdzBytes), glbSize: glbBounds.size },
   };
 };
 

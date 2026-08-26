@@ -61,7 +61,7 @@ try {
   throw new Error(`USDZ validation evidence is malformed: ${error instanceof Error ? error.message : String(error)}`);
 }
 const stageReport = validateUsdzEvidence(parsedStageEvidence, {
-  assetRevisionId: AR0_REVISION_ID,
+  arRevisionId: AR0_REVISION_ID,
   usdzSha256: sha256(usdz),
   glbSize: glbBounds.size,
 });
@@ -75,7 +75,22 @@ for (const [key, definition] of Object.entries(files)) {
   const bytes = key === 'glb' ? glb : key === 'usdz' ? usdz : poster;
   records[key] = { path: definition.path, sha256: sha256(bytes) };
 }
-const manifest = { schemaVersion: 1, assetRevisionId: AR0_REVISION_ID, assetId: 'sheenChair', files: records };
+const dimensionsMeters = { width: 0.826557978, height: 0.686247078, depth: 0.570265459 };
+for (const [axis, expected] of Object.entries(dimensionsMeters)) {
+  const index = { width: 0, height: 1, depth: 2 }[axis];
+  const actual = glbBounds.size[index];
+  if (!Number.isFinite(actual) || actual <= 0 || Math.abs(actual - expected) / expected > 0.01) {
+    throw new Error(`Canonical GLB dimension mismatch on ${axis}`);
+  }
+}
+const manifest = {
+  schemaVersion: 2,
+  arRevisionId: AR0_REVISION_ID,
+  assetId: 'sheenChair',
+  spatial: { dimensionsMeters, placementAnchor: 'floor' },
+  ar: { scale: 'fixed', placement: 'floor' },
+  files: records,
+};
 const manifestBytes = Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`);
 if (staged) {
   const existingManifest = await readFile(path.join(revisionRoot, 'manifest.json'));
@@ -90,7 +105,7 @@ const checksumEntries = [
   }),
   { path: 'manifest.json', bytes: manifestBytes.length, sha256: sha256(manifestBytes), contentType: 'application/json; charset=utf-8' },
 ];
-const checksums = { schemaVersion: 1, assetRevisionId: AR0_REVISION_ID, files: checksumEntries };
+const checksums = { schemaVersion: 2, arRevisionId: AR0_REVISION_ID, files: checksumEntries };
 const checksumBytes = Buffer.from(`${JSON.stringify(checksums, null, 2)}\n`);
 if (staged) {
   const existingChecksums = await readFile(path.join(revisionRoot, 'checksums.json'));

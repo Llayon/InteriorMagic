@@ -1,5 +1,8 @@
 import { readFile } from 'node:fs/promises';
 
+// Parser/bounds reader is runtime verification support. The paired canonical
+// writer is legacy/audit-only and is never part of the runtime path.
+
 const GLB_MAGIC = 0x46546c67;
 const JSON_CHUNK = 0x4e4f534a;
 

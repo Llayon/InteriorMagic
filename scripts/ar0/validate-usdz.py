@@ -12,10 +12,10 @@ from pxr import Usd, UsdGeom, UsdUtils
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", default=os.environ.get("AR0_USDZ_INPUT"))
 parser.add_argument("--report", default=os.environ.get("AR0_USDZ_REPORT"))
-parser.add_argument("--asset-revision-id", default=os.environ.get("AR0_ASSET_REVISION_ID"))
+parser.add_argument("--ar-revision-id", default=os.environ.get("AR0_AR_REVISION_ID"))
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 args = parser.parse_args(argv)
-if not args.input or not args.report or not args.asset_revision_id:
+if not args.input or not args.report or not args.ar_revision_id:
     raise RuntimeError("USDZ input/report/revision paths were not provided")
 input_path = Path(args.input).resolve()
 usdz_sha256 = hashlib.sha256(input_path.read_bytes()).hexdigest()
@@ -51,8 +51,8 @@ def portable_dependency(value):
 
 
 report = {
-    "schemaVersion": 1,
-    "assetRevisionId": args.asset_revision_id,
+    "schemaVersion": 2,
+    "arRevisionId": args.ar_revision_id,
     "usdzSha256": usdz_sha256,
     "parser": "Blender-bundled pxr.Usd/UsdGeom",
     "upAxis": up_axis,

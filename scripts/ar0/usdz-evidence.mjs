@@ -9,8 +9,8 @@ const requireFiniteVector = (value, label) => {
 
 export const validateUsdzEvidence = (evidence, expected) => {
   if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence)) throw new Error('USDZ validation evidence is missing or malformed');
-  if (evidence.schemaVersion !== 1) throw new Error('USDZ validation evidence schemaVersion must be 1');
-  if (evidence.assetRevisionId !== expected.assetRevisionId) throw new Error('USDZ validation evidence revision does not match');
+  if (evidence.schemaVersion !== 2) throw new Error('USDZ validation evidence schemaVersion must be 2');
+  if (evidence.arRevisionId !== expected.arRevisionId) throw new Error('USDZ validation evidence revision does not match');
   if (evidence.usdzSha256 !== expected.usdzSha256) throw new Error('USDZ validation evidence hash does not match staged USDZ');
   if (typeof evidence.parser !== 'string' || !evidence.parser.trim()) throw new Error('USDZ validation evidence parser is missing');
   if (evidence.upAxis !== 'Y') throw new Error('USDZ stage must be Y-up');

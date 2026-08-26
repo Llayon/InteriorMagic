@@ -6,9 +6,21 @@ export interface Ar0ManifestFile {
 }
 
 export interface Ar0RuntimeManifest {
-  readonly schemaVersion: 1;
-  readonly assetRevisionId: string;
+  readonly schemaVersion: 2;
+  readonly arRevisionId: string;
   readonly assetId: string;
+  readonly spatial: {
+    readonly dimensionsMeters: {
+      readonly width: number;
+      readonly height: number;
+      readonly depth: number;
+    };
+    readonly placementAnchor: 'floor';
+  };
+  readonly ar: {
+    readonly scale: 'fixed';
+    readonly placement: 'floor';
+  };
   readonly files: {
     readonly glb: Ar0ManifestFile;
     readonly usdz: Ar0ManifestFile;
@@ -26,10 +38,19 @@ export const parseAr0Manifest = (value: unknown, revision: Ar0RevisionDefinition
   if (!value || typeof value !== 'object') throw new Error('AR revision manifest is not an object');
   const candidate = value as Record<string, unknown>;
   const files = candidate.files as Record<string, unknown> | undefined;
+  const spatial = candidate.spatial as Record<string, unknown> | undefined;
+  const dimensions = spatial?.dimensionsMeters as Record<string, unknown> | undefined;
+  const ar = candidate.ar as Record<string, unknown> | undefined;
+  const dimensionsValid = dimensions
+    && ['width', 'height', 'depth'].every((axis) => Number.isFinite(dimensions[axis]) && Number(dimensions[axis]) > 0);
   if (
-    candidate.schemaVersion !== 1
-    || candidate.assetRevisionId !== revision.assetRevisionId
+    candidate.schemaVersion !== 2
+    || candidate.arRevisionId !== revision.arRevisionId
     || candidate.assetId !== revision.assetId
+    || !dimensionsValid
+    || spatial?.placementAnchor !== 'floor'
+    || ar?.scale !== 'fixed'
+    || ar?.placement !== 'floor'
     || !files
     || !isManifestFile(files.glb, 'model.glb')
     || !isManifestFile(files.usdz, 'model.usdz')

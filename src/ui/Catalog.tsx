@@ -52,7 +52,7 @@ export function Catalog() {
     {error && <div className="catalog-error" role="alert">{error}</div>}
     <div className="items" ref={itemsRef}>{catalogItems.map(({ assetId, asset, canPlace, displayName, thumbnailUrl }) => {
       const arRevision = isAr0Enabled() ? getAr0RevisionForAsset(assetId) : null;
-      const arUrl = arRevision ? buildAr0LandingUrl(arRevision.assetRevisionId) : null;
+      const arUrl = arRevision ? buildAr0LandingUrl(arRevision.arRevisionId) : null;
       return <div className={`item-shell ${arUrl ? 'has-ar' : ''}`} key={assetId}>
         <button className={`item ${object?.assetId === assetId ? 'active' : ''}`} data-asset-id={assetId} aria-label={canPlace ? `Add ${assetId}` : `Browse ${assetId}`} aria-busy={loadingAssetId === assetId} aria-disabled={!canPlace} disabled={!canPlace} onClick={() => asset && void addAsset(asset)}>{thumbnailUrl ? <img src={thumbnailUrl} alt={`${displayName} thumbnail`} loading="lazy" width="256" height="192" /> : <span>{asset?.icon}</span>}<b>{displayName}</b><small>{canPlace ? (loadingAssetId === assetId ? 'Загрузка…' : 'Добавить') : 'Только просмотр'}</small></button>
         {arUrl && <button className="item-ar-action" data-ar-asset-id={assetId} aria-label={`Примерить ${displayName} 1:1`} onClick={() => openExternalLink(arUrl)}>Примерить 1:1</button>}

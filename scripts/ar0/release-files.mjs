@@ -20,7 +20,7 @@ export const loadValidatedReleaseObjects = async (revisionRoot) => {
   } catch (error) {
     throw new Error(`AR0 checksums.json is malformed: ${error instanceof Error ? error.message : String(error)}`);
   }
-  if (checksums?.schemaVersion !== 1 || checksums.assetRevisionId !== 'sheen-chair-r1' || !Array.isArray(checksums.files)) {
+  if (checksums?.schemaVersion !== 2 || checksums.arRevisionId !== 'sheen-chair-r1' || !Array.isArray(checksums.files)) {
     throw new Error('AR0 checksums.json does not match sheen-chair-r1');
   }
   if (checksums.files.length !== EXPECTED_FILES.length) throw new Error('AR0 checksums.json has an unexpected file set');

@@ -49,7 +49,7 @@ try {
 const actualBlenderVersion = readApprovedBlenderVersion(converterReport);
 await run(blender, [
   '--background', '--factory-startup', '--python', path.join(root, 'scripts/ar0/validate-usdz.py'),
-], { AR0_USDZ_INPUT: usdz, AR0_USDZ_REPORT: usdReport, AR0_ASSET_REVISION_ID: 'sheen-chair-r1' });
+], { AR0_USDZ_INPUT: usdz, AR0_USDZ_REPORT: usdReport, AR0_AR_REVISION_ID: 'sheen-chair-r1' });
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const [glbBytes, usdzBytes, posterBytes] = await Promise.all([readFile(canonical), readFile(usdz), readFile(poster)]);

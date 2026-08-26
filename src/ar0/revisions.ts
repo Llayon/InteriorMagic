@@ -1,13 +1,13 @@
 import type { AssetId } from '@/editor/assets/registry';
 
 export interface Ar0RevisionDefinition {
-  readonly assetRevisionId: 'sheen-chair-r1';
+  readonly arRevisionId: 'sheen-chair-r1';
   readonly assetId: AssetId;
   readonly prefix: 'ar0/sheen-chair/r1/';
 }
 
 const SHEEN_CHAIR_R1: Ar0RevisionDefinition = {
-  assetRevisionId: 'sheen-chair-r1',
+  arRevisionId: 'sheen-chair-r1',
   assetId: 'sheenChair',
   prefix: 'ar0/sheen-chair/r1/',
 };
@@ -15,8 +15,8 @@ const SHEEN_CHAIR_R1: Ar0RevisionDefinition = {
 export const getAr0RevisionForAsset = (assetId: string): Ar0RevisionDefinition | null =>
   assetId === SHEEN_CHAIR_R1.assetId ? SHEEN_CHAIR_R1 : null;
 
-export const getAr0Revision = (assetRevisionId: string): Ar0RevisionDefinition | null =>
-  assetRevisionId === SHEEN_CHAIR_R1.assetRevisionId ? SHEEN_CHAIR_R1 : null;
+export const getAr0Revision = (arRevisionId: string): Ar0RevisionDefinition | null =>
+  arRevisionId === SHEEN_CHAIR_R1.arRevisionId ? SHEEN_CHAIR_R1 : null;
 
 const ensureTrailingSlash = (value: string) => value.endsWith('/') ? value : `${value}/`;
 
@@ -27,7 +27,7 @@ export interface Ar0UrlEnvironment {
 }
 
 export const buildAr0LandingUrl = (
-  assetRevisionId: string,
+  arRevisionId: string,
   environment: Ar0UrlEnvironment = {
     locationOrigin: window.location.origin,
     baseUrl: import.meta.env.BASE_URL,
@@ -36,7 +36,7 @@ export const buildAr0LandingUrl = (
   const url = new URL(environment.baseUrl, environment.locationOrigin);
   url.search = '';
   url.hash = '';
-  url.searchParams.set('ar', assetRevisionId);
+  url.searchParams.set('ar', arRevisionId);
   return url.href;
 };
 

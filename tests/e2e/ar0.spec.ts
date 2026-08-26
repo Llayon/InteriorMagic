@@ -35,8 +35,8 @@ test('AR landing uses prebuilt fixed-scale native AR files and keeps web 3D fall
   await expect(viewer).toHaveAttribute('ar-modes', 'scene-viewer quick-look');
   expect((await viewer.getAttribute('ar-modes'))?.includes('webxr')).toBe(false);
   await expect(page.getByText('Ширина:').locator('strong')).toHaveText('82.7 см');
-  await expect(page.getByText('Высота:').locator('strong')).toHaveText('68.7 см');
-  await expect(page.getByText('Глубина:').locator('strong')).toHaveText('57.1 см');
+  await expect(page.getByText('Высота:').locator('strong')).toHaveText('68.6 см');
+  await expect(page.getByText('Глубина:').locator('strong')).toHaveText('57.0 см');
   expect(responses['manifest.json']).toBe(200);
   expect(responses['model.glb']).toBe(200);
   await expect(page.getByTestId('ar0-web-fallback')).toBeVisible();
@@ -51,4 +51,29 @@ test('unknown AR revision fails safely without editor bootstrap', async ({ monit
   await page.goto('/?ar=unknown-revision');
   await expect(page.getByTestId('ar0-unknown-revision')).toBeVisible();
   await expect(page.getByTestId('app-root')).toHaveCount(0);
+});
+
+test('AR landing renders physical facts from the validated manifest', async ({ monitoredPage: page }) => {
+  await page.route('**/ar0/sheen-chair/r1/manifest.json', async (route) => {
+    const response = await route.fetch();
+    const manifest = await response.json();
+    await route.fulfill({ response, json: {
+      ...manifest,
+      spatial: { ...manifest.spatial, dimensionsMeters: { width: 1, height: 2, depth: 3 } },
+    } });
+  });
+  await page.goto('/?ar=sheen-chair-r1');
+  await expect(page.getByTestId('ar0-model-viewer')).toBeVisible();
+  await expect(page.getByText('Ширина:').locator('strong')).toHaveText('100.0 см');
+  await expect(page.getByText('Высота:').locator('strong')).toHaveText('200.0 см');
+  await expect(page.getByText('Глубина:').locator('strong')).toHaveText('300.0 см');
+});
+
+test('invalid manifest fails closed before creating a model-viewer', async ({ monitoredPage: page }) => {
+  await page.route('**/ar0/sheen-chair/r1/manifest.json', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ schemaVersion: 1 }) });
+  });
+  await page.goto('/?ar=sheen-chair-r1');
+  await expect(page.getByRole('alert')).toBeVisible();
+  await expect(page.getByTestId('ar0-model-viewer')).toHaveCount(0);
 });

@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "assetRevisionId": "sheen-chair-r1",
+  "schemaVersion": 2,
+  "arRevisionId": "sheen-chair-r1",
   "files": [
     {
       "path": "model.glb",
@@ -22,8 +22,8 @@
     },
     {
       "path": "manifest.json",
-      "bytes": 505,
-      "sha256": "47f8edceeead1c89995ffb9344923e6e11b3b3ac6cc53668dbc0ec3cb151e289",
+      "bytes": 732,
+      "sha256": "c40c9730dc8b304b8f07b12a77c8350a137e76541e1d7e05a889153eaea14889",
       "contentType": "application/json; charset=utf-8"
     }
   ]

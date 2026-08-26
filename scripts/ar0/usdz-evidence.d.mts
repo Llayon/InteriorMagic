@@ -1,14 +1,14 @@
 export const AR0_REVISION_ID: 'sheen-chair-r1';
 
 export interface UsdzEvidenceExpectation {
-  assetRevisionId: string;
+  arRevisionId: string;
   usdzSha256: string;
   glbSize: readonly number[];
 }
 
 export function validateUsdzEvidence(evidence: unknown, expected: UsdzEvidenceExpectation): {
-  schemaVersion: 1;
-  assetRevisionId: string;
+  schemaVersion: 2;
+  arRevisionId: string;
   usdzSha256: string;
   parser: string;
   upAxis: 'Y';

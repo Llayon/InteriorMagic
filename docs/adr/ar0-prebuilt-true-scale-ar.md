@@ -6,18 +6,19 @@ Status: Accepted for Track AR0.
 
 - The canonical GLB is the source runtime artifact. Because the raw Sheen Chair is not centered to the 1 mm AR tolerance, AR0 uses a file-level derivative with the editor's footprint recentering baked into a new root translation. The source file remains unchanged.
 - USDZ is generated offline from that canonical GLB, validated, and stored beside it. Runtime or request-time GLB-to-USDZ conversion is forbidden.
-- GLB and USDZ belong to one immutable `sheen-chair-r1` revision. The runtime manifest owns file identity and SHA256 only.
-- `FurnitureAssetDefinition`, resolved through `getAsset(assetId)`, remains authoritative for dimensions, footprint, placement and semantic role. These facts are not copied into the revision manifest.
+- GLB and USDZ belong to one immutable `sheen-chair-r1` revision. The runtime manifest owns file identity, SHA256, frozen spatial dimensions and AR placement facts.
+- The immutable AR revision owns the physical facts consumed by native AR. `FurnitureAssetDefinition`, resolved through `getAsset(assetId)`, remains the current editor/catalog definition and supplies presentation metadata only on the AR landing.
 - Native AR is fixed physical scale, floor placement only, using Android Scene Viewer and iOS Quick Look through prebuilt `ios-src`. WebXR is deferred.
 - Publication, when separately authorized, uses a new immutable `ar0/sheen-chair/r1/` R2 prefix. The committed revision is staged under `artifacts/ar0/sheen-chair/r1/`, outside Vite's `public/` tree, so a normal Pages build cannot publish AR payloads. The current publisher is fail-closed and does not upload; existing `catalog/v1/**` objects are outside this contract and must remain untouched.
 - RoomPlan, scanning, full-room/multi-object AR, RoomProject integration and planner/Room Geometry changes are deferred.
-- Staged USDZ validation is fail-closed. CI requires committed `pxr.Usd/UsdGeom` evidence whose `assetRevisionId` and SHA256 match the exact immutable USDZ, with Y-up meter units, no unresolved dependencies, finite positive bounds and no axis differing from the canonical GLB by more than 1%.
+- Staged USDZ validation is fail-closed. CI requires committed `pxr.Usd/UsdGeom` evidence whose `arRevisionId` and SHA256 match the exact immutable USDZ, with Y-up meter units, no unresolved dependencies, finite positive bounds and no axis differing from the canonical GLB by more than 1%.
 - Evidence bounds are internally checked: `size` must equal `max - min`, and `sizeMeters` must equal `size * metersPerUnit` within a numeric tolerance.
 - `VITE_AR0_ENABLED` is the single deployment/release capability gate and defaults OFF: only the literal `true` exposes the catalog CTA or permits the AR landing to instantiate. It is not asset, revision, catalog semantic or project metadata.
 - A separate activation decision may set `VITE_AR0_ENABLED=true` only after R2 verification, Android physical QA and iOS physical/material QA pass. The flag is not evidence that those gates passed.
 - Conversion provenance takes Blender's actual version from `converter-report.json` and enforces the approved 5.2 line. Remote verification compares the normalized MIME of every immutable object, in addition to bytes, SHA256 and CORS.
 - Three `0.183.0` is an intentional cross-cutting dependency update required by pinned `@google/model-viewer` `4.3.1`.
 - Publication is fail-closed before remote access: local bytes must match `checksums.json`, incomplete immutable prefixes are rejected, `--verify` requires both the public R2 origin and the actual app origin, every artifact's normalized MIME/length/SHA256/CORS is checked, and `--upload` remains disabled until a conditional create-only publisher is available. No remote mutation occurs in this fix-pass.
+- `arRevisionId` is an AR0-specific immutable identifier and is not Track K's future `assetRevisionId` or a shared runtime revision layer. Future revisions use the Track K pipeline and their own contract.
 
 ## Consequences
 

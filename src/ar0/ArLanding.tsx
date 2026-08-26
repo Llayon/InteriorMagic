@@ -28,7 +28,6 @@ export function ArLanding({ revisionId }: ArLandingProps) {
       .then((loadedManifest) => { if (active) setManifest(loadedManifest); })
       .catch((reason: unknown) => {
         if (active) {
-          console.error('AR0 revision load failed', reason);
           setError('Не удалось загрузить AR-модель. Попробуйте позже.');
         }
       });
@@ -46,7 +45,7 @@ export function ArLanding({ revisionId }: ArLandingProps) {
   const iosUrl = manifest && revisionBaseUrl ? new URL(manifest.files.usdz.path, revisionBaseUrl).href : undefined;
   const posterUrl = manifest && revisionBaseUrl ? new URL(manifest.files.poster.path, revisionBaseUrl).href : undefined;
 
-  return <main className="ar0-landing" data-testid="ar0-landing" data-revision-id={revision.assetRevisionId}>
+  return <main className="ar0-landing" data-testid="ar0-landing" data-revision-id={revision.arRevisionId}>
     <header className="ar0-header"><div><small>INTERIORMAGIC</small><h1>{asset.name}</h1></div><span className="ar0-scale">Масштаб 1:1</span></header>
     <section className="ar0-viewer-shell" aria-label="Интерактивная 3D-модель кресла">
       {manifest && modelUrl && iosUrl && <model-viewer
@@ -56,8 +55,8 @@ export function ArLanding({ revisionId }: ArLandingProps) {
         poster={posterUrl}
         ar
         ar-modes="scene-viewer quick-look"
-        ar-scale="fixed"
-        ar-placement="floor"
+        ar-scale={manifest.ar.scale}
+        ar-placement={manifest.ar.placement}
         camera-controls
         shadow-intensity="1"
         exposure="1"
@@ -69,9 +68,9 @@ export function ArLanding({ revisionId }: ArLandingProps) {
     </section>
     <section className="ar0-details">
       <div className="ar0-dimensions" aria-label="Размеры кресла">
-        <span>Ширина: <strong>{centimeters(asset.dimensions.width)}</strong></span>
-        <span>Высота: <strong>{centimeters(asset.dimensions.height)}</strong></span>
-        <span>Глубина: <strong>{centimeters(asset.dimensions.depth)}</strong></span>
+        <span>Ширина: <strong>{manifest ? centimeters(manifest.spatial.dimensionsMeters.width) : '—'}</strong></span>
+        <span>Высота: <strong>{manifest ? centimeters(manifest.spatial.dimensionsMeters.height) : '—'}</strong></span>
+        <span>Глубина: <strong>{manifest ? centimeters(manifest.spatial.dimensionsMeters.depth) : '—'}</strong></span>
       </div>
       <p data-testid="ar0-web-fallback">Наведите камеру на пол и немного подвигайте телефон. Если AR недоступен, модель остаётся доступной в 3D.</p>
     </section>

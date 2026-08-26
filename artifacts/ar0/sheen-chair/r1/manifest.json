@@ -1,7 +1,19 @@
 {
-  "schemaVersion": 1,
-  "assetRevisionId": "sheen-chair-r1",
+  "schemaVersion": 2,
+  "arRevisionId": "sheen-chair-r1",
   "assetId": "sheenChair",
+  "spatial": {
+    "dimensionsMeters": {
+      "width": 0.826557978,
+      "height": 0.686247078,
+      "depth": 0.570265459
+    },
+    "placementAnchor": "floor"
+  },
+  "ar": {
+    "scale": "fixed",
+    "placement": "floor"
+  },
   "files": {
     "glb": {
       "path": "model.glb",

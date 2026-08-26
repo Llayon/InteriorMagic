@@ -32,14 +32,14 @@ describe('AR0 immutable Sheen Chair assets', () => {
     });
   });
 
-  it('binds manifest and checksums to exact staged bytes without physical metadata duplication', async () => {
+  it('binds manifest and checksums to exact staged bytes and immutable physical facts', async () => {
     const revision = getAr0Revision('sheen-chair-r1')!;
     const manifestBytes = await readFile(path.join(revisionRoot, 'manifest.json'));
     const manifest = parseAr0Manifest(JSON.parse(manifestBytes.toString('utf8')), revision);
     const serialized = JSON.stringify(manifest);
-    expect(serialized).not.toContain('dimensions');
-    expect(serialized).not.toContain('footprint');
-    expect(serialized).not.toContain('placement');
+    expect(manifest.spatial.dimensionsMeters).toEqual({ width: 0.826557978, height: 0.686247078, depth: 0.570265459 });
+    expect(manifest.spatial.placementAnchor).toBe('floor');
+    expect(manifest.ar).toEqual({ scale: 'fixed', placement: 'floor' });
     expect(serialized).not.toContain('semantic');
     for (const file of Object.values(manifest.files)) {
       expect(sha256(await readFile(path.join(revisionRoot, file.path)))).toBe(file.sha256);
