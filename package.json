@@ -61,6 +61,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@gltf-transform/core": "^4.4.2",
+    "@gltf-transform/extensions": "^4.4.2",
+    "@gltf-transform/functions": "^4.4.2",
     "@playwright/test": "^1.62.1",
     "@types/node": "^24.3.1",
     "@types/react": "^19.1.12",

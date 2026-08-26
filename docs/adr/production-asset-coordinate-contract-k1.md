@@ -229,6 +229,27 @@ committed evidence ledger fails CI.
 | `production-asset-spatial-evidence-v1.json`                              | `src/editor/catalog/data/` (committed; non-binary)                    | `sourceSha256`, `canonicalSha256`, transform details, visual QA verdicts, row pointers, free-form `notes` | durable spatial meaning (that's what facts are for) |
 | Source GLBs, canonical GLBs, renders, RAW/CANONICAL QA contact sheets     | `.agent-data/k1-production-assets/` (gitignored, local-only)           | the binaries themselves                                                       | (these ARE the binaries — they stay local)                               |
 
+## 11. Source provenance (K1 provenance correction 2026-08-26)
+
+**Authoritative raw asset directory:**
+```
+D:\Programms\Max\Assets\Realistic_Furniture_glb\Furniture_Realistic_glb
+```
+
+This is the **read-only** directory K1 reads from. K1 never writes into it.
+
+**Resolution result:** All 47 frozen-selection assetIds map 1:1 to GLBs in this directory. SHA256 of every selected source GLB was computed and compared against the SHA256 stored in `k1-audit-raw.json` (from the earlier ITHappy-pipeline-root-based audit): **47 / 47 hashes match**. No RAW evidence regeneration required.
+
+**Out-of-date authority:** The earlier K1 audit had read from
+```
+D:/Programms/Max/InteriorMagic/.agent-data/ithappy-production-pipeline/runtime-assets
+```
+This directory is no longer authoritative as of the K1 provenance correction. K1 scripts (`scripts/k1-audit-raw.mjs`, `scripts/k1-canonicalize.mjs`) already prefer the env var `K1_SOURCE_ASSET_ROOT` (with `ITHAPPY_PIPELINE_ROOT` as a legacy alias only) and fall back to the **new authoritative default** `D:/Programms/Max/Assets/Realistic_Furniture_glb/Furniture_Realistic_glb`.
+
+**Monolithic alternative:** `D:/Programms/Max/Assets/Realistic_Furniture_glb/Furniture_Realistic.glb` (207 MB, all 836 assets in one file) exists but is NOT used by K1 — K1 uses the 836-file directory.
+
+**Machine-readable provenance record:** `.agent-data/k1-production-assets/reports/k1-source-provenance.json`.
+
 The facts artifact's `evidenceLedgerSha256` SHA256-stamps the ledger file,
 binding the two committed JSON artifacts to each other.
 

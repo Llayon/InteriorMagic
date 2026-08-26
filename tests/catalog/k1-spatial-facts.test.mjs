@@ -344,15 +344,15 @@ test('K1 evidence: per-entry sourceApparentForwardAxis enum', async () => {
   }
 });
 
-test('K1 evidence: transform is null iff canonicalSha256 is null', async () => {
+test('K1 evidence: appliedTransform is null iff canonicalSha256 is null', async () => {
   const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
   for (const e of ledger.entries) {
     if (e.canonicalSha256 === null) {
-      assert.equal(e.transform, null,
-        `entry ${e.assetId}: canonicalSha256===null requires transform===null.`);
+      assert.equal(e.appliedTransform, null,
+        `entry ${e.assetId}: canonicalSha256===null requires appliedTransform===null.`);
     } else {
-      assert.ok(e.transform && typeof e.transform === 'object',
-        `entry ${e.assetId}: canonicalSha256!==null requires a non-null transform object.`);
+      assert.ok(e.appliedTransform && typeof e.appliedTransform === 'object',
+        `entry ${e.assetId}: canonicalSha256!==null requires a non-null appliedTransform object.`);
     }
   }
 });

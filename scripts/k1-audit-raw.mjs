@@ -38,23 +38,24 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 // scripts/ → worktree root
 const repositoryRoot = path.resolve(scriptDir, '..');
 
-// .agent-data lives OUTSIDE the worktree, two directories up from
-// .agent-worktrees/k1-production-asset-spatial-truth/:
-//   D:/Programms/Max/InteriorMagic/.agent-data/k1-production-assets/
-// (consistent with the plan's `../../../.agent-data/...` reference).
-const k1DataRoot = path.resolve(repositoryRoot, '..', '..', '.agent-data', 'k1-production-assets');
+// K1_EVIDENCE_ROOT lives DIRECTLY UNDER the worktree root, in the gitignored
+// .agent-data dir (Plan v3 #6 + amended per Commit 2 directive). The previous
+// path went up two directories to the SHARED location outside the worktree;
+// that bug is fixed: from inside the worktree, K1 evidence lands at
+//   <worktree>/.agent-data/k1-production-assets/
+const k1DataRoot = path.resolve(repositoryRoot, '.agent-data', 'k1-production-assets');
 const k1LogsRoot = path.join(k1DataRoot, 'logs');
 const k1ReportsRoot = path.join(k1DataRoot, 'reports');
 
-// Pipeline root follows the existing convention in scripts/ithappy-local-staging.mjs,
-// which resolves to `<main-checkout-parent>/.agent-data/ithappy-production-pipeline`
-// when ITHAPPY_PIPELINE_ROOT is unset. In the worktree, the main checkout is
-// three parents up from scripts/.
-const dataRoot = path.resolve(repositoryRoot, '..', '..', '.agent-data');
-const pipelineRoot = path.resolve(
-  process.env.ITHAPPY_PIPELINE_ROOT || path.join(dataRoot, 'ithappy-production-pipeline'),
+// Source asset root — K1 uses the authoritative Realistic_Furniture_glb directory.
+// Env var name: K1_SOURCE_ASSET_ROOT (preferred). ITHAPPY_PIPELINE_ROOT is the
+// legacy alias; if neither is set we fall back to the authoritative default.
+const k1SourceAssetRoot = path.resolve(
+  process.env.K1_SOURCE_ASSET_ROOT ||
+    process.env.ITHAPPY_PIPELINE_ROOT ||
+    'D:/Programms/Max/Assets/Realistic_Furniture_glb/Furniture_Realistic_glb',
 );
-const runtimeAssetsRoot = path.join(pipelineRoot, 'runtime-assets');
+const runtimeAssetsRoot = k1SourceAssetRoot;
 
 const frozenSelectionPath = path.join(
   repositoryRoot,
@@ -155,10 +156,11 @@ const main = async () => {
     trackBaseSha: selection.trackBaseSha,
     k1BaseSha,
     assetCount: 47,
-    pipelineRoot,
+    sourceAssetRoot: k1SourceAssetRoot,
     runtimeAssetsRoot,
+    sourceRootEnvVar: 'K1_SOURCE_ASSET_ROOT',
     schemaVersion: 1,
-    notes: 'RAW audit — Box3 only. NO orientation inference. NO forward inference. NO multipliers. semanticRole is a label only (frozen selection owns authority).',
+    notes: 'RAW audit — Box3 only. NO orientation inference. NO forward inference. NO multipliers. semanticRole is a label only (frozen selection owns authority). Authoritative source: D:/Programms/Max/Assets/Realistic_Furniture_glb/Furniture_Realistic_glb (configurable via K1_SOURCE_ASSET_ROOT).',
     assets,
   };
 

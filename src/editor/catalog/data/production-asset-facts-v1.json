@@ -1,0 +1,919 @@
+{
+  "schemaVersion": 1,
+  "coordinateContractVersion": 1,
+  "k1BaseSha": "e156c8f727f04ae38d358c489fdc9c68e6618eb7",
+  "trackBaseSha": "1c32b27bfddb1b98ac7b70c9fa642604cb4d6790",
+  "frozenSelectionSha256": "028d7f30b3db967aebe69cb3742400bc0a13bf27d74a56d34c6935e4edd5ddd4",
+  "assetCount": 47,
+  "byAnchor": {
+    "floor": 35,
+    "wall": 1,
+    "surface": 11,
+    "ceiling": 0
+  },
+  "byPolicy": {
+    "full-xz-envelope": 46,
+    "full-xz-envelope-tv-wall": 1,
+    "lower-band-review": 0
+  },
+  "byEditorPlacementSupport": {
+    "supported": 35,
+    "unsupported": 12
+  },
+  "assets": [
+    {
+      "assetId": "carpet",
+      "dimensions": {
+        "width": 2.6367,
+        "height": 0.0699,
+        "depth": 3.6765
+      },
+      "footprint": {
+        "width": 2.6367,
+        "depth": 3.6765,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "carpet_001",
+      "dimensions": {
+        "width": 2.6365,
+        "height": 0.0508,
+        "depth": 3.6867
+      },
+      "footprint": {
+        "width": 2.6365,
+        "depth": 3.6867,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "carpet_002",
+      "dimensions": {
+        "width": 2.6365,
+        "height": 0.0616,
+        "depth": 3.6867
+      },
+      "footprint": {
+        "width": 2.6365,
+        "depth": 3.6867,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "carpet_003",
+      "dimensions": {
+        "width": 3.2687,
+        "height": 0.0598,
+        "depth": 3.6153
+      },
+      "footprint": {
+        "width": 3.2687,
+        "depth": 3.6153,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "carpet_004",
+      "dimensions": {
+        "width": 1.4319,
+        "height": 0.0445,
+        "depth": 2.0599
+      },
+      "footprint": {
+        "width": 1.4319,
+        "depth": 2.0599,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "chair",
+      "dimensions": {
+        "width": 1.5839,
+        "height": 0.971,
+        "depth": 1.2947
+      },
+      "footprint": {
+        "width": 1.5839,
+        "depth": 1.2947,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "chair_001",
+      "dimensions": {
+        "width": 0.5772,
+        "height": 0.4617,
+        "depth": 0.5772
+      },
+      "footprint": {
+        "width": 0.5772,
+        "depth": 0.5772,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table",
+      "dimensions": {
+        "width": 1.0777,
+        "height": 0.6604,
+        "depth": 1.0777
+      },
+      "footprint": {
+        "width": 1.0777,
+        "depth": 1.0777,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_024",
+      "dimensions": {
+        "width": 1.5947,
+        "height": 0.5262,
+        "depth": 1.5769
+      },
+      "footprint": {
+        "width": 1.5947,
+        "depth": 1.5769,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_025",
+      "dimensions": {
+        "width": 1.0719,
+        "height": 0.7116,
+        "depth": 1.0719
+      },
+      "footprint": {
+        "width": 1.0719,
+        "depth": 1.0719,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_026",
+      "dimensions": {
+        "width": 1.2361,
+        "height": 0.6044,
+        "depth": 1.2361
+      },
+      "footprint": {
+        "width": 1.2361,
+        "depth": 1.2361,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_027",
+      "dimensions": {
+        "width": 0.8998,
+        "height": 0.5426,
+        "depth": 1.5263
+      },
+      "footprint": {
+        "width": 0.8998,
+        "depth": 1.5263,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_028",
+      "dimensions": {
+        "width": 0.8998,
+        "height": 0.5426,
+        "depth": 1.5263
+      },
+      "footprint": {
+        "width": 0.8998,
+        "depth": 1.5263,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_029",
+      "dimensions": {
+        "width": 1.0777,
+        "height": 0.6604,
+        "depth": 1.0777
+      },
+      "footprint": {
+        "width": 1.0777,
+        "depth": 1.0777,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_030",
+      "dimensions": {
+        "width": 1.2361,
+        "height": 0.6044,
+        "depth": 1.2361
+      },
+      "footprint": {
+        "width": 1.2361,
+        "depth": 1.2361,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_031",
+      "dimensions": {
+        "width": 1.2361,
+        "height": 0.6044,
+        "depth": 1.2361
+      },
+      "footprint": {
+        "width": 1.2361,
+        "depth": 1.2361,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "coffee_table_032",
+      "dimensions": {
+        "width": 0.8998,
+        "height": 0.5426,
+        "depth": 1.5263
+      },
+      "footprint": {
+        "width": 0.8998,
+        "depth": 1.5263,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "cupboard",
+      "dimensions": {
+        "width": 1.9221,
+        "height": 2.803,
+        "depth": 0.9264
+      },
+      "footprint": {
+        "width": 1.9221,
+        "depth": 0.9264,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "cupboard_001",
+      "dimensions": {
+        "width": 2.5152,
+        "height": 2.9313,
+        "depth": 0.9664
+      },
+      "footprint": {
+        "width": 2.5152,
+        "depth": 0.9664,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "cupboard_002",
+      "dimensions": {
+        "width": 3.7806,
+        "height": 2.8116,
+        "depth": 0.8922
+      },
+      "footprint": {
+        "width": 3.7806,
+        "depth": 0.8922,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "cupboard_003",
+      "dimensions": {
+        "width": 1.3843,
+        "height": 2.7056,
+        "depth": 0.7151
+      },
+      "footprint": {
+        "width": 1.3843,
+        "depth": 0.7151,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "cupboard_004",
+      "dimensions": {
+        "width": 0.7322,
+        "height": 2.8025,
+        "depth": 0.7937
+      },
+      "footprint": {
+        "width": 0.7322,
+        "depth": 0.7937,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "dresser",
+      "dimensions": {
+        "width": 0.7061,
+        "height": 0.7581,
+        "depth": 0.6123
+      },
+      "footprint": {
+        "width": 0.7061,
+        "depth": 0.6123,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "dresser_001",
+      "dimensions": {
+        "width": 2.2799,
+        "height": 0.7462,
+        "depth": 0.7706
+      },
+      "footprint": {
+        "width": 2.2799,
+        "depth": 0.7706,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "dresser_002",
+      "dimensions": {
+        "width": 2.2726,
+        "height": 0.9434,
+        "depth": 0.7721
+      },
+      "footprint": {
+        "width": 2.2726,
+        "depth": 0.7721,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics",
+      "dimensions": {
+        "width": 1.6129,
+        "height": 0.8986,
+        "depth": 0.087
+      },
+      "footprint": {
+        "width": 1.6129,
+        "depth": 0.087,
+        "policy": "full-xz-envelope-tv-wall"
+      },
+      "placement": {
+        "anchor": "wall",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics_032",
+      "dimensions": {
+        "width": 1.11,
+        "height": 0.716,
+        "depth": 0.7197
+      },
+      "footprint": {
+        "width": 1.11,
+        "depth": 0.7197,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics_036",
+      "dimensions": {
+        "width": 0.51,
+        "height": 0.6809,
+        "depth": 0.7457
+      },
+      "footprint": {
+        "width": 0.51,
+        "depth": 0.7457,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics_037",
+      "dimensions": {
+        "width": 0.8203,
+        "height": 0.6798,
+        "depth": 0.3129
+      },
+      "footprint": {
+        "width": 0.8203,
+        "depth": 0.3129,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics_040",
+      "dimensions": {
+        "width": 0.2868,
+        "height": 0.7321,
+        "depth": 0.6617
+      },
+      "footprint": {
+        "width": 0.2868,
+        "depth": 0.6617,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics_046",
+      "dimensions": {
+        "width": 0.393,
+        "height": 0.4117,
+        "depth": 0.3011
+      },
+      "footprint": {
+        "width": 0.393,
+        "depth": 0.3011,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "electronics_049",
+      "dimensions": {
+        "width": 1.6129,
+        "height": 1.07,
+        "depth": 0.3733
+      },
+      "footprint": {
+        "width": 1.6129,
+        "depth": 0.3733,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "flower_038",
+      "dimensions": {
+        "width": 0.4931,
+        "height": 0.3918,
+        "depth": 0.5378
+      },
+      "footprint": {
+        "width": 0.4931,
+        "depth": 0.5378,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "flower_039",
+      "dimensions": {
+        "width": 0.4875,
+        "height": 0.6306,
+        "depth": 0.514
+      },
+      "footprint": {
+        "width": 0.4875,
+        "depth": 0.514,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "flower_040",
+      "dimensions": {
+        "width": 0.6194,
+        "height": 0.7863,
+        "depth": 0.7134
+      },
+      "footprint": {
+        "width": 0.6194,
+        "depth": 0.7134,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "flower_041",
+      "dimensions": {
+        "width": 0.5667,
+        "height": 1.607,
+        "depth": 0.6299
+      },
+      "footprint": {
+        "width": 0.5667,
+        "depth": 0.6299,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "lamp",
+      "dimensions": {
+        "width": 0.4508,
+        "height": 2.2122,
+        "depth": 0.4508
+      },
+      "footprint": {
+        "width": 0.4508,
+        "depth": 0.4508,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "lamp_027",
+      "dimensions": {
+        "width": 0.6439,
+        "height": 0.7567,
+        "depth": 0.6439
+      },
+      "footprint": {
+        "width": 0.6439,
+        "depth": 0.6439,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "surface",
+        "status": "resolved",
+        "editorPlacementSupport": "unsupported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "lamp_028",
+      "dimensions": {
+        "width": 0.3798,
+        "height": 1.744,
+        "depth": 0.3798
+      },
+      "footprint": {
+        "width": 0.3798,
+        "depth": 0.3798,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa",
+      "dimensions": {
+        "width": 3.6734,
+        "height": 1.1613,
+        "depth": 1.5732
+      },
+      "footprint": {
+        "width": 3.6734,
+        "depth": 1.5732,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_026",
+      "dimensions": {
+        "width": 2.6918,
+        "height": 0.9271,
+        "depth": 1.4593
+      },
+      "footprint": {
+        "width": 2.6918,
+        "depth": 1.4593,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_027",
+      "dimensions": {
+        "width": 2.9269,
+        "height": 0.9026,
+        "depth": 1.4256
+      },
+      "footprint": {
+        "width": 2.9269,
+        "depth": 1.4256,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_028",
+      "dimensions": {
+        "width": 3.6602,
+        "height": 0.9951,
+        "depth": 1.1918
+      },
+      "footprint": {
+        "width": 3.6602,
+        "depth": 1.1918,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_029",
+      "dimensions": {
+        "width": 3.6602,
+        "height": 0.9951,
+        "depth": 1.2692
+      },
+      "footprint": {
+        "width": 3.6602,
+        "depth": 1.2692,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_030",
+      "dimensions": {
+        "width": 2.7708,
+        "height": 1.2313,
+        "depth": 1.496
+      },
+      "footprint": {
+        "width": 2.7708,
+        "depth": 1.496,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_031",
+      "dimensions": {
+        "width": 2.8952,
+        "height": 1.3,
+        "depth": 1.1265
+      },
+      "footprint": {
+        "width": 2.8952,
+        "depth": 1.1265,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    },
+    {
+      "assetId": "sofa_032",
+      "dimensions": {
+        "width": 4.5493,
+        "height": 1.0137,
+        "depth": 4.9794
+      },
+      "footprint": {
+        "width": 4.5493,
+        "depth": 4.9794,
+        "policy": "full-xz-envelope"
+      },
+      "placement": {
+        "anchor": "floor",
+        "status": "resolved",
+        "editorPlacementSupport": "supported"
+      },
+      "canonicalForward": "+Z"
+    }
+  ],
+  "evidenceLedgerSha256": "d32bc368417c4c94bd5be7d57104f1c15a76cb8d54594697f1dd088d7edcf7f7"
+}
