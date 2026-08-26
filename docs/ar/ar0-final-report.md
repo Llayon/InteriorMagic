@@ -81,3 +81,10 @@ USDZ and poster:
 - Evaluate additional assets, improved reproducible USDZ packaging and WebXR only as separately approved follow-up work.
 
 There is no runtime USDZ conversion, RoomProject change, planner change, Room Geometry change, backend, Track I modification, `catalog/v1` mutation, application deployment or merge in this track.
+
+## Landing-quality fix-pass handoff
+
+- Pushed head: `8cfdbac4e6678d132a2357248467dd249662ddce`.
+- Commits: `369a1de` (artifact/public boundary), `9fdbc26` (release verification and activation gates), `f41fdd7` (evidence report), `5eed0e7` (lazy editor bootstrap/planner import race), `8cfdbac` (final counts).
+- CI is pending for this exact head. The required checks are `quality`, `e2e-chromium`, `e2e-planner`, plus the PR-only `ar0-evidence` job.
+- No R2 upload or remote verification, Pages deployment, merge, catalog/v1 mutation, or immutable r1 replacement occurred.
