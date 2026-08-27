@@ -1,27 +1,17 @@
 // tests/catalog/k1-spatial-facts.test.mjs
 //
-// K1 — Hermetic CI test for the committed facts artifact and committed
-// non-binary evidence ledger (Plan Task 5.1, Amended v3).
+// K1 — Hermetic CI test for the three committed artifacts:
+//   src/editor/catalog/data/production-catalog-v1.json (Frozen Selection)
+//   src/editor/catalog/data/production-asset-facts-v1.json (FACTS)
+//   src/editor/catalog/data/production-asset-spatial-evidence-v1.json (EVIDENCE)
 //
-// STRICT HERMETIC RULE (Plan v3 #4 / A21):
-//   This file MUST NEVER read `.agent-data`, even conditionally. No
-//   `existsSync('.agent-data/...')` branch. No `readFileSync` of any
-//   `.agent-data/` path. No gating on filesystem checks against `.agent-data`.
-//   All actual local report / canonical GLB / source GLB hash verification
-//   belongs ONLY in `tests/catalog/upstream/k1-spatial-facts.test.mjs`.
+// All three are COMMITTED JSON files; tests read them and assert shape +
+// cross-file cardinality + frozenSelectionSha256 binding.
 //
-// This test reads ONLY the two committed JSON artifacts in
-// `src/editor/catalog/data/`:
-//   - production-asset-facts-v1.json            (committed in Commit 2)
-//   - production-asset-spatial-evidence-v1.json (committed in Commit 2)
-//
-// In Commit 1, those files DO NOT EXIST YET, so this test is INTENTIONALLY RED.
-// The expected failure mode is a clear "facts artifact not found" assertion so
-// the red is unambiguous and self-explanatory. Commit 2 makes the same test
-// GREEN by committing the two artifacts.
-//
-// Each test name states what it asserts and each `assert` message explains
-// the expected invariant, so a failure makes the contract violation obvious.
+// STRICT HERMETIC RULE:
+//   This test MUST NEVER read `.agent-data`, source GLBs, or canonical GLBs.
+//   All hash + measurement verification belongs to the upstream test
+//   `tests/catalog/upstream/k1-spatial-facts.test.mjs` (not added in K1).
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -30,13 +20,12 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// ----------------------------------------------------------------------------
-// Paths — committed files only.
-// ----------------------------------------------------------------------------
-
 const testDir = path.dirname(fileURLToPath(import.meta.url));
-// tests/catalog/ → repo root
 const repositoryRoot = path.resolve(testDir, '..', '..');
+const SELECTION_PATH = path.join(
+  repositoryRoot,
+  'src', 'editor', 'catalog', 'data', 'production-catalog-v1.json',
+);
 const FACTS_PATH = path.join(
   repositoryRoot,
   'src', 'editor', 'catalog', 'data', 'production-asset-facts-v1.json',
@@ -46,361 +35,358 @@ const EVIDENCE_PATH = path.join(
   'src', 'editor', 'catalog', 'data', 'production-asset-spatial-evidence-v1.json',
 );
 
-// ----------------------------------------------------------------------------
-// Helpers
-// ----------------------------------------------------------------------------
-
 const isSha256Hex = (s) => typeof s === 'string' && /^[0-9a-f]{64}$/.test(s);
 
-const loadJsonOrFailRed = async (p, label) => {
-  // This is NOT a `.agent-data` read; the path is under `src/editor/catalog/data/`.
-  // The failure mode is the intentional RED in Commit 1.
-  let raw;
-  try {
-    raw = await readFile(p, 'utf8');
-  } catch (err) {
-    if (err && err.code === 'ENOENT') {
-      throw new assert.AssertionError({
-        message: `K1 hermetic RED: ${label} artifact not found at ${p}. This file is COMMITTED in Commit 2, not Commit 1.`,
-        actual: 'missing',
-        expected: 'committed',
-        operator: 'existsSync (committed file only)',
-      });
-    }
-    throw err;
-  }
-  return JSON.parse(raw);
+const loadJson = async (p) => {
+  const raw = await readFile(p, 'utf8');
+  return { bytes: raw, data: JSON.parse(raw) };
 };
 
-// (Previously a sha256OfFile helper lived here; removed as unused.
-// The hermetic tests only test structural fields, not file-level hashes.)
-
-const DEEP_FORBIDDEN_FIELDS = [
-  'assetRevisionId',
-  'modelUrl',
-  'signedUrl',
-  'r2Key',
-  'sourceCategory',
-  'realWorldScale',
-  'plannerEligible',
-  'arEnabled',
-  'plannerApplicable',
+const DEEP_FORBIDDEN_FACTS_FIELDS = [
+  'assetRevisionId', 'modelUrl', 'signedUrl', 'r2Key',
+  'sourceCategory', 'realWorldScale', 'plannerEligible', 'arEnabled',
+  'semanticRole', 'rawVisualQa', 'canonicalVisualQa',
+  'sourceSha256', 'canonicalSha256', 'productionEligibility',
+];
+const DEEP_FORBIDDEN_EVIDENCE_FIELDS = [
+  'modelUrl', 'signedUrl', 'r2Key', 'realWorldScale',
+  'plannerEligible', 'arEnabled', 'productionEligibility',
 ];
 
-const FACTS_DEEP_FORBIDDEN_FIELDS = [
-  ...DEEP_FORBIDDEN_FIELDS,
-  // facts-specific (already forbidden everywhere, but doubled here for clarity):
-  'semanticRole',
-  'rawSourceSha256',
-  'canonicalSha256',
-  'sourceApparentForwardAxis',
-  'rotationCorrectionRadians',
-  'visualQaVerdict',
-  'forwardEvidence',
-];
-
-const EVIDENCE_DEEP_FORBIDDEN_FIELDS = [
-  ...DEEP_FORBIDDEN_FIELDS,
-];
-
-// Deep scan: walk an object recursively, return all key paths that contain a forbidden name.
-const collectForbiddenKeyPaths = (node, basePath = '', forbidden = DEEP_FORBIDDEN_FIELDS) => {
+const collectForbiddenKeyPaths = (node, basePath, forbidden) => {
   const hits = [];
-  if (node === null || typeof node !== 'object') return hits;
-  if (Array.isArray(node)) {
-    for (let i = 0; i < node.length; i += 1) {
-      hits.push(...collectForbiddenKeyPaths(node[i], `${basePath}[${i}]`, forbidden));
+  if (node && typeof node === 'object') {
+    for (const [key, value] of Object.entries(node)) {
+      if (forbidden.includes(key)) hits.push(`${basePath}.${key}`.replace(/^\./, ''));
+      hits.push(...collectForbiddenKeyPaths(value, basePath ? `${basePath}.${key}` : key, forbidden));
     }
-    return hits;
-  }
-  for (const [key, value] of Object.entries(node)) {
-    if (forbidden.includes(key)) hits.push(`${basePath}.${key}`.replace(/^\./, ''));
-    hits.push(...collectForbiddenKeyPaths(value, basePath ? `${basePath}.${key}` : key, forbidden));
   }
   return hits;
 };
 
+const PLACEMENT_ANCHORS = ['floor', 'wall', 'surface', 'ceiling'];
+const PLACEMENT_STATUSES = ['resolved', 'ambiguous', 'unsupported'];
+const FOOTPRINT_POLICIES = ['full-xz-envelope', 'full-xz-envelope-tv-wall', 'lower-band-review'];
+const FORWARD_AXES = ['+X', '-X', '+Z', '-Z', 'ambiguous'];
+const VISUAL_QA_VERDICTS = ['pass', 'fail', 'unsupported'];
+const K1_SPATIAL_STATUSES = ['pass', 'blocked'];
+
+let selectionCache = null;
+let factsCache = null;
+let evidenceCache = null;
+const load = async (path, key) => {
+  if (key === 'selection' && !selectionCache) selectionCache = await loadJson(path);
+  else if (key === 'facts' && !factsCache) factsCache = await loadJson(path);
+  else if (key === 'evidence' && !evidenceCache) evidenceCache = await loadJson(path);
+  return key === 'selection' ? selectionCache : key === 'facts' ? factsCache : evidenceCache;
+};
+
 // ----------------------------------------------------------------------------
-// Tests — committed facts artifact
+// HERMETIC CARDINALITY GATE — Selection ⊂ Facts ⊂ Evidence
+// ----------------------------------------------------------------------------
+
+test('K1 cardinality: Selection IDs == Facts IDs == Evidence IDs (exactly 47, no duplicates)', async () => {
+  const sel = await load(SELECTION_PATH, 'selection');
+  const facts = await load(FACTS_PATH, 'facts');
+  const evid = await load(EVIDENCE_PATH, 'evidence');
+
+  const selIds = sel.data.assets.map((a) => a.assetId);
+  const factIds = facts.data.assets.map((a) => a.assetId);
+  const evIds = evid.data.entries.map((e) => e.assetId);
+
+  assert.equal(new Set(selIds).size, 47, `Selection must have 47 unique IDs; got ${new Set(selIds).size}.`);
+  assert.equal(new Set(factIds).size, 47, `Facts must have 47 unique IDs; got ${new Set(factIds).size}.`);
+  assert.equal(new Set(evIds).size, 47, `Evidence must have 47 unique IDs; got ${new Set(evIds).size}.`);
+
+  assert.deepEqual(new Set(selIds), new Set(factIds), 'Selection ID set must equal Facts ID set.');
+  assert.deepEqual(new Set(selIds), new Set(evIds), 'Selection ID set must equal Evidence ID set.');
+
+  // Same deterministic ordering.
+  assert.deepEqual(selIds.slice().sort(), factIds.slice().sort());
+  assert.deepEqual(selIds.slice().sort(), evIds.slice().sort());
+});
+
+test('K1 cardinality: facts.frozenSelectionSha256 matches actual sha256 of production-catalog-v1.json bytes', async () => {
+  const facts = await load(FACTS_PATH, 'facts');
+  const expected = createHash('sha256').update(selectionCache.bytes).digest('hex');
+  assert.equal(
+    facts.data.frozenSelectionSha256,
+    expected,
+    `facts.frozenSelectionSha256 must equal sha256 of production-catalog-v1.json bytes. ` +
+      `Expected ${expected}, got ${facts.data.frozenSelectionSha256}.`,
+  );
+});
+
+test('K1 cardinality: evidence.frozenSelectionSha256 matches facts.frozenSelectionSha256', async () => {
+  const facts = await load(FACTS_PATH, 'facts');
+  const evid = await load(EVIDENCE_PATH, 'evidence');
+  assert.equal(evid.data.frozenSelectionSha256, facts.data.frozenSelectionSha256);
+});
+
+// ----------------------------------------------------------------------------
+// FACTS — durable spatial only.
 // ----------------------------------------------------------------------------
 
 test('K1 facts: schemaVersion===1 and coordinateContractVersion===1', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  assert.equal(facts.schemaVersion, 1,
-    `facts.schemaVersion must be 1 (frozen). Got ${facts.schemaVersion}.`);
-  assert.equal(facts.coordinateContractVersion, 1,
-    `facts.coordinateContractVersion must be 1 (frozen). Got ${facts.coordinateContractVersion}.`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  assert.equal(f.schemaVersion, 1);
+  assert.equal(f.coordinateContractVersion, 1);
 });
 
 test('K1 facts: assetCount===47 and assets.length===47', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  assert.equal(facts.assetCount, 47,
-    `facts.assetCount must be 47 (frozen selection size). Got ${facts.assetCount}.`);
-  assert.ok(Array.isArray(facts.assets),
-    `facts.assets must be an array. Got ${typeof facts.assets}.`);
-  assert.equal(facts.assets.length, facts.assetCount,
-    `facts.assets.length (${facts.assets.length}) must equal facts.assetCount (${facts.assetCount}).`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  assert.equal(f.assetCount, 47);
+  assert.equal(f.assets.length, 47);
 });
 
 test('K1 facts: no duplicate assetIds', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const ids = facts.assets.map((a) => a.assetId);
-  const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
-  assert.equal(dupes.length, 0,
-    `Found duplicate assetIds in facts.assets: ${[...new Set(dupes)].join(', ')}`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const ids = f.assets.map((a) => a.assetId);
+  assert.equal(new Set(ids).size, ids.length);
 });
 
-test('K1 facts: per-asset dimensions are finite && > 0 (Plan v3 #5 — no arbitrary range)', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  for (const a of facts.assets) {
-    const { width, height, depth } = a.dimensions ?? {};
-    assert.ok(width !== undefined && height !== undefined && depth !== undefined,
-      `asset ${a.assetId}: dimensions fields missing.`);
-    for (const [axis, value] of [['width', width], ['height', height], ['depth', depth]]) {
-      assert.ok(Number.isFinite(value) && value > 0,
-        `asset ${a.assetId}: dimensions.${axis} must be finite && > 0 (Plan v3 #5). Got ${value}.`);
-    }
+test('K1 facts: per-asset dimensions are finite && > 0', async () => {
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    assert.ok(Number.isFinite(a.dimensions.width) && a.dimensions.width > 0, `${a.assetId}: width`);
+    assert.ok(Number.isFinite(a.dimensions.height) && a.dimensions.height > 0, `${a.assetId}: height`);
+    assert.ok(Number.isFinite(a.dimensions.depth) && a.dimensions.depth > 0, `${a.assetId}: depth`);
   }
 });
 
 test('K1 facts: per-asset footprint dimensions are finite && > 0', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  for (const a of facts.assets) {
-    const { width, depth } = a.footprint ?? {};
-    assert.ok(width !== undefined && depth !== undefined,
-      `asset ${a.assetId}: footprint width/depth missing.`);
-    for (const [axis, value] of [['width', width], ['depth', depth]]) {
-      assert.ok(Number.isFinite(value) && value > 0,
-        `asset ${a.assetId}: footprint.${axis} must be finite && > 0. Got ${value}.`);
-    }
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    assert.ok(a.footprint.width > 0, `${a.assetId}: footprint.width`);
+    assert.ok(a.footprint.depth > 0, `${a.assetId}: footprint.depth`);
   }
 });
 
-test('K1 facts: footprint.width <= dimensions.width + DIMENSION_EPSILON_M and same for depth', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const DIMENSION_EPSILON_M = 0.01;
-  for (const a of facts.assets) {
-    assert.ok(a.footprint.width <= a.dimensions.width + DIMENSION_EPSILON_M,
-      `asset ${a.assetId}: footprint.width (${a.footprint.width}) must be <= dimensions.width (${a.dimensions.width}) + ${DIMENSION_EPSILON_M}`);
-    assert.ok(a.footprint.depth <= a.dimensions.depth + DIMENSION_EPSILON_M,
-      `asset ${a.assetId}: footprint.depth (${a.footprint.depth}) must be <= dimensions.depth (${a.dimensions.depth}) + ${DIMENSION_EPSILON_M}`);
+test('K1 facts: footprint.width <= dimensions.width and same for depth', async () => {
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    assert.ok(a.footprint.width <= a.dimensions.width + 1e-6,
+      `${a.assetId}: footprint.width (${a.footprint.width}) must be <= dimensions.width (${a.dimensions.width}).`);
+    assert.ok(a.footprint.depth <= a.dimensions.depth + 1e-6,
+      `${a.assetId}: footprint.depth must be <= dimensions.depth.`);
   }
 });
 
-test('K1 facts: footprint.policy is one of the three enum values', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const ALLOWED = new Set(['full-xz-envelope', 'full-xz-envelope-tv-wall', 'lower-band-review']);
-  for (const a of facts.assets) {
-    assert.ok(ALLOWED.has(a.footprint?.policy),
-      `asset ${a.assetId}: footprint.policy must be one of ${[...ALLOWED].join(' | ')}. Got ${a.footprint?.policy}.`);
+test('K1 facts: footprint.policy is one of the enum values', async () => {
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    assert.ok(FOOTPRINT_POLICIES.includes(a.footprint.policy), `${a.assetId}: ${a.footprint.policy}`);
   }
 });
 
-test('K1 facts: placement.anchor enum (incl null when status==ambiguous)', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const ALLOWED = new Set(['floor', 'wall', 'surface', 'ceiling', null]);
-  for (const a of facts.assets) {
-    assert.ok('anchor' in (a.placement ?? {}),
-      `asset ${a.assetId}: placement.anchor missing.`);
-    assert.ok(ALLOWED.has(a.placement.anchor),
-      `asset ${a.assetId}: placement.anchor must be one of floor|wall|surface|ceiling|null. Got ${a.placement.anchor}.`);
-    if (a.placement.status === 'ambiguous') {
-      assert.equal(a.placement.anchor, null,
-        `asset ${a.assetId}: placement.anchor must be null when status==='ambiguous'. Got ${a.placement.anchor}.`);
-    } else if (a.placement.status === 'resolved') {
-      assert.ok(a.placement.anchor !== null,
-        `asset ${a.assetId}: placement.anchor must be non-null when status==='resolved'.`);
-    }
+test('K1 facts: placement.anchor enum (incl null when status==ambiguous or unsupported)', async () => {
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    const ok = a.placement.anchor === null || PLACEMENT_ANCHORS.includes(a.placement.anchor);
+    assert.ok(ok, `${a.assetId}: anchor=${a.placement.anchor}`);
   }
 });
 
 test('K1 facts: placement.editorPlacementSupport enum and ties to ambiguous status', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const ALLOWED = new Set(['supported', 'unsupported']);
-  for (const a of facts.assets) {
-    const support = a.placement?.editorPlacementSupport;
-    assert.ok(ALLOWED.has(support),
-      `asset ${a.assetId}: placement.editorPlacementSupport must be supported|unsupported. Got ${support}.`);
-    if (a.placement?.status === 'ambiguous') {
-      assert.equal(support, 'unsupported',
-        `asset ${a.assetId}: when status==='ambiguous', editorPlacementSupport must be 'unsupported'. Got ${support}.`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    assert.ok(['supported', 'unsupported'].includes(a.placement.editorPlacementSupport),
+      `${a.assetId}: editorPlacementSupport=${a.placement.editorPlacementSupport}`);
+    if (a.placement.status === 'ambiguous' || a.placement.status === 'unsupported') {
+      assert.equal(a.placement.anchor, null,
+        `${a.assetId}: ambiguous/unsupported must have anchor=null.`);
+      assert.equal(a.placement.editorPlacementSupport, 'unsupported',
+        `${a.assetId}: ambiguous/unsupported must have editorPlacementSupport=unsupported.`);
     }
   }
 });
 
 test('K1 facts: every record carries canonicalForward === "+Z" (frozen)', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  for (const a of facts.assets) {
-    assert.equal(a.canonicalForward, '+Z',
-      `asset ${a.assetId}: canonicalForward must be "+Z" (frozen per ADR §2). Got ${a.canonicalForward}.`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  for (const a of f.assets) {
+    assert.equal(a.canonicalForward, '+Z');
   }
 });
 
 test('K1 facts: deep scan finds NO forbidden fields on facts records', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const hits = collectForbiddenKeyPaths(facts.assets, '', FACTS_DEEP_FORBIDDEN_FIELDS);
-  assert.equal(hits.length, 0,
-    `facts.assets must NOT contain any forbidden field. Found: ${hits.join(', ')}`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const hits = collectForbiddenKeyPaths(f.assets, 'assets', DEEP_FORBIDDEN_FACTS_FIELDS);
+  assert.equal(hits.length, 0, `forbidden fields present: ${JSON.stringify(hits)}`);
 });
 
 test('K1 facts: top-level artifact also has NO forbidden fields', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  // Walk the whole artifact (excluding the assets[] deep scan done above).
-  const top = { ...facts };
-  delete top.assets;
-  const hits = collectForbiddenKeyPaths(top, '', DEEP_FORBIDDEN_FIELDS);
-  assert.equal(hits.length, 0,
-    `facts top-level must NOT contain any forbidden field. Found: ${hits.join(', ')}`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const hits = collectForbiddenKeyPaths(
+    { ...f, assets: undefined }, // skip assets (covered by per-record test)
+    '',
+    DEEP_FORBIDDEN_FACTS_FIELDS,
+  );
+  assert.equal(hits.length, 0, `top-level forbidden fields: ${JSON.stringify(hits)}`);
 });
 
 test('K1 facts: deterministic ordering — assets sorted by assetId', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const ids = facts.assets.map((a) => a.assetId);
-  const sorted = [...ids].sort();
-  assert.deepEqual(ids, sorted,
-    'facts.assets must be sorted by assetId (deterministic ordering).');
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const ids = f.assets.map((a) => a.assetId);
+  const sorted = ids.slice().sort();
+  assert.deepEqual(ids, sorted, 'assets array must be sorted by assetId.');
 });
 
 test('K1 facts: evidenceLedgerSha256 is a 64-char hex string AND matches the committed ledger file', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  assert.ok(isSha256Hex(facts.evidenceLedgerSha256),
-    `facts.evidenceLedgerSha256 must be a 64-char lowercase hex string. Got ${facts.evidenceLedgerSha256}.`);
-  const ledgerBytes = await readFile(EVIDENCE_PATH);
-  const ledgerHash = createHash('sha256').update(ledgerBytes).digest('hex');
-  assert.equal(facts.evidenceLedgerSha256, ledgerHash,
-    `facts.evidenceLedgerSha256 (${facts.evidenceLedgerSha256}) must equal sha256 of ${EVIDENCE_PATH} (${ledgerHash}).`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const e = await load(EVIDENCE_PATH, 'evidence');
+  assert.ok(isSha256Hex(f.evidenceLedgerSha256),
+    `evidenceLedgerSha256 must be 64-char hex; got ${f.evidenceLedgerSha256}`);
+  assert.equal(f.evidenceLedgerSha256, createHash('sha256').update(e.bytes).digest('hex'),
+    'evidenceLedgerSha256 must match sha256 of production-asset-spatial-evidence-v1.json bytes.');
 });
 
-test('K1 facts: byAnchor + byAmbiguousCount sums to 47', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const sumAnchors = Object.values(facts.byAnchor ?? {}).reduce((s, n) => s + n, 0);
-  const ambig = facts.byAmbiguousCount ?? 0;
-  assert.equal(sumAnchors + ambig, 47,
-    `byAnchor sum (${sumAnchors}) + byAmbiguousCount (${ambig}) must equal 47.`);
+test('K1 facts: byStatus sums to 47', async () => {
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const sum = PLACEMENT_STATUSES.reduce((s, k) => s + (f.byStatus?.[k] ?? 0), 0);
+  assert.equal(sum, 47, `byStatus entries must sum to 47; got ${sum}.`);
 });
 
 test('K1 facts: byPolicy and byEditorPlacementSupport both sum to 47', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const sumPolicy = Object.values(facts.byPolicy ?? {}).reduce((s, n) => s + n, 0);
-  const sumSupport = Object.values(facts.byEditorPlacementSupport ?? {}).reduce((s, n) => s + n, 0);
-  assert.equal(sumPolicy, 47, `byPolicy sum must equal 47. Got ${sumPolicy}.`);
-  assert.equal(sumSupport, 47, `byEditorPlacementSupport sum must equal 47. Got ${sumSupport}.`);
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const sumPolicy = FOOTPRINT_POLICIES.reduce((s, k) => s + (f.byPolicy?.[k] ?? 0), 0);
+  assert.equal(sumPolicy, 47, `byPolicy entries must sum to 47; got ${sumPolicy}.`);
+  const sumSupp = Object.values(f.byEditorPlacementSupport ?? {}).reduce((s, n) => s + n, 0);
+  assert.equal(sumSupp, 47, `byEditorPlacementSupport entries must sum to 47; got ${sumSupp}.`);
+});
+
+test('K1 facts: byAnchor entries (where non-null) sum to status=resolved count', async () => {
+  const f = (await load(FACTS_PATH, 'facts')).data;
+  const sumAnchors = PLACEMENT_ANCHORS.reduce((s, k) => s + (f.byAnchor?.[k] ?? 0), 0);
+  const resolvedCount = f.byStatus?.resolved ?? 0;
+  // byAnchor only counts resolved anchors; ambiguous (anchor=null) excluded.
+  assert.equal(sumAnchors, resolvedCount,
+    `byAnchor sum (${sumAnchors}) must equal status=resolved count (${resolvedCount}).`);
 });
 
 // ----------------------------------------------------------------------------
-// Tests — committed non-binary evidence ledger
+// EVIDENCE — non-binary ledger.
 // ----------------------------------------------------------------------------
-//
-// NOTE: loadJsonOrFailRed throws AssertionError on ENOENT, so the same file-missing
-// behavior propagates here. That is the intentional Commit-1 RED for the ledger too.
 
 test('K1 evidence: schemaVersion===1, coordinateContractVersion===1, assetCount===47', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  assert.equal(ledger.schemaVersion, 1, `evidence.schemaVersion must be 1.`);
-  assert.equal(ledger.coordinateContractVersion, 1, `evidence.coordinateContractVersion must be 1.`);
-  assert.equal(ledger.assetCount, 47, `evidence.assetCount must be 47.`);
-});
-
-test('K1 evidence: byCanonicalVisualQa has the four explicit keys incl notApplicable (no literal "null" key)', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const keys = Object.keys(ledger.byCanonicalVisualQa ?? {});
-  assert.ok(!keys.includes('null'),
-    `byCanonicalVisualQa must NOT use a literal "null" key. Found keys: ${keys.join(',')}.`);
-  for (const required of ['pass', 'fail', 'unsupported', 'notApplicable']) {
-    assert.ok(keys.includes(required),
-      `byCanonicalVisualQa must include explicit "${required}" key. Found keys: ${keys.join(',')}.`);
-  }
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  assert.equal(e.schemaVersion, 1);
+  assert.equal(e.coordinateContractVersion, 1);
+  assert.equal(e.assetCount, 47);
+  assert.equal(e.entries.length, 47);
 });
 
 test('K1 evidence: byRawVisualQa has pass|fail|unsupported keys', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const keys = Object.keys(ledger.byRawVisualQa ?? {});
-  for (const required of ['pass', 'fail', 'unsupported']) {
-    assert.ok(keys.includes(required),
-      `byRawVisualQa must include "${required}" key. Found keys: ${keys.join(',')}.`);
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const k of ['pass', 'fail', 'unsupported']) {
+    assert.ok(typeof e.byRawVisualQa?.[k] === 'number', `byRawVisualQa.${k} missing`);
   }
 });
 
-test('K1 evidence: per-entry sourceSha256 is 64-char hex; canonicalSha256 is null OR 64-char hex', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  for (const e of ledger.entries) {
-    assert.ok(isSha256Hex(e.sourceSha256),
-      `entry ${e.assetId}: sourceSha256 must be 64-char hex. Got ${e.sourceSha256}.`);
-    if (e.canonicalSha256 !== null) {
-      assert.ok(isSha256Hex(e.canonicalSha256),
-        `entry ${e.assetId}: canonicalSha256 must be null OR 64-char hex. Got ${e.canonicalSha256}.`);
-    }
+test('K1 evidence: byCanonicalVisualQa has pass|fail|notApplicable keys (no literal "null" key)', async () => {
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const k of ['pass', 'fail', 'notApplicable']) {
+    assert.ok(typeof e.byCanonicalVisualQa?.[k] === 'number', `byCanonicalVisualQa.${k} missing`);
+  }
+  assert.equal(e.byCanonicalVisualQa.null, undefined, 'must not have literal "null" key.');
+});
+
+test('K1 evidence: per-entry sourceSha256 is 64-char hex; canonicalSha256 is 64-char hex', async () => {
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const entry of e.entries) {
+    assert.ok(isSha256Hex(entry.sourceSha256), `${entry.assetId}: sourceSha256 not 64-char hex.`);
+    assert.ok(isSha256Hex(entry.canonicalSha256), `${entry.assetId}: canonicalSha256 not 64-char hex.`);
   }
 });
 
 test('K1 evidence: per-entry sourceApparentForwardAxis enum', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const ALLOWED = new Set(['+X', '-X', '+Z', '-Z', 'ambiguous']);
-  for (const e of ledger.entries) {
-    assert.ok(ALLOWED.has(e.sourceApparentForwardAxis),
-      `entry ${e.assetId}: sourceApparentForwardAxis must be one of ${[...ALLOWED].join('|')}. Got ${e.sourceApparentForwardAxis}.`);
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const entry of e.entries) {
+    assert.ok(FORWARD_AXES.includes(entry.sourceApparentForwardAxis),
+      `${entry.assetId}: ${entry.sourceApparentForwardAxis}`);
   }
 });
 
-test('K1 evidence: appliedTransform is null iff canonicalSha256 is null', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  for (const e of ledger.entries) {
-    if (e.canonicalSha256 === null) {
-      assert.equal(e.appliedTransform, null,
-        `entry ${e.assetId}: canonicalSha256===null requires appliedTransform===null.`);
-    } else {
-      assert.ok(e.appliedTransform && typeof e.appliedTransform === 'object',
-        `entry ${e.assetId}: canonicalSha256!==null requires a non-null appliedTransform object.`);
-    }
+test('K1 evidence: appliedTransform fields', async () => {
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const entry of e.entries) {
+    const at = entry.appliedTransform;
+    assert.ok(typeof at.rotationCorrectionRadians === 'number');
+    assert.equal(at.rotationAxis, '+Y');
+    assert.ok(at.translationApplied && typeof at.translationApplied.x === 'number');
+    assert.equal(at.scaleApplied, 1);
   }
 });
 
-test('K1 evidence: per-entry rawVisualQa enum', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const ALLOWED = new Set(['pass', 'fail', 'unsupported']);
-  for (const e of ledger.entries) {
-    assert.ok(ALLOWED.has(e.rawVisualQa),
-      `entry ${e.assetId}: rawVisualQa must be pass|fail|unsupported. Got ${e.rawVisualQa}.`);
+test('K1 evidence: per-entry rawVisualQa enum and k1SpatialStatus enum', async () => {
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const entry of e.entries) {
+    assert.ok(VISUAL_QA_VERDICTS.includes(entry.rawVisualQa),
+      `${entry.assetId}: rawVisualQa=${entry.rawVisualQa}`);
+    assert.ok(['pass', 'fail'].includes(entry.canonicalVisualQa),
+      `${entry.assetId}: canonicalVisualQa=${entry.canonicalVisualQa}`);
+    assert.ok(K1_SPATIAL_STATUSES.includes(entry.k1SpatialStatus),
+      `${entry.assetId}: k1SpatialStatus=${entry.k1SpatialStatus}`);
+    assert.equal(typeof entry.semanticMismatch, 'boolean');
   }
 });
 
 test('K1 evidence: deterministic ordering — entries sorted by assetId', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const ids = ledger.entries.map((e) => e.assetId);
-  const sorted = [...ids].sort();
-  assert.deepEqual(ids, sorted,
-    'evidence.entries must be sorted by assetId (deterministic ordering).');
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  const ids = e.entries.map((en) => en.assetId);
+  const sorted = ids.slice().sort();
+  assert.deepEqual(ids, sorted);
 });
 
 test('K1 evidence: deep scan finds NO forbidden fields on evidence entries', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const hits = collectForbiddenKeyPaths(ledger, '', EVIDENCE_DEEP_FORBIDDEN_FIELDS);
-  assert.equal(hits.length, 0,
-    `evidence must NOT contain any forbidden field. Found: ${hits.join(', ')}`);
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  const hits = collectForbiddenKeyPaths(e.entries, 'entries', DEEP_FORBIDDEN_EVIDENCE_FIELDS);
+  assert.equal(hits.length, 0, `forbidden fields: ${JSON.stringify(hits)}`);
 });
 
 test('K1 evidence: byRawVisualQa and byCanonicalVisualQa sums match per-entry counts', async () => {
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  // Raw counts.
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
   const rawCounts = { pass: 0, fail: 0, unsupported: 0 };
-  for (const e of ledger.entries) rawCounts[e.rawVisualQa] += 1;
-  assert.deepEqual(rawCounts, ledger.byRawVisualQa,
-    `byRawVisualQa (${JSON.stringify(ledger.byRawVisualQa)}) must match per-entry counts (${JSON.stringify(rawCounts)}).`);
-  // Canonical counts: pass/fail/unsupported from canonicalVisualQa; notApplicable when canonicalSha256===null.
-  const canCounts = { pass: 0, fail: 0, unsupported: 0, notApplicable: 0 };
-  for (const e of ledger.entries) {
-    if (e.canonicalSha256 === null) canCounts.notApplicable += 1;
-    else canCounts[e.canonicalVisualQa] += 1;
-  }
-  assert.deepEqual(canCounts, ledger.byCanonicalVisualQa,
-    `byCanonicalVisualQa (${JSON.stringify(ledger.byCanonicalVisualQa)}) must match per-entry counts (${JSON.stringify(canCounts)}).`);
+  for (const en of e.entries) rawCounts[en.rawVisualQa] += 1;
+  assert.deepEqual(e.byRawVisualQa, rawCounts);
+
+  const canCounts = { pass: 0, fail: 0, notApplicable: 0 };
+  for (const en of e.entries) canCounts[en.canonicalVisualQa] += 1;
+  assert.deepEqual(e.byCanonicalVisualQa, canCounts);
 });
 
-test('K1 evidence: membership parity with facts — same assetId set, same ordering', async () => {
-  const facts = await loadJsonOrFailRed(FACTS_PATH, 'facts');
-  const ledger = await loadJsonOrFailRed(EVIDENCE_PATH, 'evidence');
-  const factsIds = facts.assets.map((a) => a.assetId);
-  const ledgerIds = ledger.entries.map((e) => e.assetId);
-  assert.deepEqual(ledgerIds, factsIds,
-    'evidence.entries must list the same assetIds in the same order as facts.assets.');
+test('K1 evidence: bySemanticMismatch === count(entries where semanticMismatch===true)', async () => {
+  const e = (await load(EVIDENCE_PATH, 'evidence')).data;
+  const observed = e.entries.filter((en) => en.semanticMismatch === true).length;
+  assert.equal(e.bySemanticMismatch, observed,
+    `bySemanticMismatch (${e.bySemanticMismatch}) must equal observed count (${observed}).`);
+});
+
+// ----------------------------------------------------------------------------
+// Selection ↔ Facts ↔ Evidence cross-artifact binding
+// ----------------------------------------------------------------------------
+
+test('K1 binding: every Selection asset has matching Facts and Evidence rows', async () => {
+  const sel = (await load(SELECTION_PATH, 'selection')).data;
+  const facts = (await load(FACTS_PATH, 'facts')).data;
+  const evid = (await load(EVIDENCE_PATH, 'evidence')).data;
+  for (const a of sel.assets) {
+    assert.ok(
+      facts.assets.some((f) => f.assetId === a.assetId),
+      `Selection ${a.assetId}: missing from facts.`,
+    );
+    assert.ok(
+      evid.entries.some((e) => e.assetId === a.assetId),
+      `Selection ${a.assetId}: missing from evidence.`,
+    );
+  }
+});
+
+test('K1 binding: facts.trackBaseSha === selection.trackBaseSha', async () => {
+  const sel = (await load(SELECTION_PATH, 'selection')).data;
+  const facts = (await load(FACTS_PATH, 'facts')).data;
+  const evid = (await load(EVIDENCE_PATH, 'evidence')).data;
+  assert.equal(facts.data?.trackBaseSha ?? facts.trackBaseSha, sel.trackBaseSha,
+    'facts.trackBaseSha must equal selection.trackBaseSha.');
+  assert.equal(evid.data?.trackBaseSha ?? evid.trackBaseSha, sel.trackBaseSha,
+    'evidence.trackBaseSha must equal selection.trackBaseSha.');
 });

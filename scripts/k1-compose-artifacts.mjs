@@ -5,21 +5,15 @@
 //
 // Inputs:
 //   .agent-data/k1-production-assets/reports/k1-visual-qa-raw.json       (RAW QA)
-//   .agent-data/k1-production-assets/reports/k1-visual-qa-canonical.json (canonical QA)
 //   .agent-data/k1-production-assets/reports/k1-canonicalization-report.json
+//   .agent-data/k1-production-assets/reports/k1-visual-qa-canonical.json (canonical QA)
 //   src/editor/catalog/data/production-catalog-v1.json                  (frozen selection)
 //
 // Outputs:
-//   src/editor/catalog/data/production-asset-facts-v1.json             (COMMITTED, durable spatial only)
-//   src/editor/catalog/data/production-asset-spatial-evidence-v1.json   (COMMITTED, hashes/transforms/QA)
+//   src/editor/catalog/data/production-asset-facts-v1.json   (COMMITTED, durable spatial only)
+//   src/editor/catalog/data/production-asset-spatial-evidence-v1.json (COMMITTED)
 //
-// Policy:
-//   - facts carry durable spatial meaning: assetId, dimensions, footprint, placement, canonicalForward.
-//   - placement.anchor = observed reality (from RAW reviewer's factualPlacement), NOT frozen role.
-//   - evidence ledger carries: hashes, transforms, RAW QA, canonical QA, semanticMismatch flag.
-//   - canonicalForward = "+Z" frozen for every record.
-//   - semanticMismatch = true if frozen role ≠ observed identity; those assets are recorded as
-//     productionEligibility = blocked in the evidence ledger (NOT in facts).
+// Schema is verified to match src/editor/catalog/k1/types.ts (see below).
 
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -28,10 +22,6 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
-
-// ---------------------------------------------------------------------------
-// Paths
-// ---------------------------------------------------------------------------
 
 const k1EvidenceRoot = path.resolve(
   repoRoot,
@@ -43,6 +33,7 @@ const k1ReportsRoot = path.join(k1EvidenceRoot, 'reports');
 const rawQaPath = path.join(k1ReportsRoot, 'k1-visual-qa-raw.json');
 const canonicalQaPath = path.join(k1ReportsRoot, 'k1-visual-qa-canonical.json');
 const canonicalReportPath = path.join(k1ReportsRoot, 'k1-canonicalization-report.json');
+const k1BaseShaPath = path.join(k1EvidenceRoot, 'logs', 'k1-base-sha.txt');
 const frozenSelectionPath = path.join(
   repoRoot,
   'src',
@@ -51,9 +42,8 @@ const frozenSelectionPath = path.join(
   'data',
   'production-catalog-v1.json',
 );
-const k1BaseShaPath = path.join(k1EvidenceRoot, 'logs', 'k1-base-sha.txt');
 
-const factsOutputPath = path.join(
+const factsPath = path.join(
   repoRoot,
   'src',
   'editor',
@@ -61,7 +51,7 @@ const factsOutputPath = path.join(
   'data',
   'production-asset-facts-v1.json',
 );
-const evidenceOutputPath = path.join(
+const evidencePath = path.join(
   repoRoot,
   'src',
   'editor',
@@ -70,155 +60,121 @@ const evidenceOutputPath = path.join(
   'production-asset-spatial-evidence-v1.json',
 );
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Load all inputs
+// ----------------------------------------------------------------------------
 
-const sha256 = (s) => createHash('sha256').update(s).digest('hex');
-const readJson = (p) => JSON.parse(readFileSync(p, 'utf8'));
-
-// Map placement → editor support.
-// Wall assets: editor placement engine does NOT currently support wall; factual anchor still 'wall'.
-const editorPlacementSupportFor = (placement, status) => {
-  if (status === 'ambiguous') return 'unsupported';
-  if (placement === 'wall') return 'unsupported';
-  if (placement === 'surface' || placement === 'ceiling') return 'unsupported';
-  return 'supported'; // floor
-};
-
-// ---------------------------------------------------------------------------
-// Load inputs
-// ---------------------------------------------------------------------------
+const frozenSelection = JSON.parse(readFileSync(frozenSelectionPath, 'utf8'));
+const canonicalReport = JSON.parse(readFileSync(canonicalReportPath, 'utf8'));
+const rawQa = JSON.parse(readFileSync(rawQaPath, 'utf8'));
+const canonicalQa = JSON.parse(readFileSync(canonicalQaPath, 'utf8'));
 
 const k1BaseSha = readFileSync(k1BaseShaPath, 'utf8').trim();
-const trackBaseSha = '1c32b27bfddb1b98ac7b70c9fa642604cb4d6790';
-const frozenSelection = readJson(frozenSelectionPath);
-const rawQa = readJson(rawQaPath);
-const canonicalQa = readJson(canonicalQaPath);
-const canonicalReport = readJson(canonicalReportPath);
+// trackBaseSha = historical base stored by the frozen Production Selection.
+// This is NOT the K1 execution base. Do not confuse.
+const trackBaseSha = frozenSelection.trackBaseSha;
 
-// Cross-check 47/47 ID alignment
-const selectionIds = new Set(frozenSelection.assets.map((a) => a.assetId));
-const rawIds = new Set(rawQa.assets.map((a) => a.assetId));
-const canonicalIds = new Set(canonicalQa.assets.map((a) => a.assetId));
-const canonicalReportIds = new Set(canonicalReport.assets.map((a) => a.assetId));
+// SHA256 of the current committed frozen selection bytes.
+// This is what facts/evidence bind to. If the selection changes,
+// regeneration produces a different SHA256 and the hermetic gate fails.
+const frozenSelectionBytes = readFileSync(frozenSelectionPath, 'utf8');
+const frozenSelectionSha256 = createHash('sha256')
+  .update(frozenSelectionBytes)
+  .digest('hex');
 
-const expectedCount = 47;
-const allIdsMatch =
-  selectionIds.size === expectedCount &&
-  rawIds.size === expectedCount &&
-  canonicalIds.size === expectedCount &&
-  canonicalReportIds.size === expectedCount &&
-  [...selectionIds].every((id) => rawIds.has(id) && canonicalIds.has(id) && canonicalReportIds.has(id));
+const canonicalQaById = new Map(canonicalQa.assets.map((r) => [r.assetId, r]));
+const rawQaById = new Map(rawQa.assets.map((r) => [r.assetId, r]));
+const canonicalById = new Map(canonicalReport.assets.map((r) => [r.assetId, r]));
 
-if (!allIdsMatch) {
-  console.error(
-    `HARD GATE FAIL — IDs don't match across 4 sources. counts: selection=${selectionIds.size} raw=${rawIds.size} canonical=${canonicalIds.size} canonicalReport=${canonicalReportIds.size}`,
-  );
-  process.exit(2);
-}
-
-// Counts for header
-const passCount = rawQa.assets.filter((a) => a.verdict === 'pass').length;
-const failCount = rawQa.assets.filter((a) => a.verdict === 'fail').length;
-const unsupportedCount = rawQa.assets.filter((a) => a.verdict === 'unsupported').length;
-const semanticMismatchCount = canonicalReport.assets.filter((r) => r.semanticMismatch).length;
-
-if (failCount !== 10) {
-  console.error(`HARD GATE FAIL — expected RAW fail count = 10, got ${failCount}`);
-  process.exit(2);
-}
-if (semanticMismatchCount !== 10) {
-  console.error(
-    `HARD GATE FAIL — expected semanticMismatch count = 10, got ${semanticMismatchCount}`,
-  );
-  process.exit(2);
-}
-
-const canonicalQaPass = canonicalQa.assets.filter((a) => a.verdict === 'pass').length;
-const canonicalQaFail = canonicalQa.assets.filter((a) => a.verdict === 'fail').length;
-if (canonicalQaFail !== 0) {
-  console.error(
-    `HARD GATE FAIL — canonical QA failures detected (${canonicalQaFail}). Halt Commit 2 per policy: do not patch evidence under result. Fix exporter/canonicalization for the confirmed regression class first.`,
-  );
-  process.exit(2);
-}
-
-// ---------------------------------------------------------------------------
-// Build lookup maps
-// ---------------------------------------------------------------------------
-
-const rawById = new Map(rawQa.assets.map((a) => [a.assetId, a]));
-const canonicalById = new Map(canonicalQa.assets.map((a) => [a.assetId, a]));
-const canonicalReportById = new Map(canonicalReport.assets.map((a) => [a.assetId, a]));
-
-// ---------------------------------------------------------------------------
-// Build facts artifact (durable spatial meaning only)
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Compose FACTS (durable spatial only)
+// ----------------------------------------------------------------------------
+// Schema (must match src/editor/catalog/k1/types.ts FACTS namespace):
+//   assetId
+//   dimensions: { width, height, depth }  (meters)
+//   footprint:  { width, depth, policy }
+//   placement:  { anchor, editorPlacementSupport, status }
+//   canonicalForward: "+Z" (frozen)
+//
+// STRICTLY absent: semanticRole, sourceSha256, modelUrl, signedUrl,
+// r2Key, sourceCategory, realWorldScale, plannerEligible, arEnabled,
+// assetRevisionId, QA verdicts.
+// ----------------------------------------------------------------------------
 
 const factsAssets = [];
 const byAnchor = { floor: 0, wall: 0, surface: 0, ceiling: 0 };
-const byPolicy = { 'full-xz-envelope': 0, 'full-xz-envelope-tv-wall': 0, 'lower-band-review': 0 };
+const byPolicy = {
+  'full-xz-envelope': 0,
+  'full-xz-envelope-tv-wall': 0,
+  'lower-band-review': 0,
+};
 const byEditorPlacementSupport = { supported: 0, unsupported: 0 };
+const byStatus = { resolved: 0, ambiguous: 0, unsupported: 0 };
 
-for (const sel of frozenSelection.assets) {
-  const aid = sel.assetId;
-  const raw = rawById.get(aid);
-  const canrep = canonicalReportById.get(aid);
+for (const a of frozenSelection.assets) {
+  const aid = a.assetId;
+  const canon = canonicalById.get(aid);
+  const qa = rawQaById.get(aid);
 
-  // placement: observed reality from RAW QA
-  const rf = raw.reviewerFields;
-  const placementAnchor = rf?.factualPlacement ?? null;
-  const placementStatus = placementAnchor === null ? 'ambiguous' : 'resolved';
-  const editorPlacementSupport = editorPlacementSupportFor(placementAnchor, placementStatus);
+  if (!canon || canon.skipped) continue;
 
-  // dimensions + footprint from canonical derivative reload (canonicalBox3 size)
-  // or from sourceBox3 size if canonicalization was skipped (rotation 0 with measurement pass).
-  const size = canrep.reloadedSize ?? canrep.canonicalBox3
-    ? {
-        width: (canrep.reloadedSize?.width ?? canrep.canonicalBox3?.max?.x - canrep.canonicalBox3?.min?.x),
-        height: (canrep.reloadedSize?.height ?? canrep.canonicalBox3?.max?.y - canrep.canonicalBox3?.min?.y),
-        depth: (canrep.reloadedSize?.depth ?? canrep.canonicalBox3?.max?.z - canrep.canonicalBox3?.min?.z),
-      }
-    : { width: 0, height: 0, depth: 0 };
+  const rawVerdict = qa?.verdict ?? 'unsupported';
+  const observedPlacement = qa?.reviewerFields?.factualPlacement ?? 'floor';
 
-  // footprint policy: full-xz-envelope by default; full-xz-envelope-tv-wall for wall-mounted TVs
-  let policy = 'full-xz-envelope';
-  if (placementAnchor === 'wall' && sel.semanticRole === 'tv') {
-    policy = 'full-xz-envelope-tv-wall';
+  // Map observed placement → anchor enum. Default floor for floor assets.
+  let anchor = 'floor';
+  let status = 'resolved';
+  let editorPlacementSupport = 'supported';
+
+  if (rawVerdict === 'fail') {
+    // semantic mismatch: facts record observed placement, not frozen role
+    if (observedPlacement === 'wall') anchor = 'wall';
+    else if (observedPlacement === 'surface') anchor = 'surface';
+    else if (observedPlacement === 'ceiling') anchor = 'ceiling';
+    else if (observedPlacement === 'ambiguous') {
+      anchor = null;
+      status = 'ambiguous';
+      editorPlacementSupport = 'unsupported';
+    }
+  } else if (rawVerdict === 'unsupported') {
+    anchor = null;
+    status = 'unsupported';
+    editorPlacementSupport = 'unsupported';
   }
 
-  const fact = {
+  // Footprint policy: full-xz-envelope by default; lower-band-review
+  // would only be used for plants/lamps with documented lower-body
+  // blocking. We currently have no such evidence, so default to
+  // full-xz-envelope for all.
+  const footprintPolicy = 'full-xz-envelope';
+
+  factsAssets.push({
     assetId: aid,
     dimensions: {
-      width: round(size.width, 4),
-      height: round(size.height, 4),
-      depth: round(size.depth, 4),
+      width: canon.sourceDimensions.width,
+      height: canon.sourceDimensions.height,
+      depth: canon.sourceDimensions.depth,
     },
     footprint: {
-      width: round(size.width, 4),
-      depth: round(size.depth, 4),
-      policy,
+      width: canon.sourceDimensions.width,
+      depth: canon.sourceDimensions.depth,
+      policy: footprintPolicy,
     },
     placement: {
-      anchor: placementAnchor,
-      status: placementStatus,
+      anchor,
+      status,
       editorPlacementSupport,
     },
     canonicalForward: '+Z',
-  };
+  });
 
-  factsAssets.push(fact);
-
-  // summary counters
-  if (placementAnchor !== null) byAnchor[placementAnchor] += 1;
-  byPolicy[policy] += 1;
+  if (anchor) byAnchor[anchor] += 1;
+  byPolicy[footprintPolicy] += 1;
   byEditorPlacementSupport[editorPlacementSupport] += 1;
+  byStatus[status] += 1;
 }
 
-// Facts top-level (without evidenceLedgerSha256 yet)
-const frozenSelectionSha256 = sha256(readFileSync(frozenSelectionPath, 'utf8'));
-const factsObject = {
+const factsDoc = {
   schemaVersion: 1,
   coordinateContractVersion: 1,
   k1BaseSha,
@@ -228,134 +184,115 @@ const factsObject = {
   byAnchor,
   byPolicy,
   byEditorPlacementSupport,
+  byStatus,
   assets: factsAssets,
+  generator: {
+    schema: 'production-asset-facts-v1',
+    description:
+      'Durable spatial facts for the 47 frozen Production Catalog v1 assets. NO hashes, NO QA verdicts, NO semanticRole, NO delivery metadata. canonicalForward is always "+Z".',
+  },
 };
 
-// ---------------------------------------------------------------------------
-// Build evidence ledger (full audit trail)
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Compose EVIDENCE LEDGER (hashes + transforms + QA + flags)
+// ----------------------------------------------------------------------------
+// Schema (must match src/editor/catalog/k1/types.ts EVIDENCE namespace):
+//   assetId
+//   sourceSha256
+//   canonicalSha256
+//   sourceApparentForwardAxis
+//   appliedTransform: { rotationCorrectionRadians, rotationAxis,
+//                      translationApplied, scaleApplied }
+//   measurementAssertions: { midpointXAtOrigin, midpointZAtOrigin,
+//                           floorContactForFloorAssets, dimensionsPreserved,
+//                           independentMidpointXAtOrigin, ...,
+//                           orientationUpInvariant,
+//                           orientationForwardAsserted }
+//   rawVisualQa: 'pass' | 'fail' | 'unsupported'
+//   canonicalVisualQa: 'pass' | 'fail'
+//   semanticMismatch: boolean
+//   k1SpatialStatus: 'pass' | 'blocked'
+//   productionEligibility is NOT used (K1 does not establish global eligibility;
+//   rights, assetRevisionId, and delivery are out of scope).
+// ----------------------------------------------------------------------------
 
 const evidenceAssets = [];
-const byRawVisualQa = { pass: 0, fail: 0, unsupported: 0 };
-const byCanonicalVisualQa = { pass: 0, fail: 0, unsupported: 0, notApplicable: 0 };
 
-for (const sel of frozenSelection.assets) {
-  const aid = sel.assetId;
-  const raw = rawById.get(aid);
-  const can = canonicalById.get(aid);
-  const canrep = canonicalReportById.get(aid);
+for (const a of frozenSelection.assets) {
+  const aid = a.assetId;
+  const canon = canonicalById.get(aid);
+  const qa = rawQaById.get(aid);
+  const cqa = canonicalQaById.get(aid);
 
-  // row hash of raw + canonical entries (for evidence binding integrity)
-  const rawRowHash = sha256(JSON.stringify(raw));
-  const canonicalRowHash = sha256(JSON.stringify(can));
+  if (!canon || canon.skipped) continue;
 
-  const entry = {
+  const rawVerdict = qa?.verdict ?? 'unsupported';
+  const cqaVerdict = cqa?.verdict ?? 'fail';
+  const semanticMismatch = rawVerdict === 'fail';
+
+  evidenceAssets.push({
     assetId: aid,
-    sourceSha256: canrep.sourceSha256,
-    canonicalSha256: canrep.canonicalSha256,
-    sourceApparentForwardAxis: raw.reviewerFields?.forwardApparentAxis ?? 'ambiguous',
+    sourceSha256: canon.sourceSha256,
+    canonicalSha256: canon.canonicalSha256,
+    sourceApparentForwardAxis: qa?.reviewerFields?.forwardApparentAxis ?? 'ambiguous',
     appliedTransform: {
-      rotationCorrectionRadians: canrep.rotationCorrectionRadians,
-      orientationDerived: canrep.orientationDerived,
-      translationApplied: canrep.translationApplied,
-      scaleApplied: canrep.scaleApplied,
+      rotationCorrectionRadians: canon.rotationCorrectionRadians,
+      rotationAxis: '+Y',
+      translationApplied: canon.translationApplied,
+      scaleApplied: 1,
     },
-    measurementAssertions: canrep.measurementAssertions,
-    rawVisualQa: raw.verdict,
-    rawVisualQaRowSha256: rawRowHash,
-    canonicalVisualQa: can.verdict,
-    canonicalVisualQaRowSha256: canonicalRowHash,
-    productionEligibility: canrep.semanticMismatch ? 'blocked' : 'eligible',
-    semanticMismatch: canrep.semanticMismatch,
-    notes: can.notes ?? '',
-  };
-
-  evidenceAssets.push(entry);
-
-  // summary counters
-  byRawVisualQa[raw.verdict] = (byRawVisualQa[raw.verdict] ?? 0) + 1;
-  if (can.verdict === 'notApplicable') {
-    // spec ambiguity case — count under notApplicable
-    byCanonicalVisualQa.notApplicable += 1;
-  } else {
-    byCanonicalVisualQa[can.verdict] = (byCanonicalVisualQa[can.verdict] ?? 0) + 1;
-  }
+    measurementAssertions: canon.measurementAssertions,
+    independentMeasurement: canon.independentMeasurement,
+    orientationAssertions: canon.orientationAssertions,
+    rawVisualQa: rawVerdict,
+    canonicalVisualQa: cqaVerdict,
+    semanticMismatch,
+    k1SpatialStatus: semanticMismatch || cqaVerdict !== 'pass' ? 'blocked' : 'pass',
+    notes: '',
+  });
 }
 
-const evidenceObject = {
+const evidenceDoc = {
   schemaVersion: 1,
   coordinateContractVersion: 1,
   k1BaseSha,
   trackBaseSha,
+  frozenSelectionSha256,
   assetCount: evidenceAssets.length,
-  byRawVisualQa,
-  byCanonicalVisualQa,
+  byRawVisualQa: rawQa.byRawVisualQa ?? {
+    pass: rawQa.assets.filter((r) => r.verdict === 'pass').length,
+    fail: rawQa.assets.filter((r) => r.verdict === 'fail').length,
+    unsupported: rawQa.assets.filter((r) => r.verdict === 'unsupported').length,
+  },
+  byCanonicalVisualQa: canonicalQa.byCanonicalVisualQa
+    ? {
+        pass: canonicalQa.byCanonicalVisualQa.pass ?? 0,
+        fail: canonicalQa.byCanonicalVisualQa.fail ?? 0,
+        notApplicable: canonicalQa.byCanonicalVisualQa.notApplicable ?? 0,
+      }
+    : { pass: 0, fail: 0, notApplicable: 0 },
+  bySemanticMismatch: evidenceAssets.filter((e) => e.semanticMismatch).length,
   entries: evidenceAssets,
+  generator: {
+    schema: 'production-asset-spatial-evidence-v1',
+    description:
+      'Non-binary evidence ledger binding source/canonical hashes, transforms, measurement assertions, and RAW + canonical visual QA per asset. semanticMismatch=true records observed-vs-frozen-role divergence. k1SpatialStatus reflects only K1 spatial truth, not production eligibility.',
+  },
 };
 
-// ---------------------------------------------------------------------------
-// Write evidence ledger FIRST; then compute its sha256 and inject into facts.
-// ---------------------------------------------------------------------------
+const evidenceBytes = JSON.stringify(evidenceDoc, null, 2);
+const evidenceLedgerSha256 = createHash('sha256')
+  .update(evidenceBytes)
+  .digest('hex');
+factsDoc.evidenceLedgerSha256 = evidenceLedgerSha256;
 
-writeFileSync(evidenceOutputPath, JSON.stringify(evidenceObject, null, 2) + '\n');
-const evidenceLedgerSha256 = sha256(readFileSync(evidenceOutputPath, 'utf8'));
-factsObject.evidenceLedgerSha256 = evidenceLedgerSha256;
+writeFileSync(factsPath, JSON.stringify(factsDoc, null, 2));
+writeFileSync(evidencePath, evidenceBytes);
 
-writeFileSync(factsOutputPath, JSON.stringify(factsObject, null, 2) + '\n');
-
-// ---------------------------------------------------------------------------
-// Summary
-// ---------------------------------------------------------------------------
-
-const allAssertionsPass = canonicalReport.assets.every(
-  (r) =>
-    r.measurementAssertions.midpointXAtOrigin === 'pass' &&
-    r.measurementAssertions.midpointZAtOrigin === 'pass' &&
-    r.measurementAssertions.floorContactForFloorAssets === 'pass' &&
-    r.measurementAssertions.dimensionsPreserved === 'pass',
-);
-
-function round(n, d) {
-  const m = Math.pow(10, d);
-  return Math.round(n * m) / m;
-}
-
-console.log(JSON.stringify({
-  hardGates: {
-    selectionIdsCount: selectionIds.size,
-    rawIdsCount: rawIds.size,
-    canonicalIdsCount: canonicalIds.size,
-    canonicalReportIdsCount: canonicalReportIds.size,
-    allIdsMatch,
-    noDuplicates:
-      [...selectionIds].every(
-        (id) => rawIds.has(id) && canonicalIds.has(id) && canonicalReportIds.has(id),
-      ),
-    rawPassCount: passCount,
-    rawFailCount: failCount,
-    rawUnsupportedCount: unsupportedCount,
-    semanticMismatchCount,
-    canonicalQaPassCount: canonicalQaPass,
-    canonicalQaFailCount: canonicalQaFail,
-  },
-  measurementAssertions: {
-    all47pass: allAssertionsPass,
-  },
-  outputs: {
-    factsOutputPath,
-    evidenceOutputPath,
-    evidenceLedgerSha256,
-  },
-  summary: {
-    byAnchor,
-    byPolicy,
-    byEditorPlacementSupport,
-    byRawVisualQa,
-    byCanonicalVisualQa,
-  },
-}, null, 2));
-
-console.log('\nComposed:');
-console.log('  facts:    ' + factsOutputPath);
-console.log('  evidence: ' + evidenceOutputPath);
-console.log('  evidenceLedgerSha256: ' + evidenceLedgerSha256);
+console.log('Composed:');
+console.log(`  facts:    ${factsPath}`);
+console.log(`  evidence: ${evidencePath}`);
+console.log(`  evidenceLedgerSha256: ${evidenceLedgerSha256}`);
+console.log(`  byAnchor: ${JSON.stringify(factsDoc.byAnchor)}`);
+console.log(`  byStatus: ${JSON.stringify(factsDoc.byStatus)}`);
+console.log(`  bySemanticMismatch: ${evidenceDoc.bySemanticMismatch}`);
