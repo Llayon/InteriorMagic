@@ -31,6 +31,18 @@ export default tseslint.config(
   },
   {
     files: [
+      'src/editor/catalog/k1/**/*.ts',
+    ],
+    rules: {
+      // K1's type namespaces (`FACTS`, `EVIDENCE`) are a deliberate v3
+      // design choice — they group fact and evidence row schemas side-by-
+      // side in one file. Per Plan v3 §1 A22, this is an intentional
+      // locality-vs-style trade-off. Override the no-namespace default.
+      '@typescript-eslint/no-namespace': 'off',
+    },
+  },
+  {
+    files: [
       'scripts/**/*.mjs',
       'playwright.config.ts',
       'tests/**/*.ts',

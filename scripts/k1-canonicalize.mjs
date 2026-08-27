@@ -172,15 +172,15 @@ const computeBox3FromAccessors = (document) => {
         try {
           pos = prim.getAttribute('POSITION');
         } catch {
-        /* defensive no-op: gltf-transform version may lack this API */
-      }
+          /* defensive no-op: gltf-transform version may lack this API */
+        }
         if (!pos) continue;
         let arr = null;
         try {
           arr = pos.getArray();
         } catch {
-        /* defensive no-op: gltf-transform version may lack this API */
-      }
+          /* defensive no-op: gltf-transform version may lack this API */
+        }
         const itemSize =
           typeof pos.getElementSize === 'function' ? pos.getElementSize() : 3;
         if (!arr || itemSize < 3) continue;
@@ -198,8 +198,8 @@ const computeBox3FromAccessors = (document) => {
         if (child.propertyType === 'Node') visit(child, worldMatrix);
       }
     } catch {
-        /* defensive no-op: gltf-transform version may lack this API */
-      }
+      /* defensive no-op: gltf-transform version may lack this API */
+    }
   };
 
   const identity = new THREE.Matrix4();
