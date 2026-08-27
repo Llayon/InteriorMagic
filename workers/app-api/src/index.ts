@@ -1,5 +1,11 @@
 import { getOrCreateUserId } from './db';
 import {
+  ProjectDocumentError,
+  parseRoomProjectDocument,
+  serializeRoomProjectCanonical,
+} from './projectContract';
+import { createProject, getProject, updateProjectCas } from './projects';
+import {
   buildExpiredCookieHeader,
   buildSetCookieHeader,
   createSession,
@@ -13,6 +19,10 @@ import {
 import { parseMaxAgeEnv, TelegramVerificationError, verifyTelegramInitData } from './telegram';
 
 export const MAX_WIRE_BODY_BYTES = 16 * 1024;
+/** Project documents get their own bound; auth endpoints keep the tight 16 KiB. */
+export const MAX_PROJECT_BODY_BYTES = 512 * 1024;
+
+const PROJECT_UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type WorkerErrorCode =
   | 'invalid_request'
@@ -22,11 +32,15 @@ export type WorkerErrorCode =
   | 'init_data_expired'
   | 'payload_too_large'
   | 'internal_error'
-  | 'unauthenticated';
+  | 'unauthenticated'
+  | 'project_not_found'
+  | 'stale_revision'
+  | 'project_id_conflict'
+  | 'invalid_project';
 
 const corsHeaders = (origin: string) => ({
   'Access-Control-Allow-Origin': origin,
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Credentials': 'true',
   Vary: 'Origin',
@@ -88,6 +102,31 @@ const parseBody = (text: string): { initData: string } => {
   const initData = record['initData'];
   if (typeof initData !== 'string' || initData.length === 0) throw new TelegramVerificationError('invalid_init_data');
   return { initData };
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const hasExactKeys = (record: Record<string, unknown>, allowed: readonly string[]): boolean => {
+  const expected = new Set(allowed);
+  const present = new Set(Object.keys(record));
+  if (present.size !== expected.size) return false;
+  for (const key of present) if (!expected.has(key)) return false;
+  return true;
+};
+
+const isExactJson = (request: Request): boolean =>
+  request.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase() === 'application/json';
+
+const contentLengthExceeds = (request: Request, maxBytes: number): boolean => {
+  const header = request.headers.get('content-length');
+  return header !== null && Number(header) > maxBytes;
+};
+
+/** Reads a strictly bounded JSON body; throws Error('payload_too_large') on overflow. */
+const readBoundedJson = async (request: Request, maxBytes: number): Promise<unknown> => {
+  const text = await readBoundedText(request.body, maxBytes);
+  return JSON.parse(text);
 };
 
 export async function requireSession(request: Request, env: AppApiWorkerEnv, now: number = Date.now()): Promise<string | null> {
@@ -175,6 +214,125 @@ export const createAppApiHandler = () =>
       const headers = { ...corsHeaders(allowedOrigin), 'Cache-Control': 'no-store' } as Record<string, string>;
       headers['Set-Cookie'] = buildExpiredCookieHeader(policy);
       return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...headers, 'Content-Type': 'application/json' } });
+    }
+
+    // H3B project routes — ownership always derives from requireSession().
+    const projectIdFromPath = (): string | null => {
+      if (!url.pathname.startsWith('/projects/')) return null;
+      try {
+        return decodeURIComponent(url.pathname.slice('/projects/'.length));
+      } catch {
+        return '';
+      }
+    };
+
+    if (url.pathname === '/projects') {
+      if (request.method !== 'POST') return errorResponse('invalid_request', 405, allowedOrigin);
+      if (!isOriginAllowedForMutating()) return errorResponse('origin_forbidden', 403);
+      if (!isExactJson(request)) return errorResponse('invalid_request', 415, allowedOrigin);
+      if (contentLengthExceeds(request, MAX_PROJECT_BODY_BYTES)) {
+        return errorResponse('payload_too_large', 413, allowedOrigin);
+      }
+      if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
+      const userId = await requireSession(request, env);
+      if (userId === null) return errorResponse('unauthenticated', 401, allowedOrigin);
+
+      let payload: { id: string; canonical: string; schemaVersion: number };
+      try {
+        const parsed: unknown = await readBoundedJson(request, MAX_PROJECT_BODY_BYTES);
+        if (!isRecord(parsed) || !hasExactKeys(parsed, ['id', 'project'])) throw new Error('shape');
+        const id = parsed['id'];
+        if (typeof id !== 'string' || !PROJECT_UUID_PATTERN.test(id)) throw new Error('uuid');
+        const document = parseRoomProjectDocument(parsed['project']);
+        payload = { id, canonical: serializeRoomProjectCanonical(document), schemaVersion: document.version };
+      } catch (e) {
+        if (e instanceof Error && e.message === 'payload_too_large') return errorResponse('payload_too_large', 413, allowedOrigin);
+        if (e instanceof ProjectDocumentError) return errorResponse('invalid_project', 400, allowedOrigin);
+        return errorResponse('invalid_request', 400, allowedOrigin);
+      }
+
+      try {
+        const result = await createProject(env.DB, userId, payload.id, payload.schemaVersion, payload.canonical, Date.now());
+        if (result.kind === 'conflict') return errorResponse('project_id_conflict', 409, allowedOrigin);
+        return json({ ok: true, metadata: result.metadata }, 200, allowedOrigin);
+      } catch {
+        return errorResponse('internal_error', 500, allowedOrigin);
+      }
+    }
+
+    const pathProjectId = projectIdFromPath();
+    if (pathProjectId !== null) {
+      const originForCors = requestOrigin === allowedOrigin ? allowedOrigin : undefined;
+      if (request.method === 'GET') {
+        if (!isOriginAllowedForGet()) return errorResponse('origin_forbidden', 403);
+        if (!PROJECT_UUID_PATTERN.test(pathProjectId)) return errorResponse('invalid_request', 400, originForCors);
+        if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
+        const userId = await requireSession(request, env);
+        if (userId === null) return errorResponse('unauthenticated', 401, originForCors);
+        let row: Awaited<ReturnType<typeof getProject>>;
+        try {
+          row = await getProject(env.DB, userId, pathProjectId);
+        } catch {
+          return errorResponse('internal_error', 500, originForCors);
+        }
+        if (row === null) return errorResponse('project_not_found', 404, originForCors);
+        let document: unknown;
+        try {
+          document = parseRoomProjectDocument(JSON.parse(row.project_json));
+        } catch {
+          return errorResponse('internal_error', 500, originForCors);
+        }
+        return json(
+          {
+            ok: true,
+            metadata: { id: row.id, schemaVersion: row.schema_version, revision: row.revision, createdAt: row.created_at, updatedAt: row.updated_at },
+            project: document,
+          },
+          200,
+          originForCors,
+        );
+      }
+
+      if (request.method === 'PUT') {
+        if (!isOriginAllowedForMutating()) return errorResponse('origin_forbidden', 403);
+        if (!isExactJson(request)) return errorResponse('invalid_request', 415, allowedOrigin);
+        if (contentLengthExceeds(request, MAX_PROJECT_BODY_BYTES)) {
+          return errorResponse('payload_too_large', 413, allowedOrigin);
+        }
+        if (!PROJECT_UUID_PATTERN.test(pathProjectId)) return errorResponse('invalid_request', 400, allowedOrigin);
+        if (!env.DB) return errorResponse('server_misconfigured', 503, allowedOrigin);
+        const userId = await requireSession(request, env);
+        if (userId === null) return errorResponse('unauthenticated', 401, allowedOrigin);
+
+        let canonical: string;
+        let schemaVersion: number;
+        let expectedRevision: number;
+        try {
+          const parsed: unknown = await readBoundedJson(request, MAX_PROJECT_BODY_BYTES);
+          if (!isRecord(parsed) || !hasExactKeys(parsed, ['expectedRevision', 'project'])) throw new Error('shape');
+          const revision = parsed['expectedRevision'];
+          if (typeof revision !== 'number' || !Number.isSafeInteger(revision) || revision < 1) throw new Error('revision');
+          const document = parseRoomProjectDocument(parsed['project']);
+          expectedRevision = revision;
+          schemaVersion = document.version;
+          canonical = serializeRoomProjectCanonical(document);
+        } catch (e) {
+          if (e instanceof Error && e.message === 'payload_too_large') return errorResponse('payload_too_large', 413, allowedOrigin);
+          if (e instanceof ProjectDocumentError) return errorResponse('invalid_project', 400, allowedOrigin);
+          return errorResponse('invalid_request', 400, allowedOrigin);
+        }
+
+        try {
+          const result = await updateProjectCas(env.DB, userId, pathProjectId, expectedRevision, schemaVersion, canonical, Date.now());
+          if (result.kind === 'stale_revision') return errorResponse('stale_revision', 409, allowedOrigin);
+          if (result.kind === 'not_found') return errorResponse('project_not_found', 404, allowedOrigin);
+          return json({ ok: true, metadata: result.metadata }, 200, allowedOrigin);
+        } catch {
+          return errorResponse('internal_error', 500, allowedOrigin);
+        }
+      }
+
+      return errorResponse('invalid_request', 405, allowedOrigin);
     }
 
     // POST /auth/telegram — Telegram bootstrap, creates first-party session + Set-Cookie
