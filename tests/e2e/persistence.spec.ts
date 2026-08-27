@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures';
-import { addAsset, openApp, project } from './helpers';
+import { addAsset, openApp, project, waitForEditorReady } from './helpers';
 
 test('restores objects, transforms and finishes after save and reload', async ({ monitoredPage: page }) => {
   await openApp(page);
@@ -13,7 +13,7 @@ test('restores objects, transforms and finishes after save and reload', async ({
   await page.getByRole('button', { name: 'Project menu' }).click();
   await page.getByRole('button', { name: 'Save project' }).click();
   await page.reload();
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady())).toBe(true);
+  await waitForEditorReady(page);
   await expect.poll(async () => (await project(page)).objects.length).toBe(2);
   expect(await project(page)).toEqual(expected);
   expect(await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getSessionSummary())).toMatchObject({ undoCount: 0, redoCount: 0 });

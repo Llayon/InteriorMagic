@@ -48,7 +48,11 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 .categories button { flex: none; background: transparent; color: #77736c; padding: 4px 10px; min-height: 40px; border-radius: 14px; font-size: 12px; white-space: nowrap; }
 .categories button.active { background: #30312e; color: white; }
 .items { min-height: 0; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+.item-shell { flex: 0 0 105px; height: 92px; position: relative; }
 .item { flex: 0 0 105px; height: 92px; border-radius: 16px; background: #eee9e1; display: grid; place-content: center; gap: 1px; position: relative; overflow: hidden; }
+.item-shell > .item { width: 100%; height: 100%; }
+.item-shell.has-ar > .item { padding-bottom: 21px; }
+.item-ar-action { position: absolute; z-index: 2; left: 7px; right: 7px; bottom: 5px; min-width: 0; min-height: 21px; height: 21px; padding: 0 5px; border-radius: 8px; background: #30312e; color: white; font-size: 8.5px; font-weight: 650; }
 .item img { width: 82px; height: 48px; object-fit: cover; border-radius: 10px; margin: auto; }
 .item span { font-size: 29px; color: #77624f; }
 .item b { font-size: 12px; }
@@ -59,6 +63,7 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 .item.active { box-shadow: inset 0 0 0 2px #30312e; }
 .workspace-sheet[data-sheet-state="expanded"] .catalog-panel .items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow-x: hidden; overflow-y: auto; gap: 8px; }
 .workspace-sheet[data-sheet-state="expanded"] .catalog-panel .item { width: 100%; min-width: 0; }
+.workspace-sheet[data-sheet-state="expanded"] .catalog-panel .item-shell { width: 100%; min-width: 0; }
 .catalog-error { color: #9b3732; font-size: 11px; }
 .device-qa { position: absolute; z-index: 35; top: calc(var(--safe-top) + 118px); right: max(10px, var(--safe-right)); display: grid; justify-items: end; gap: 5px; padding: 8px; border-radius: 14px; }
 .device-qa-row { display: flex; gap: 4px; align-items: center; }
@@ -88,6 +93,7 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
   .categories { flex: none; flex-wrap: wrap; }
   .items { min-height: 0; display: grid; grid-template-columns: 1fr 1fr; overflow-x: hidden; overflow-y: auto; align-content: start; }
   .item { width: 100%; min-width: 0; }
+  .item-shell { width: 100%; min-width: 0; }
   .global-toolbar { top: 14px; right: 14px; }
   .object-toolbar { bottom: 20px; }
   .hint { top: 12px; }

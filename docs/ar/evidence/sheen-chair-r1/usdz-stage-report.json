@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 2,
+  "arRevisionId": "sheen-chair-r1",
+  "usdzSha256": "4b0bec120f9db100b888b7083a8e2d7873d7c2f56d5343b65eb4c8fc69330618",
+  "parser": "Blender-bundled pxr.Usd/UsdGeom",
+  "upAxis": "Y",
+  "metersPerUnit": 1.0,
+  "stageBounds": {
+    "min": [
+      -0.4132789890281856,
+      -8.868773770931426e-17,
+      -0.2851327294483783
+    ],
+    "max": [
+      0.4132789750583471,
+      0.6862470911801213,
+      0.28513274248689413
+    ],
+    "size": [
+      0.8265579640865327,
+      0.6862470911801214,
+      0.5702654719352724
+    ],
+    "sizeMeters": [
+      0.8265579640865327,
+      0.6862470911801214,
+      0.5702654719352724
+    ]
+  },
+  "dependencies": {
+    "layers": [
+      "model.usdz"
+    ],
+    "assets": [
+      "model.usdz[textures/Image_0.png]",
+      "model.usdz[textures/Image_2.png]",
+      "model.usdz[textures/Image_3.png]",
+      "model.usdz[textures/Image_4.png]",
+      "model.usdz[textures/Image_5.png]"
+    ],
+    "unresolved": []
+  }
+}

@@ -3,7 +3,7 @@ import { expect, test as base, type Page, type Request, type Response } from '@p
 const isCriticalUrl = (url: string, page: Page) => {
   const parsed = new URL(url);
   const origin = new URL(page.url() || 'http://127.0.0.1:4173').origin;
-  return parsed.origin === origin && (parsed.pathname === '/' || /\.(?:js|css|glb|jpg|jpeg|png|svg)$/i.test(parsed.pathname) || parsed.pathname.startsWith('/src/'));
+  return parsed.origin === origin && (parsed.pathname === '/' || /\.(?:js|css|json|glb|usdz|webp|jpg|jpeg|png|svg)$/i.test(parsed.pathname) || parsed.pathname.startsWith('/src/'));
 };
 
 export const test = base.extend<{ monitoredPage: Page }>({
@@ -15,7 +15,13 @@ export const test = base.extend<{ monitoredPage: Page }>({
       if (message.type() === 'error') failures.push(`console.error: ${message.text()}`);
     });
     page.on('requestfailed', (request: Request) => {
-      if (isCriticalUrl(request.url(), page)) failures.push(`requestfailed: ${request.url()} (${request.failure()?.errorText ?? 'unknown'})`);
+      const failureText = request.failure()?.errorText ?? 'unknown';
+      // model-viewer may cancel its GLB fetch after the decoder has consumed
+      // the response. The dedicated status/hash assertions still verify the
+      // artifact delivery; only this expected post-decode cancellation is
+      // excluded from page-level failure reporting.
+      const expectedModelViewerCancellation = failureText === 'net::ERR_ABORTED' && /\/model\.glb$/u.test(new URL(request.url()).pathname);
+      if (isCriticalUrl(request.url(), page) && !expectedModelViewerCancellation) failures.push(`requestfailed: ${request.url()} (${failureText})`);
     });
     page.on('response', (response: Response) => {
       if (response.status() >= 400 && isCriticalUrl(response.url(), page)) failures.push(`HTTP ${response.status()}: ${response.url()}`);

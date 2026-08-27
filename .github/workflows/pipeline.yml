@@ -59,12 +59,6 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run browser tests
         run: npm run test:e2e
-      - name: Run planner fixture browser tests
-        run: npm run test:e2e:planner
-      - name: Run real planner integration browser tests
-        run: npm run test:e2e:planner-real
-      - name: Run planning intent integration browser tests
-        run: npm run test:e2e:planner-intent
       - name: Upload Playwright artifacts
         if: failure()
         uses: actions/upload-artifact@v6
@@ -76,9 +70,80 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  e2e-planner:
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run planner fixture browser tests
+        run: npm run test:e2e:planner
+      - name: Run real planner integration browser tests
+        run: npm run test:e2e:planner-real
+      - name: Run planning intent integration browser tests
+        run: npm run test:e2e:planner-intent
+      - name: Upload planner Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-planner-artifacts
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  ar0-evidence:
+    if: github.event_name == 'pull_request'
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR head for AR0 evidence
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Verify exact PR head checkout
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify immutable AR0 revision
+        run: npm run assets:ar0:verify
+      - name: Run AR0 browser evidence
+        run: npm run test:e2e:ar0
+      - name: Upload AR0 Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-ar0-artifacts
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
   build-pages:
     if: github.event_name != 'pull_request'
-    needs: e2e-chromium
+    needs: [e2e-chromium, e2e-planner]
     runs-on: ubuntu-latest
     permissions:
       contents: read
