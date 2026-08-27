@@ -61,7 +61,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -108,7 +107,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -155,7 +153,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -202,7 +199,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -249,7 +245,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -296,7 +291,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -343,7 +337,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -390,7 +383,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -437,7 +429,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -484,7 +475,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -531,7 +521,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -578,7 +567,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -625,7 +613,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -672,7 +659,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -719,7 +705,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -766,7 +751,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -813,7 +797,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -860,7 +843,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -907,7 +889,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -954,7 +935,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1001,7 +981,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1048,7 +1027,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1095,7 +1073,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1142,7 +1119,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1189,7 +1165,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1236,7 +1211,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1283,7 +1257,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1330,7 +1303,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1377,7 +1349,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1424,7 +1395,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1471,7 +1441,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1518,7 +1487,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1565,7 +1533,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1612,7 +1579,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1659,7 +1625,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1706,7 +1671,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1753,7 +1717,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1800,7 +1763,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -1847,7 +1809,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1894,7 +1855,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1941,7 +1901,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -1988,7 +1947,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -2035,7 +1993,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -2082,7 +2039,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -2129,7 +2085,6 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     },
     {
@@ -2176,7 +2131,6 @@
       "rawVisualQa": "fail",
       "canonicalVisualQa": "pass",
       "semanticMismatch": true,
-      "k1SpatialStatus": "blocked",
       "notes": ""
     },
     {
@@ -2223,12 +2177,11 @@
       "rawVisualQa": "pass",
       "canonicalVisualQa": "pass",
       "semanticMismatch": false,
-      "k1SpatialStatus": "pass",
       "notes": ""
     }
   ],
   "generator": {
     "schema": "production-asset-spatial-evidence-v1",
-    "description": "Non-binary evidence ledger binding source/canonical hashes, transforms, measurement assertions, and RAW + canonical visual QA per asset. semanticMismatch=true records observed-vs-frozen-role divergence. k1SpatialStatus reflects only K1 spatial truth, not production eligibility."
+    "description": "Non-binary evidence ledger binding source/canonical hashes, transforms, measurement assertions, RAW + canonical visual QA per asset. semanticMismatch=true records observed-vs-frozen-role divergence. Two orthogonal axes are reported separately: canonicalVisualQa (spatial truth) and semanticMismatch (frozen role vs observed identity)."
   }
 }

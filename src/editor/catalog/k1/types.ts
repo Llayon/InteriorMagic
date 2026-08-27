@@ -28,7 +28,6 @@ export type FootprintPolicy =
   | 'lower-band-review';
 export type ForwardApparentAxis = '+X' | '-X' | '+Z' | '-Z' | 'ambiguous';
 export type VisualQaVerdict = 'pass' | 'fail' | 'unsupported';
-export type K1SpatialStatus = 'pass' | 'blocked';
 
 // ----------------------------------------------------------------------------
 // FACTS — durable spatial meaning.
@@ -150,13 +149,15 @@ export namespace EVIDENCE {
     canonicalVisualQa: 'pass' | 'fail';
     semanticMismatch: boolean;
     /**
-     * Narrow K1 status: 'pass' = spatial truth authoritative (canonical
-     * geometry + identity + materials preserved, RAW QA pass). 'blocked'
-     * if semanticMismatch=true OR canonicalVisualQa != 'pass'. This is
-     * NOT a production-eligibility verdict (rights, assetRevisionId,
-     * delivery are out of K1 scope).
+     * Per-axis semantic axis separation:
+     *   canonicalVisualQa records whether the canonical derivative
+     *   preserved identity/materials/contact/orientation. If 'pass',
+     *   the asset's spatial truth is authoritative regardless of
+     *   semanticMismatch status.
+     *   semanticMismatch records whether frozen semanticRole diverges
+     *   from observed visual identity. Independent of spatial QA.
+     *   `notes` carries free-form provenance detail.
      */
-    k1SpatialStatus: K1SpatialStatus;
     notes: string;
   }
 

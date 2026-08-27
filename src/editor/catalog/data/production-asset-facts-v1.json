@@ -6,19 +6,19 @@
   "frozenSelectionSha256": "c574cadd3850b75b0b6c1dc3c869fad37235699678d79e6026800f81f3d919d0",
   "assetCount": 47,
   "byAnchor": {
-    "floor": 40,
-    "wall": 0,
-    "surface": 7,
+    "floor": 35,
+    "wall": 1,
+    "surface": 11,
     "ceiling": 0
   },
   "byPolicy": {
-    "full-xz-envelope": 47,
-    "full-xz-envelope-tv-wall": 0,
+    "full-xz-envelope": 46,
+    "full-xz-envelope-tv-wall": 1,
     "lower-band-review": 0
   },
   "byEditorPlacementSupport": {
-    "supported": 47,
-    "unsupported": 0
+    "supported": 35,
+    "unsupported": 12
   },
   "byStatus": {
     "resolved": 47,
@@ -511,12 +511,12 @@
       "footprint": {
         "width": 1.6128783822059631,
         "depth": 0.08700115606188774,
-        "policy": "full-xz-envelope"
+        "policy": "full-xz-envelope-tv-wall"
       },
       "placement": {
-        "anchor": "floor",
+        "anchor": "wall",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -535,7 +535,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -554,7 +554,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -573,7 +573,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -592,7 +592,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -611,7 +611,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -630,7 +630,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -647,9 +647,9 @@
         "policy": "full-xz-envelope"
       },
       "placement": {
-        "anchor": "floor",
+        "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -666,9 +666,9 @@
         "policy": "full-xz-envelope"
       },
       "placement": {
-        "anchor": "floor",
+        "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -685,9 +685,9 @@
         "policy": "full-xz-envelope"
       },
       "placement": {
-        "anchor": "floor",
+        "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -704,9 +704,9 @@
         "policy": "full-xz-envelope"
       },
       "placement": {
-        "anchor": "floor",
+        "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -744,7 +744,7 @@
       "placement": {
         "anchor": "surface",
         "status": "resolved",
-        "editorPlacementSupport": "supported"
+        "editorPlacementSupport": "unsupported"
       },
       "canonicalForward": "+Z"
     },
@@ -924,5 +924,5 @@
     "schema": "production-asset-facts-v1",
     "description": "Durable spatial facts for the 47 frozen Production Catalog v1 assets. NO hashes, NO QA verdicts, NO semanticRole, NO delivery metadata. canonicalForward is always \"+Z\"."
   },
-  "evidenceLedgerSha256": "55e680c77a56c57cc6c46d293ae3831be507b3c00be21a6a2c46644c94e00f67"
+  "evidenceLedgerSha256": "6ee71e0d641609010c4737d90ecfb62422c29ea6f108d24d512c8f2cc0fcbdf7"
 }

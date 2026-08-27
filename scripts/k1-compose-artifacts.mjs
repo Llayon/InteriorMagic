@@ -120,34 +120,44 @@ for (const a of frozenSelection.assets) {
   if (!canon || canon.skipped) continue;
 
   const rawVerdict = qa?.verdict ?? 'unsupported';
-  const observedPlacement = qa?.reviewerFields?.factualPlacement ?? 'floor';
+  // observedPlacement = factual anchor determined by RAW visual review.
+  // K1's contract: facts.anchor MUST be derived from RAW evidence for
+  // BOTH pass and fail raw verdicts. The semanticMismatch flag (frozen
+  // role != observed identity) does NOT alter placement; it is recorded
+  // in evidence.semanticMismatch separately.
+  const observedPlacement = qa?.reviewerFields?.factualPlacement ?? null;
 
-  // Map observed placement → anchor enum. Default floor for floor assets.
-  let anchor = 'floor';
+  // Map observed placement → anchor enum. Same rules for all raw verdicts.
+  let anchor = null;
   let status = 'resolved';
-  let editorPlacementSupport = 'supported';
+  let editorPlacementSupport = 'unsupported';
+  let footprintPolicy = 'full-xz-envelope';
 
-  if (rawVerdict === 'fail') {
-    // semantic mismatch: facts record observed placement, not frozen role
-    if (observedPlacement === 'wall') anchor = 'wall';
-    else if (observedPlacement === 'surface') anchor = 'surface';
-    else if (observedPlacement === 'ceiling') anchor = 'ceiling';
-    else if (observedPlacement === 'ambiguous') {
-      anchor = null;
-      status = 'ambiguous';
-      editorPlacementSupport = 'unsupported';
-    }
-  } else if (rawVerdict === 'unsupported') {
-    anchor = null;
+  if (rawVerdict === 'unsupported') {
     status = 'unsupported';
+  } else if (observedPlacement === null || observedPlacement === 'ambiguous') {
+    // RAW reviewer could not determine placement → ambiguous.
+    status = 'ambiguous';
+  } else if (observedPlacement === 'floor') {
+    anchor = 'floor';
+    status = 'resolved';
+    editorPlacementSupport = 'supported';
+  } else if (observedPlacement === 'wall') {
+    anchor = 'wall';
+    status = 'resolved';
+    editorPlacementSupport = 'unsupported';
+    // Wall-mounted assets (TV panels, monitors) — full XZ footprint
+    // applies to the panel face; K1 documents this policy explicitly.
+    footprintPolicy = 'full-xz-envelope-tv-wall';
+  } else if (observedPlacement === 'surface') {
+    anchor = 'surface';
+    status = 'resolved';
+    editorPlacementSupport = 'unsupported';
+  } else if (observedPlacement === 'ceiling') {
+    anchor = 'ceiling';
+    status = 'resolved';
     editorPlacementSupport = 'unsupported';
   }
-
-  // Footprint policy: full-xz-envelope by default; lower-band-review
-  // would only be used for plants/lamps with documented lower-body
-  // blocking. We currently have no such evidence, so default to
-  // full-xz-envelope for all.
-  const footprintPolicy = 'full-xz-envelope';
 
   factsAssets.push({
     assetId: aid,
@@ -210,11 +220,17 @@ const factsDoc = {
 //                           orientationUpInvariant,
 //                           orientationForwardAsserted }
 //   rawVisualQa: 'pass' | 'fail' | 'unsupported'
-//   canonicalVisualQa: 'pass' | 'fail'
-//   semanticMismatch: boolean
-//   k1SpatialStatus: 'pass' | 'blocked'
-//   productionEligibility is NOT used (K1 does not establish global eligibility;
-//   rights, assetRevisionId, and delivery are out of scope).
+//     canonicalVisualQa: 'pass' | 'fail'
+//     semanticMismatch: boolean
+//     productionEligibility is NOT used (K1 does not establish global eligibility;
+//     rights, assetRevisionId, and delivery are out of scope).
+//
+// Two orthogonal axes:
+//   1. spatial QA         pass | fail (canonical visual QA verdict)
+//   2. semanticMismatch   true  | false (frozen role vs observed identity)
+// They are reported SEPARATELY. A frozen-mismatch asset that canonicalizes
+// cleanly (identity preserved, materials preserved, geometry assertions
+// pass) is recorded as semanticMismatch=true + canonicalVisualQa='pass'.
 // ----------------------------------------------------------------------------
 
 const evidenceAssets = [];
@@ -248,7 +264,6 @@ for (const a of frozenSelection.assets) {
     rawVisualQa: rawVerdict,
     canonicalVisualQa: cqaVerdict,
     semanticMismatch,
-    k1SpatialStatus: semanticMismatch || cqaVerdict !== 'pass' ? 'blocked' : 'pass',
     notes: '',
   });
 }
@@ -277,7 +292,7 @@ const evidenceDoc = {
   generator: {
     schema: 'production-asset-spatial-evidence-v1',
     description:
-      'Non-binary evidence ledger binding source/canonical hashes, transforms, measurement assertions, and RAW + canonical visual QA per asset. semanticMismatch=true records observed-vs-frozen-role divergence. k1SpatialStatus reflects only K1 spatial truth, not production eligibility.',
+      'Non-binary evidence ledger binding source/canonical hashes, transforms, measurement assertions, RAW + canonical visual QA per asset. semanticMismatch=true records observed-vs-frozen-role divergence. Two orthogonal axes are reported separately: canonicalVisualQa (spatial truth) and semanticMismatch (frozen role vs observed identity).',
   },
 };
 

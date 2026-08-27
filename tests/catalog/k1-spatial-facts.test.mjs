@@ -71,7 +71,6 @@ const PLACEMENT_STATUSES = ['resolved', 'ambiguous', 'unsupported'];
 const FOOTPRINT_POLICIES = ['full-xz-envelope', 'full-xz-envelope-tv-wall', 'lower-band-review'];
 const FORWARD_AXES = ['+X', '-X', '+Z', '-Z', 'ambiguous'];
 const VISUAL_QA_VERDICTS = ['pass', 'fail', 'unsupported'];
-const K1_SPATIAL_STATUSES = ['pass', 'blocked'];
 
 let selectionCache = null;
 let factsCache = null;
@@ -319,16 +318,19 @@ test('K1 evidence: appliedTransform fields', async () => {
   }
 });
 
-test('K1 evidence: per-entry rawVisualQa enum and k1SpatialStatus enum', async () => {
+test('K1 evidence: per-entry rawVisualQa enum and canonicalVisualQa enum and semanticMismatch boolean', async () => {
   const e = (await load(EVIDENCE_PATH, 'evidence')).data;
   for (const entry of e.entries) {
     assert.ok(VISUAL_QA_VERDICTS.includes(entry.rawVisualQa),
       `${entry.assetId}: rawVisualQa=${entry.rawVisualQa}`);
     assert.ok(['pass', 'fail'].includes(entry.canonicalVisualQa),
       `${entry.assetId}: canonicalVisualQa=${entry.canonicalVisualQa}`);
-    assert.ok(K1_SPATIAL_STATUSES.includes(entry.k1SpatialStatus),
-      `${entry.assetId}: k1SpatialStatus=${entry.k1SpatialStatus}`);
-    assert.equal(typeof entry.semanticMismatch, 'boolean');
+    assert.equal(typeof entry.semanticMismatch, 'boolean',
+      `${entry.assetId}: semanticMismatch must be boolean.`);
+    // k1SpatialStatus was removed; canonicalVisualQa and semanticMismatch
+    // are now the only status fields. Verify it's absent from committed JSON.
+    assert.equal(entry.k1SpatialStatus, undefined,
+      `${entry.assetId}: k1SpatialStatus was removed; should not be present.`);
   }
 });
 
