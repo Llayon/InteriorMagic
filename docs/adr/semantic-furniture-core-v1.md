@@ -64,12 +64,17 @@ real producer and consumer boundary.
 
 ### Curated descriptive role
 
-`role` is the curated descriptive classification for an asset. Its presence in
-a curated manifest is not, by itself, production semantic authority. The role
-is authoritative only when it is provenance-backed and bound to the exact
-immutable asset content it describes. It records what the object is treated as
-by the application; it does not decide whether that object is suitable for a
-particular planning scenario.
+`role` is the curated descriptive classification for an asset. A role becomes
+production semantic authority only after provenance-backed review for the
+corresponding asset content. Presence in a curated selection manifest alone is
+not sufficient evidence of semantic correctness. It records what the object
+is treated as by the application; it does not decide whether that object is
+suitable for a particular planning scenario.
+
+Role must not be inferred from geometry, `sourceCategory`, `displayCategory`,
+catalog category, name, tags, `assetId`, or model node names. A known semantic
+mismatch blocks planning/runtime activation until the owning semantic catalog
+is corrected or superseded.
 
 For example, `armchair` is descriptive authority. Whether an armchair is an
 eligible Conversation participant is scenario judgment based on the complete
@@ -201,6 +206,12 @@ one exists, or by deterministic provenance/content hashes before such a release
 identity exists. G2E does not require K1 to mint the future runtime
 `assetRevisionId`. Required fields, non-null values, raw mesh bounds, and
 successful TypeScript compilation do not establish that authority.
+
+Presence of role, dimensions, or footprint fields does not by itself establish
+semantic or spatial production authority. Runtime mesh bounds may be audit
+evidence but are not automatically authoritative. This is an authority-model
+clarification only; it does not fix the Production Selection, import K1
+evidence into G2E, or modify catalog runtime.
 
 K1 activation requires provenance-backed authoritative facts, not merely
 non-null `FurnitureAssetDefinition` fields. Its artifact must distinguish:
