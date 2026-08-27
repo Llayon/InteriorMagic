@@ -1,24 +1,10 @@
 import { getTelegramInitData } from '@/platform/telegram/host';
+import { resolveAppApiEndpoint, toAppApiBaseUrl } from '@/platform/appApi/endpoint';
 import { identityStore } from './store';
 
-const ENDPOINT_ENV = (): string | null => {
-  try {
-    const metaEnv = (import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_APP_API_ENDPOINT;
-    const procEnv = (globalThis as unknown as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITE_APP_API_ENDPOINT;
-    const raw = typeof metaEnv === 'string' ? metaEnv : typeof procEnv === 'string' ? procEnv : null;
-    if (typeof raw !== 'string') return null;
-    const trimmed = raw.trim();
-    return trimmed.length === 0 ? null : trimmed;
-  } catch {
-    return null;
-  }
-};
+const ENDPOINT_ENV = (): string | null => resolveAppApiEndpoint();
 
-const toBaseUrl = (endpoint: string): string => {
-  const trimmed = endpoint.trim().replace(/\/+$/, '');
-  if (trimmed.endsWith('/auth/telegram')) return trimmed.slice(0, -'/auth/telegram'.length);
-  return trimmed;
-};
+const toBaseUrl = (endpoint: string): string => toAppApiBaseUrl(endpoint);
 
 const parseUserId = (data: unknown): string | null => {
   if (typeof data !== 'object' || data === null) return null;

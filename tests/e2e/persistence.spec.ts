@@ -18,3 +18,14 @@ test('restores objects, transforms and finishes after save and reload', async ({
   expect(await project(page)).toEqual(expected);
   expect(await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getSessionSummary())).toMatchObject({ undoCount: 0, redoCount: 0 });
 });
+
+test('H3B: local mutation survives reload without a manual Save', async ({ monitoredPage: page }) => {
+  await openApp(page);
+  await addAsset(page, 'chairs', 'chair');
+  const expected = await project(page);
+  // No explicit Save: the persistence seam must have written already.
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady())).toBe(true);
+  await expect.poll(async () => (await project(page)).objects.length).toBe(1);
+  expect(await project(page)).toEqual(expected);
+});
