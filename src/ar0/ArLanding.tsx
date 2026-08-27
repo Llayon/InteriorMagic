@@ -26,7 +26,7 @@ export function ArLanding({ revisionId }: ArLandingProps) {
         return parseAr0Manifest(await response.json(), revision);
       })
       .then((loadedManifest) => { if (active) setManifest(loadedManifest); })
-      .catch((reason: unknown) => {
+      .catch(() => {
         if (active) {
           setError('Не удалось загрузить AR-модель. Попробуйте позже.');
         }
