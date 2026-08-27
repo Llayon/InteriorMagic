@@ -64,9 +64,12 @@ real producer and consumer boundary.
 
 ### Curated descriptive role
 
-`role` is the authoritative curated descriptive classification for an asset
-revision. It records what the object is treated as by the application; it does
-not decide whether that object is suitable for a particular planning scenario.
+`role` is the curated descriptive classification for an asset. Its presence in
+a curated manifest is not, by itself, production semantic authority. The role
+is authoritative only when it is provenance-backed and bound to the exact
+immutable asset content it describes. It records what the object is treated as
+by the application; it does not decide whether that object is suitable for a
+particular planning scenario.
 
 For example, `armchair` is descriptive authority. Whether an armchair is an
 eligible Conversation participant is scenario judgment based on the complete
@@ -191,17 +194,21 @@ TV and Conversation remain the empirical ownership examples:
 
 ## Authority and versioning
 
-Semantic and spatial facts are authoritative only when the owning asset or
-catalog pipeline provides provenance-backed, reviewed facts for the specific
-asset revision. Required fields, non-null values, raw mesh bounds, and successful
-TypeScript compilation do not establish that authority.
+Semantic and spatial facts are authoritative only when provenance-backed and
+bound to the exact immutable asset content they describe. That immutable
+identity may be represented by a release-layer asset revision identifier when
+one exists, or by deterministic provenance/content hashes before such a release
+identity exists. G2E does not require K1 to mint the future runtime
+`assetRevisionId`. Required fields, non-null values, raw mesh bounds, and
+successful TypeScript compilation do not establish that authority.
 
 K1 activation requires provenance-backed authoritative facts, not merely
 non-null `FurnitureAssetDefinition` fields. Its artifact must distinguish:
 
 - a schema version, which describes the facts format;
-- a content revision or deterministic hash, which identifies the curated data;
-- the asset revision to which each fact record applies;
+- deterministic provenance/content hashes, such as `sourceSha256` and
+  `canonicalSha256`, which bind the facts to the exact immutable asset content;
+- a release-layer asset revision identifier when one exists;
 - provenance or evidence sufficient to audit the values.
 
 The schema version belongs at the facts artifact or manifest boundary. It is
@@ -214,8 +221,10 @@ and is not part of G2E.
 ## K1 handoff
 
 Before production activation, K1 must provide a deterministic, validated fact
-set keyed by unique asset ID and asset revision. A planning-enabled record must
-have:
+set keyed by unique `assetId` and provenance-bound to the exact
+inspected/canonicalized asset content. The spatial facts artifact is not
+required to duplicate `semanticRole` or mint `assetRevisionId`. A
+planning-enabled record must have:
 
 - an explicitly curated `FurnitureSemanticRole`;
 - finite positive canonical dimensions in meters;
