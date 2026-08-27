@@ -3,7 +3,6 @@ import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { getAsset } from '@/editor/assets/registry';
 import { measureGlbFile } from '../../scripts/ar0/glb-bounds.mjs';
 import { getAr0Revision } from './revisions';
 import { parseAr0Manifest } from './manifest';
@@ -21,10 +20,18 @@ describe('AR0 immutable Sheen Chair assets', () => {
     expect(Math.abs(canonical.min[1])).toBeLessThanOrEqual(0.001);
   });
 
-  it('matches authoritative Asset Definition dimensions within 1%', async () => {
-    const asset = getAsset('sheenChair');
+  it('matches frozen AR revision dimensions within tolerance', async () => {
+    const revision = getAr0Revision('sheen-chair-r1')!;
+    const manifest = parseAr0Manifest(
+      JSON.parse((await readFile(path.join(revisionRoot, 'manifest.json'))).toString('utf8')),
+      revision,
+    );
     const bounds = await measureGlbFile(path.join(revisionRoot, 'model.glb'));
-    const expected = [asset.dimensions.width, asset.dimensions.height, asset.dimensions.depth];
+    const expected = [
+      manifest.spatial.dimensionsMeters.width,
+      manifest.spatial.dimensionsMeters.height,
+      manifest.spatial.dimensionsMeters.depth,
+    ];
     bounds.size.forEach((actual, axis) => {
       expect(Number.isFinite(actual)).toBe(true);
       expect(actual).toBeGreaterThan(0);
