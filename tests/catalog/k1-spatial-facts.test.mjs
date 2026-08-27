@@ -72,10 +72,8 @@ const loadJsonOrFailRed = async (p, label) => {
   return JSON.parse(raw);
 };
 
-const sha256OfFile = async (p) => {
-  const buf = await readFile(p);
-  return createHash('sha256').update(buf).digest('hex');
-};
+// (Previously a sha256OfFile helper lived here; removed as unused.
+// The hermetic tests only test structural fields, not file-level hashes.)
 
 const DEEP_FORBIDDEN_FIELDS = [
   'assetRevisionId',

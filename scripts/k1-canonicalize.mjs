@@ -51,7 +51,6 @@ const repositoryRoot = path.resolve(scriptDir, '..');
 const k1DataRoot = path.resolve(repositoryRoot, '.agent-data', 'k1-production-assets');
 const k1ReportsRoot = path.join(k1DataRoot, 'reports');
 const k1CanonicalRoot = path.join(k1DataRoot, 'canonical');
-const k1LogsRoot = path.join(k1DataRoot, 'logs');
 
 // Source asset root — K1 uses the authoritative Realistic_Furniture_glb directory.
 const k1SourceAssetRoot = path.resolve(
@@ -60,16 +59,6 @@ const k1SourceAssetRoot = path.resolve(
     'D:/Programms/Max/Assets/Realistic_Furniture_glb/Furniture_Realistic_glb',
 );
 const sourceAssetsRoot = k1SourceAssetRoot;
-
-const frozenSelectionPath = path.join(
-  repositoryRoot,
-  'src',
-  'editor',
-  'catalog',
-  'data',
-  'production-catalog-v1.json',
-);
-const k1BaseShaLogPath = path.join(k1LogsRoot, 'k1-base-sha.txt');
 
 const auditReportPath = path.join(k1ReportsRoot, 'k1-audit-raw.json');
 const rawVisualQaPath = path.join(k1ReportsRoot, 'k1-visual-qa-raw.json');
@@ -109,91 +98,6 @@ const io = new NodeIO()
 
 const hashBytes = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
-// Convert a glTF-Transform Document to a THREE.Scene for Box3 measurement.
-// This is a lightweight approach: we walk the node graph and create
-// corresponding THREE.Object3D nodes, then measure.
-const documentToThreeScene = (document) => {
-  const scene = new THREE.Scene();
-  const nodeMap = new Map(); // gltf-transform Node index → THREE.Object3D
-  const list = document.getRoot().listSiblings(); // all top-level accessors
-  // Walk nodes
-  const nodes = document.getRoot().listNodes();
-  for (const node of nodes) {
-    let obj;
-    if (node.propertyType === 'Node') {
-      obj = new THREE.Group();
-    } else if (node.propertyType === 'Mesh') {
-      const mesh = node.getMesh();
-      const geometry = new THREE.BufferGeometry();
-      const position = mesh.getPrimitive(0).getAttribute('POSITION');
-      if (position) {
-        const arr = position.getArray();
-        const itemSize = position.getElementSize();
-        geometry.setAttribute('position', new THREE.BufferAttribute(arr, itemSize));
-      }
-      const material = new THREE.MeshBasicMaterial({ color: 0xcccccc });
-      obj = new THREE.Mesh(geometry, material);
-    } else {
-      obj = new THREE.Object3D();
-    }
-    // Apply node transform
-    const t = node.getTranslation();
-    const r = node.getRotation();
-    const s = node.getScale();
-    obj.position.set(t[0], t[1], t[2]);
-    obj.quaternion.set(r[0], r[1], r[2], r[3]);
-    obj.scale.set(s[0], s[1], s[2]);
-    obj.name = node.getName() || '';
-    nodeMap.set(node, obj);
-  }
-  // Build parent-child relationships from each Node's list of children
-  for (const node of nodes) {
-    if (node.propertyType !== 'Node') continue;
-    const obj = nodeMap.get(node);
-    for (const child of node.listChildren()) {
-      const childObj = nodeMap.get(child);
-      if (childObj) obj.add(childObj);
-    }
-    // If this Node has no parent in the list AND is a scene, attach to root scene
-    const parent = node.getParentNode();
-    if (!parent && obj.parent === null) {
-      scene.add(obj);
-    }
-  }
-  // Also handle meshes: their parent is the node they belong to
-  for (const node of nodes) {
-    if (node.propertyType !== 'Mesh') continue;
-    const obj = nodeMap.get(node);
-    // Find the node in the parent scene's node list that references this mesh
-    for (const sceneNode of document.getRoot().listNodes()) {
-      if (sceneNode.propertyType !== 'Node') continue;
-      // gltf-transform's Node has listMeshes() in newer versions; we
-      // fall back to parent lookup if needed.
-      const parentObj = nodeMap.get(sceneNode);
-      if (parentObj && parentObj.children.indexOf(obj) === -1) {
-        // Attach if this scene node references our mesh
-        try {
-          const meshes = sceneNode.listMeshes ? sceneNode.listMeshes() : [];
-          if (meshes.indexOf(node) !== -1 && obj.parent === null) {
-            parentObj.add(obj);
-          }
-        } catch {
-          // ignore — attach at root
-          if (obj.parent === null) scene.add(obj);
-        }
-      }
-    }
-    if (obj.parent === null) scene.add(obj);
-  }
-  scene.updateMatrixWorld(true);
-  return scene;
-};
-
-// Alternative Box3 computation directly from accessor bounds (works for
-// static, non-skinned glTFs). We iterate POSITION accessors and union the
-// min/max ranges in the node-local frame. This is more reliable than the
-// THREE.Scene walk above because it doesn't depend on Three.js Object3D
-// hierarchy.
 const computeBox3FromAccessors = (document) => {
   // Find root nodes: top-level Nodes that have no parent.
   const allNodes = document.getRoot().listNodes();
@@ -238,15 +142,21 @@ const computeBox3FromAccessors = (document) => {
             try {
               const m = typeof n.getMesh === 'function' ? n.getMesh() : null;
               if (m) acc.push(m);
-            } catch {}
+            } catch {
+              /* defensive no-op: gltf-transform version may lack this API */
+            }
             try {
               for (const c of n.listChildren()) collect(c, acc);
-            } catch {}
+            } catch {
+              /* defensive no-op: gltf-transform version may lack this API */
+            }
           };
           collect(child, allMeshes);
         }
       }
-    } catch {}
+    } catch {
+      /* defensive no-op: gltf-transform version may lack this API */
+    }
 
     for (const mesh of allMeshes) {
       let prims = [];
@@ -254,17 +164,23 @@ const computeBox3FromAccessors = (document) => {
         if (typeof mesh.listPrimitives === 'function') {
           prims = mesh.listPrimitives();
         }
-      } catch {}
+      } catch {
+        /* defensive no-op: gltf-transform version may lack this API */
+      }
       for (const prim of prims) {
         let pos = null;
         try {
           pos = prim.getAttribute('POSITION');
-        } catch {}
+        } catch {
+        /* defensive no-op: gltf-transform version may lack this API */
+      }
         if (!pos) continue;
         let arr = null;
         try {
           arr = pos.getArray();
-        } catch {}
+        } catch {
+        /* defensive no-op: gltf-transform version may lack this API */
+      }
         const itemSize =
           typeof pos.getElementSize === 'function' ? pos.getElementSize() : 3;
         if (!arr || itemSize < 3) continue;
@@ -281,7 +197,9 @@ const computeBox3FromAccessors = (document) => {
       for (const child of node.listChildren()) {
         if (child.propertyType === 'Node') visit(child, worldMatrix);
       }
-    } catch {}
+    } catch {
+        /* defensive no-op: gltf-transform version may lack this API */
+      }
   };
 
   const identity = new THREE.Matrix4();
@@ -520,7 +438,6 @@ async function runPilot(assetId) {
 async function runBatch() {
   const audit = JSON.parse(await readFile(auditReportPath, 'utf8'));
   const rawQa = JSON.parse(await readFile(rawVisualQaPath, 'utf8'));
-  const auditById = new Map(audit.assets.map((r) => [r.assetId, r]));
   const qaById = new Map(rawQa.assets.map((r) => [r.assetId, r]));
 
   const out = [];
@@ -558,7 +475,6 @@ async function runBatch() {
       out.push({
         assetId: id,
         semanticRole: auditRow.semanticRole,
-        sourceSha256: auditRow.sourceSha256,
         sourceSha256: auditRow.sourceSha256,
         canonicalSha256: null,
         skipped: true,

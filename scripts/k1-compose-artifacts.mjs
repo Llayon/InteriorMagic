@@ -158,7 +158,6 @@ const canonicalReportById = new Map(canonicalReport.assets.map((a) => [a.assetId
 
 const factsAssets = [];
 const byAnchor = { floor: 0, wall: 0, surface: 0, ceiling: 0 };
-const byAmbiguousCount = 0;
 const byPolicy = { 'full-xz-envelope': 0, 'full-xz-envelope-tv-wall': 0, 'lower-band-review': 0 };
 const byEditorPlacementSupport = { supported: 0, unsupported: 0 };
 
