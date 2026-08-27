@@ -1,0 +1,2187 @@
+{
+  "schemaVersion": 1,
+  "coordinateContractVersion": 1,
+  "k1BaseSha": "e156c8f727f04ae38d358c489fdc9c68e6618eb7",
+  "trackBaseSha": "1c32b27bfddb1b98ac7b70c9fa642604cb4d6790",
+  "frozenSelectionSha256": "c574cadd3850b75b0b6c1dc3c869fad37235699678d79e6026800f81f3d919d0",
+  "assetCount": 47,
+  "byRawVisualQa": {
+    "pass": 37,
+    "fail": 10,
+    "unsupported": 0
+  },
+  "byCanonicalVisualQa": {
+    "pass": 47,
+    "fail": 0,
+    "notApplicable": 0
+  },
+  "bySemanticMismatch": 10,
+  "entries": [
+    {
+      "assetId": "carpet",
+      "sourceSha256": "3884936fea30a5ab38994939e65b2575309e567145293f4aa405c2c3d66a6947",
+      "canonicalSha256": "7ecf06e35234bf6e8f7a71bc95fffb214d805f43a94a6bd463f9afc0f1a488dc",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.00008058547973632812,
+          "y": -0.005666199140250683,
+          "z": 0.005095839500427246
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.636662244796753,
+          "height": 0.06988438684493303,
+          "depth": 3.676490306854248
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "carpet_001",
+      "sourceSha256": "4becb8adecd159b30c6f6803a5db36fe7d670b9a363ac8220fbd20e41015ba40",
+      "canonicalSha256": "d89b100ba6103e98369e4f3699f65cedb744f58a4fccb5956157025335ef487a",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000019669532775878906,
+          "y": 0.008589934557676315,
+          "z": 5.960464477539062e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.6365050077438354,
+          "height": 0.05077826604247093,
+          "depth": 3.686680793762207
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "carpet_002",
+      "sourceSha256": "3d403b56989527a0ae3aab87f95d9fd5f10f7ffc6cf4e928b4dd9d26e07a2c56",
+      "canonicalSha256": "3bf6b2cbbc09328bd8f692a7999ed0aa2746a0105c42514a68fcc9385ce078a3",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000019669532775878906,
+          "y": 3.778795303333027e-7,
+          "z": 5.960464477539062e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.6365050077438354,
+          "height": 0.061626141653448485,
+          "depth": 3.686680793762207
+        },
+        "midpointX": -0.0000019669532775878906,
+        "midpointZ": -5.960464477539062e-7,
+        "minY": -3.778795303333027e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "carpet_003",
+      "sourceSha256": "7c9c56ae542444d3d57c74daf7f64862b926121aa65314231259de835b67d3a5",
+      "canonicalSha256": "dc5b19672659df3d5fa6febb9fb591a9ca1522fce72805a99f298f8133b6353f",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -0.31785207986831665,
+          "y": 3.7738874425485847e-7,
+          "z": 0.008430778980255127
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 3.268734097480774,
+          "height": 0.05977981651022901,
+          "depth": 3.6152502298355103
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "carpet_004",
+      "sourceSha256": "8bfa91dfe0407a5a427b1d166ad1cdc82cacbd0c52815726cfab08abbc5be401",
+      "canonicalSha256": "cce9cbd3c3db910dace837006d4387d7ec49e63764ad2aeda0859811b6439bc8",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 6.258487701416016e-7,
+          "y": 2.0199017569666466e-7,
+          "z": -5.960464477539062e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.4318932890892029,
+          "height": 0.04448774539427802,
+          "depth": 2.0598669052124023
+        },
+        "midpointX": -6.258487701416016e-7,
+        "midpointZ": 5.960464477539062e-7,
+        "minY": -2.0199017569666466e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "chair",
+      "sourceSha256": "f5fc82722fb8d55b62a5df0208ccf77e4295893ef00128b0ab67a8d7c8fe228f",
+      "canonicalSha256": "7049d9d13e621d15295de9427dfe76db87b38a5898234e75bde06d8ddc026cbc",
+      "sourceApparentForwardAxis": "+Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 3.8743019104003906e-7,
+          "y": 0.00000461402805740363,
+          "z": 1.4901161193847656e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.583863079547882,
+          "height": 0.9710300213423579,
+          "depth": 1.2947130799293518
+        },
+        "midpointX": -3.8743019104003906e-7,
+        "midpointZ": -1.4901161193847656e-7,
+        "minY": -0.00000461402805740363
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "+Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "chair_001",
+      "sourceSha256": "c2231cfbd9520f704e01ff49427684064ea799182ba6bbb3060db60dfe536988",
+      "canonicalSha256": "055702159b815c70dbde6fa27dc3dc6398df2fc70be642d04a2a47771a35e5b9",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000014454126358032227,
+          "y": -3.480758792306915e-9,
+          "z": -2.9802322387695312e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.5771811306476593,
+          "height": 0.4617412055493926,
+          "depth": 0.5771850347518921
+        },
+        "midpointX": -0.0000014454126358032227,
+        "midpointZ": 2.9802322387695312e-8,
+        "minY": 3.480758792306915e-9
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table",
+      "sourceSha256": "1bf4d3c6d49ea9823ba48296bee18eb587c720f239fd6338bb8c1a8ebbc320f3",
+      "canonicalSha256": "de0ebb00fca40f185a57ce93f9fe541449e14a204a39b7838297d0f71af20920",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -4.470348358154297e-7,
+          "y": 7.886527697564816e-8,
+          "z": 2.9802322387695312e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.0776799321174622,
+          "height": 0.6603809787714354,
+          "depth": 1.0776802897453308
+        },
+        "midpointX": 4.470348358154297e-7,
+        "midpointZ": -2.9802322387695312e-8,
+        "minY": -7.886527697564816e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_024",
+      "sourceSha256": "634a4612dbc691c4c81f1fcfbd0bf8259c31346a75dfdf3794e550fa47206c9b",
+      "canonicalSha256": "79f54cbcfec93a05c21a0743e2ac9b6bf43629f2e095a4a9ebd6f725a7eb202d",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0,
+          "y": 9.245034249261153e-8,
+          "z": 5.960464477539063e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.5947291851043701,
+          "height": 0.5261994928752998,
+          "depth": 1.576888918876648
+        },
+        "midpointX": 0,
+        "midpointZ": -5.960464477539063e-8,
+        "minY": -9.245034249261153e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_025",
+      "sourceSha256": "bd1199e3013772f3ae6779688c57887c939b88a8f5124b17c550791d3d3921b2",
+      "canonicalSha256": "d6f5d4de61f6a99c38aea4a634a286507e6aa5903faacbb379aff5a01b6b66ae",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.000001341104507446289,
+          "y": 6.771708882524763e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.0718969702720642,
+          "height": 0.7115510187211171,
+          "depth": 1.0718969106674194
+        },
+        "midpointX": -0.000001341104507446289,
+        "midpointZ": 0,
+        "minY": -6.771708882524763e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_026",
+      "sourceSha256": "dd893b8425eaab269d877e04c0060cf845f292d2c8c6923d0e448ed43edfcb82",
+      "canonicalSha256": "276248f987d24d44b3fc21b0a79815df3012896c0885e6d502df1429f34a6c33",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 7.152557373046875e-7,
+          "y": 9.380274690329315e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.2360719442367554,
+          "height": 0.6043793305008975,
+          "depth": 1.2360713481903076
+        },
+        "midpointX": -7.152557373046875e-7,
+        "midpointZ": 0,
+        "minY": -9.380274690329315e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_027",
+      "sourceSha256": "59fea46d8fcd3bd54cbfa7073685cc1bd03ee5183ed24765ea9b398efc0897b2",
+      "canonicalSha256": "779df26735bf3ef31e667330a2a666cad88325111c07cdbd0b0b147a77c5f1aa",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -5.662441253662109e-7,
+          "y": 6.774354233129998e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.8998476266860962,
+          "height": 0.5426471910803343,
+          "depth": 1.5263200998306274
+        },
+        "midpointX": 5.662441253662109e-7,
+        "midpointZ": 0,
+        "minY": -6.774354233129998e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_028",
+      "sourceSha256": "2feaacf753f4ba2dd7b0a0a5e58c6e7ad24202c31fa7178ea49afb39439b4e6d",
+      "canonicalSha256": "f87900583dafbbf5548876f65059e31fb8fe61d6e7b55f1f662c487ab0b5c114",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 6.556510925292969e-7,
+          "y": 6.774373417783863e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.8998476266860962,
+          "height": 0.5426471910805262,
+          "depth": 1.5263200998306274
+        },
+        "midpointX": -6.556510925292969e-7,
+        "midpointZ": 0,
+        "minY": -6.774373417783863e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_029",
+      "sourceSha256": "4eeee8ca5b4ae6e65bee10e4f0000820717587ea2177915ec7b21aa480d8798e",
+      "canonicalSha256": "8003d09705aac49aa2de13f92fa271d268b23dc77f8aad0507473556be1b5f23",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -4.470348358154297e-7,
+          "y": 7.886527697564816e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.0776799321174622,
+          "height": 0.6603809787714354,
+          "depth": 1.0776803493499756
+        },
+        "midpointX": 4.470348358154297e-7,
+        "midpointZ": 0,
+        "minY": -7.886527697564816e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_030",
+      "sourceSha256": "f581c137a980ea10a2dee6b307277d279c84687134024753d677c9ff61644f75",
+      "canonicalSha256": "74f60f33f57ba15a962c5c7e47c05ef77f482cdea828d2f4e085361c7830c799",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 4.172325134277344e-7,
+          "y": 9.380273269243844e-8,
+          "z": 2.9802322387695312e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.2360717058181763,
+          "height": 0.6043793305008833,
+          "depth": 1.236071527004242
+        },
+        "midpointX": -4.172325134277344e-7,
+        "midpointZ": -2.9802322387695312e-8,
+        "minY": -9.380273269243844e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_031",
+      "sourceSha256": "fa9638c41f0f07326f5b2125f361a1cae625eee906869c7543c77fae84245226",
+      "canonicalSha256": "3ef8b61d0497430f1ad909dba3079ef469d8094473c99fd2f4ab47effdd5920f",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 4.172325134277344e-7,
+          "y": 9.38027397978658e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.2360713481903076,
+          "height": 0.6043793305008904,
+          "depth": 1.2360713481903076
+        },
+        "midpointX": -4.172325134277344e-7,
+        "midpointZ": 0,
+        "minY": -9.38027397978658e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "coffee_table_032",
+      "sourceSha256": "8cbb987bcad5a31a3632eb4df68840d7bfd648eaf458c7ec7a7f0d5532e00b08",
+      "canonicalSha256": "bf68c794ebd56ea311acdf5958d403be2c165f5d8589d632e739f5f1786ae9d9",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -5.662441253662109e-7,
+          "y": 6.774354233129998e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.8998476266860962,
+          "height": 0.5426471910803343,
+          "depth": 1.5263200998306274
+        },
+        "midpointX": 5.662441253662109e-7,
+        "midpointZ": 0,
+        "minY": -6.774354233129998e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "cupboard",
+      "sourceSha256": "fc67d6074253f4df2f4d8fef167de358e7a9282ea2310b05343801eaca9ee0f4",
+      "canonicalSha256": "4ab85467e066edcf4dea746c0a3ec4db16163def1c028264389cec20615bdbfb",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000014603137969970703,
+          "y": 1.5657397511859017e-7,
+          "z": -9.685754776000977e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.9220864176750183,
+          "height": 2.8029965535924077,
+          "depth": 0.9263530671596527
+        },
+        "midpointX": -0.0000014603137969970703,
+        "midpointZ": 9.685754776000977e-7,
+        "minY": -1.5657397511859017e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "cupboard_001",
+      "sourceSha256": "63b14d20ccbab3abf910a34617010afd9dc8e8e509fc28db443a7444779943fc",
+      "canonicalSha256": "b37f15a39b0d665fa93dd0f7c24e62a82c55631d1e3eb283c226c49f9d40c6c6",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000017285346984863281,
+          "y": 6.21326989858062e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.515218138694763,
+          "height": 2.9313345576771326,
+          "depth": 0.9663655757904053
+        },
+        "midpointX": -0.0000017285346984863281,
+        "midpointZ": 0,
+        "minY": -6.21326989858062e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "cupboard_002",
+      "sourceSha256": "13c320542f9bc6e65592052eccbac77452ba921db11e90c28e78f7b90ba88c99",
+      "canonicalSha256": "853723ab8c0644f7508cfbc8218723b01681d19ca2f71b03a7febe55b936e131",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 2.384185791015625e-7,
+          "y": 3.0796607575211965e-7,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 3.780565023422241,
+          "height": 2.8115630845316275,
+          "depth": 0.8921828866004944
+        },
+        "midpointX": -2.384185791015625e-7,
+        "midpointZ": 0,
+        "minY": -3.0796607575211965e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "cupboard_003",
+      "sourceSha256": "5d0997cbd90c94348e2cbf85791bad1d8ea9a57382dbd3cb1c18dd9609ae58cc",
+      "canonicalSha256": "30b640345a0532b0cdd62ad52e5767d9068b894f30b45519a88ddf1d03e725aa",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 2.384185791015625e-7,
+          "y": -0.00042507052421569824,
+          "z": 9.685754776000977e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.3843252658843994,
+          "height": 2.7055764496326447,
+          "depth": 0.715139240026474
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "cupboard_004",
+      "sourceSha256": "b0af974fd48d178e8c9f51438ac93c679e3746f2504dccb3a01c384cadb5343d",
+      "canonicalSha256": "965327b7fdafaf32a2daabb859b3bc9fb1cd29e958cd029c0c0a2c87021cb5ec",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -0.0000011473894119262695,
+          "y": -0.004854371305555105,
+          "z": 0.0000018477439880371094
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.7321583926677704,
+          "height": 2.80250675464049,
+          "depth": 0.7936621308326721
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "dresser",
+      "sourceSha256": "a8a00db5e2f3ed38e7912f7f4ae370db36f9f812c901d84e584d0e022c1b60fc",
+      "canonicalSha256": "d17a91722bcb7f2d3f957277c480717e0a8587febda8182248289ed9805e9a9f",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000025033950805664062,
+          "y": 5.356415044843743e-8,
+          "z": 0.0022306442260742188
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.7061402201652527,
+          "height": 0.758148902574618,
+          "depth": 0.6122869849205017
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "dresser_001",
+      "sourceSha256": "e04ed77b15b802ab1c63ea7ead5b2a6e86c2e86a577e69de72c67730e0be4cfd",
+      "canonicalSha256": "c3b64a70580f1c09bf61ac8fe4b461db44dd13668419c78fcbd7cc7d112c8032",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 1.1920928955078125e-7,
+          "y": 1.7893671611091122e-7,
+          "z": 6.109476089477539e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.279863119125366,
+          "height": 0.746204614762064,
+          "depth": 0.7706019580364227
+        },
+        "midpointX": -1.1920928955078125e-7,
+        "midpointZ": -6.109476089477539e-7,
+        "minY": -1.7893671611091122e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "dresser_002",
+      "sourceSha256": "05dfc66f3ced7f062346a782336bb621496ad839727975a135a52f34725ab972",
+      "canonicalSha256": "c9209fa60ab14f8cbf64b2200dd684f65624153b8961162e7c1594f7491f2783",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 5.960464477539063e-8,
+          "y": 1.2340363753082784e-7,
+          "z": 8.642673492431641e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.2725688219070435,
+          "height": 0.9433547300320555,
+          "depth": 0.7720550298690796
+        },
+        "midpointX": -5.960464477539063e-8,
+        "midpointZ": -8.642673492431641e-7,
+        "minY": -1.2340363753082784e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics",
+      "sourceSha256": "2b6126a0a1874e034218a39e600f5f3e7e156f55e61875b8b937071bbb0450d3",
+      "canonicalSha256": "fd59049e9b7fbdce9d46f6b7a166be67fb213a63ccf59b77a0a840061bb6c8ef",
+      "sourceApparentForwardAxis": "+Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 3.2782554626464844e-7,
+          "y": 0.4492958188056946,
+          "z": -0.007386764511466026
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.6128783822059631,
+          "height": 0.8985914587974548,
+          "depth": 0.08700115606188774
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "+Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics_032",
+      "sourceSha256": "c9ee335154e046203f47c57923ccf9e4ee9f57c5d544878f513b2c6a33136038",
+      "canonicalSha256": "ac015d8372a25d978ae815f6fdceeeb33595d450c12f44711d691ffb777f8b9c",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -4.172325134277344e-7,
+          "y": 7.132433665901772e-8,
+          "z": 0.06929624080657959
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.1099624633789062,
+          "height": 0.7160431263818623,
+          "depth": 0.7197242379188538
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics_036",
+      "sourceSha256": "9efe56d3906afa94515a8d987349db27dd4b90d79e78931e1a40d4a64bce9ea9",
+      "canonicalSha256": "9652d063b341c990d4e124d76b40544ffc9be7fc5450a0a0eacda66b6b3c4a55",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0,
+          "y": 3.7153434107040084e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.5100000500679016,
+          "height": 0.6809225453931802,
+          "depth": 0.7457493543624878
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": -3.7153434107040084e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics_037",
+      "sourceSha256": "a00a1069f35430645755d3857a4025334ce0878bb285af0eece4d2baf977486b",
+      "canonicalSha256": "d783613b773e16e546d6946746e4404b8500f4021b5b2cc2415659043ca7b3ea",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000011026859283447266,
+          "y": 5.460227470166501e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.8202753663063049,
+          "height": 0.6797521660372112,
+          "depth": 0.3128845691680908
+        },
+        "midpointX": -0.0000011026859283447266,
+        "midpointZ": 0,
+        "minY": -5.460227470166501e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics_040",
+      "sourceSha256": "d87f79dd9668918f2a663d4403a3cb78dc624f1feaf51cfd64ae29fbe26017ae",
+      "canonicalSha256": "874fcd416f225757ff16e5f22fafc86ea444f50911872535d2c471ba7ca275ff",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.0000012814998626708984,
+          "y": 2.336135196401301e-8,
+          "z": 4.470348358154297e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.28677940368652344,
+          "height": 0.732080363746789,
+          "depth": 0.6616574823856354
+        },
+        "midpointX": -0.0000012814998626708984,
+        "midpointZ": -4.470348358154297e-8,
+        "minY": -2.336135196401301e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics_046",
+      "sourceSha256": "69c594821271a605d0f4355e9ae4322e37d051b87f4d564c5cf752d733a9d776",
+      "canonicalSha256": "be1da16cfe64f2a142c0ef701619a0e1acd62bdd27cda9b2a1542e21e182369d",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 2.7567148208618164e-7,
+          "y": 2.799258780328273e-8,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.3930034786462784,
+          "height": 0.41168474970088553,
+          "depth": 0.30107301473617554
+        },
+        "midpointX": -2.7567148208618164e-7,
+        "midpointZ": 0,
+        "minY": -2.799258780328273e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "electronics_049",
+      "sourceSha256": "52d13e7c03b31b8366fdd0f58dc447db9ae0bbcc720e7128b9694c43aac82f55",
+      "canonicalSha256": "259ec0643b4dd517a3dfdddc45a78ecda50e243a1a91688edde35b3f6ab193a8",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.000002592802047729492,
+          "y": 6.715054468031667e-8,
+          "z": 8.344650268554688e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 1.6128783822059631,
+          "height": 1.0699796156048293,
+          "depth": 0.37329792976379395
+        },
+        "midpointX": -0.000002592802047729492,
+        "midpointZ": -8.344650268554688e-7,
+        "minY": -6.715054468031667e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "flower_038",
+      "sourceSha256": "0f99bc85dfe80edf74db3bc172d684aa809403972508db0f93d58d20ee6d5a1e",
+      "canonicalSha256": "2f4c307d0375ea199ac7fcbfa87e72e01480c1d1c1736d08ce5434d04edcdf68",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -0.003158457577228546,
+          "y": 1.4351412502833227e-8,
+          "z": -0.015110775828361511
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.4930814355611801,
+          "height": 0.3918423796163051,
+          "depth": 0.5378378331661224
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "flower_039",
+      "sourceSha256": "49030440886953df1389a78479d1377a41f2aaff6cb316f4f0602e540b533da5",
+      "canonicalSha256": "01a7871cc3fe0aacabe75c01afd8cb1e5db8dbb09fa0510c954e6b14f920a795",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.009486034512519836,
+          "y": 2.6412767084593725e-8,
+          "z": 0.015193112194538116
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.4875243604183197,
+          "height": 0.6305526163061081,
+          "depth": 0.5140400379896164
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "flower_040",
+      "sourceSha256": "0f208002592065d8615b4d5d80863e2788d62254c1a252fe3a6f9bdc186d0404",
+      "canonicalSha256": "ad1db2444c7bd41832ddc15968aa4d0096e66ae2dfdbf2c115a955d3acb69fb9",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -0.016010284423828125,
+          "y": 3.009797211461773e-8,
+          "z": -0.005488589406013489
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.6193737387657166,
+          "height": 0.7862593236541855,
+          "depth": 0.7133886516094208
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "flower_041",
+      "sourceSha256": "f623411b793a530cf0fffedc98f4e046d7550ddc8c0c663c7c1cf3f908ea6099",
+      "canonicalSha256": "1e6754a8fa02ec4db1cfe56dce4e42b2f193f67faaa95f71e4b8683d83fce4a7",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -2.980232238769531e-7,
+          "y": 2.992700132153914e-8,
+          "z": -7.450580596923828e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.5666937232017517,
+          "height": 1.6069940627868036,
+          "depth": 0.6298995912075043
+        },
+        "midpointX": 2.980232238769531e-7,
+        "midpointZ": 7.450580596923828e-8,
+        "minY": -2.992700132153914e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "lamp",
+      "sourceSha256": "739caa6790454ee896b45fbbc6110c640a12721521ed25366c168cad4cac651d",
+      "canonicalSha256": "124006a2a6fc5828a9103a813d0f4ba9da7753fd6335b1a1eed242daf7278945",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 7.450580596923828e-9,
+          "y": 3.6724593144299433e-8,
+          "z": -7.450580596923828e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.45082788169384,
+          "height": 2.2121968636594076,
+          "depth": 0.45082709193229675
+        },
+        "midpointX": -7.450580596923828e-9,
+        "midpointZ": 7.450580596923828e-8,
+        "minY": -3.6724593144299433e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "lamp_027",
+      "sourceSha256": "a9eec4bb161d4728f7a26b76b0b3495b03a9ffbe1d841ad531601dcea72da0c4",
+      "canonicalSha256": "29e6638150d2e6434aac435ff61ccaa50e0ece6a79d4d73204564ba8288b2435",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 5.960464477539063e-8,
+          "y": 1.9027906361657188e-8,
+          "z": -2.9802322387695312e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.6438766121864319,
+          "height": 0.7566984486124095,
+          "depth": 0.6438784003257751
+        },
+        "midpointX": -5.960464477539063e-8,
+        "midpointZ": 2.9802322387695312e-8,
+        "minY": -1.9027906361657188e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "lamp_028",
+      "sourceSha256": "375144ceb4ebe254747610ef540f1636a58f8a121916bdbdcee13ebdc7989b07",
+      "canonicalSha256": "e712e4c2491a67592fa659d5f0ba50f67b4e8dfb5055b7405a62507a04c69e4c",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 7.450580596923828e-9,
+          "y": 3.65899950338644e-8,
+          "z": -7.450580596923828e-8
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 0.37978173792362213,
+          "height": 1.7440232404397875,
+          "depth": 0.37978094816207886
+        },
+        "midpointX": -7.450580596923828e-9,
+        "midpointZ": 7.450580596923828e-8,
+        "minY": -3.65899950338644e-8
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa",
+      "sourceSha256": "d655c4c97b5e99f451c801cc949f9da0574c51b8575ce9e2555d0ca60639d9e1",
+      "canonicalSha256": "9021d893a1743c7217ee3e344a0b87f600583237f605417e9e7d92732c44e094",
+      "sourceApparentForwardAxis": "-Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 3.141592653589793,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 0.00017082691192626953,
+          "y": 5.960464477539063e-8,
+          "z": 0.127317875623703
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 3.6733784675598145,
+          "height": 1.1613238453865051,
+          "depth": 1.573237240314484
+        },
+        "midpointX": 1.1102230246251565e-16,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "-Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_026",
+      "sourceSha256": "19567972bdaa9e2da02e159a14967cb73723bb5bcae4a6ac349f241229b8b618",
+      "canonicalSha256": "4fa7e05771be766deebe02964bf835493b71c0417e3ba4316a37d7ed1cf39962",
+      "sourceApparentForwardAxis": "-Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 3.141592653589793,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -7.748603820800781e-7,
+          "y": 2.700374750475021e-7,
+          "z": 2.9802322398797543e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.69180166721344,
+          "height": 0.9271138030574946,
+          "depth": 1.4593014717102053
+        },
+        "midpointX": 7.748603820800781e-7,
+        "midpointZ": -2.980232238769531e-7,
+        "minY": -2.700374750475021e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "-Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_027",
+      "sourceSha256": "07d25644c90ae426743b27eb749a0bdc775d55db38a7d11a4308c870c31842c3",
+      "canonicalSha256": "334184b610c06b88e028bf2f446fa5c1c91ea79f7b26f8ffa5a2cb25fb9b670a",
+      "sourceApparentForwardAxis": "-Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 3.141592653589793,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -4.172325134277344e-7,
+          "y": 0.01851874403655529,
+          "z": -9.238719940185547e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.92690908908844,
+          "height": 0.902603505179286,
+          "depth": 1.425558984279633
+        },
+        "midpointX": 0,
+        "midpointZ": 0,
+        "minY": 0
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "-Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_028",
+      "sourceSha256": "bbe1deff2244c0f4ca2f9f3da0b36781beabd20621997a99c3ac331f78817c9e",
+      "canonicalSha256": "73b73f732818463cc2d5dbba3109d8ebec7890abf77f683d9f8edc4b9bd16c2f",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": 4.76837158203125e-7,
+          "y": -0.0000013623554195874021,
+          "z": 0.000001519918441772461
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 3.6602182388305664,
+          "height": 0.9951292361896549,
+          "depth": 1.191775619983673
+        },
+        "midpointX": -4.76837158203125e-7,
+        "midpointZ": -0.000001519918441772461,
+        "minY": 0.0000013623554195874021
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_029",
+      "sourceSha256": "ce9718afb7d4f48edeb0d4a2d62f0bd2ffce66592b2d525e6c795e8c4d5fae42",
+      "canonicalSha256": "9567113502a2d597c9d9d7b5629ab9f0f4062aec0127b7585820b1501404d93e",
+      "sourceApparentForwardAxis": "-Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 3.141592653589793,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -0.0000017285346984863281,
+          "y": -0.0000013623450740851695,
+          "z": -3.576278687078549e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 3.660220980644226,
+          "height": 0.9951292362000004,
+          "depth": 1.2692294120788579
+        },
+        "midpointX": 0.0000017285346984863281,
+        "midpointZ": 3.5762786865234375e-7,
+        "minY": 0.0000013623450740851695
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "-Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_030",
+      "sourceSha256": "10d4520debe68a388406c668cd7da2a29f85ec2487db42ee9d796f9cb5adde00",
+      "canonicalSha256": "f89b3b856a90fba7ab874e41e68d1363180ba3bad737dcb112e60a2571822a85",
+      "sourceApparentForwardAxis": "-Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 3.141592653589793,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -5.960464477539063e-8,
+          "y": -0.0000014174418083712226,
+          "z": -7.152557371936652e-7
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.7708131074905396,
+          "height": 1.2313083540959724,
+          "depth": 1.4960343837738042
+        },
+        "midpointX": 5.960464477539063e-8,
+        "midpointZ": 7.152557373046875e-7,
+        "minY": 0.0000014174418083712226
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "-Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_031",
+      "sourceSha256": "e94a7198487433061d4a51e3ce8444df2614af5d15fa080b9c022eeca9777708",
+      "canonicalSha256": "7b24af449c1db3bdf4c252f8ae971193fcceaea8a9ec15e4d7bdcbee58975523",
+      "sourceApparentForwardAxis": "ambiguous",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 0,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -3.5762786865234375e-7,
+          "y": 2.2569159341401246e-7,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "notApplicable"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 2.895205020904541,
+          "height": 1.2999768129871256,
+          "depth": 1.1264662742614746
+        },
+        "midpointX": 3.5762786865234375e-7,
+        "midpointZ": 0,
+        "minY": -2.2569159341401246e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": "notApplicable",
+        "axis": "ambiguous"
+      },
+      "rawVisualQa": "fail",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": true,
+      "notes": ""
+    },
+    {
+      "assetId": "sofa_032",
+      "sourceSha256": "d2e3b9e5a9b1cd8fe1ac6ad895e89ff681fadf4b0bab28ef4c6ead07f6f8c017",
+      "canonicalSha256": "a48f9380aa0a38c117b3f92eadc1588705c107e91600273cff9e5c8ecfe21ed7",
+      "sourceApparentForwardAxis": "-Z",
+      "appliedTransform": {
+        "rotationCorrectionRadians": 3.141592653589793,
+        "rotationAxis": "+Y",
+        "translationApplied": {
+          "x": -0.000001192092895729857,
+          "y": 3.729752222625393e-7,
+          "z": 0
+        },
+        "scaleApplied": 1
+      },
+      "measurementAssertions": {
+        "midpointXAtOrigin": "pass",
+        "midpointZAtOrigin": "pass",
+        "floorContactForFloorAssets": "pass",
+        "dimensionsPreserved": "pass",
+        "independentMidpointXAtOrigin": "pass",
+        "independentMidpointZAtOrigin": "pass",
+        "independentFloorContact": "pass",
+        "orientationUpInvariant": "pass",
+        "orientationForwardAsserted": "pass"
+      },
+      "independentMeasurement": {
+        "dimensions": {
+          "width": 4.549340724945069,
+          "height": 1.013670459835879,
+          "depth": 4.979354858398438
+        },
+        "midpointX": 0.0000011920928955078125,
+        "midpointZ": 0,
+        "minY": -3.729752222625393e-7
+      },
+      "orientationAssertions": {
+        "upInvariant": true,
+        "forwardAsserted": true,
+        "axis": "-Z"
+      },
+      "rawVisualQa": "pass",
+      "canonicalVisualQa": "pass",
+      "semanticMismatch": false,
+      "notes": ""
+    }
+  ],
+  "generator": {
+    "schema": "production-asset-spatial-evidence-v1",
+    "description": "Non-binary evidence ledger binding source/canonical hashes, transforms, measurement assertions, RAW + canonical visual QA per asset. semanticMismatch=true records observed-vs-frozen-role divergence. Two orthogonal axes are reported separately: canonicalVisualQa (spatial truth) and semanticMismatch (frozen role vs observed identity)."
+  }
+}

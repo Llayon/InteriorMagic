@@ -9,3 +9,8 @@ visual-evidence
 .dev.vars
 .wrangler
 .agent-data/
+
+# K1 — local-only evidence, worktrees, scratch dirs (gitignored)
+.agent-data/
+.agent-worktrees/
+.worktrees/

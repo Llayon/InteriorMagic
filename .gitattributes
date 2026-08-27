@@ -1,2 +1,5 @@
 artifacts/ar0/** -text
 docs/ar/evidence/** -text
+# K1: force LF on committed JSON artifacts to keep hash-based bindings
+# (frozenSelectionSha256, evidenceLedgerSha256) stable across platforms.
+src/editor/catalog/data/**/*.json text eol=lf
