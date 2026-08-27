@@ -3,7 +3,7 @@
   "coordinateContractVersion": 1,
   "k1BaseSha": "e156c8f727f04ae38d358c489fdc9c68e6618eb7",
   "trackBaseSha": "1c32b27bfddb1b98ac7b70c9fa642604cb4d6790",
-  "frozenSelectionSha256": "028d7f30b3db967aebe69cb3742400bc0a13bf27d74a56d34c6935e4edd5ddd4",
+  "frozenSelectionSha256": "c574cadd3850b75b0b6c1dc3c869fad37235699678d79e6026800f81f3d919d0",
   "assetCount": 47,
   "byAnchor": {
     "floor": 40,
@@ -924,5 +924,5 @@
     "schema": "production-asset-facts-v1",
     "description": "Durable spatial facts for the 47 frozen Production Catalog v1 assets. NO hashes, NO QA verdicts, NO semanticRole, NO delivery metadata. canonicalForward is always \"+Z\"."
   },
-  "evidenceLedgerSha256": "080440d83f510067ea1e3bd71a54ecaa61231a5091dd5e7b12a0cfc9264a1dc5"
+  "evidenceLedgerSha256": "55e680c77a56c57cc6c46d293ae3831be507b3c00be21a6a2c46644c94e00f67"
 }

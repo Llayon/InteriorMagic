@@ -38,8 +38,10 @@ const EVIDENCE_PATH = path.join(
 const isSha256Hex = (s) => typeof s === 'string' && /^[0-9a-f]{64}$/.test(s);
 
 const loadJson = async (p) => {
-  const raw = await readFile(p, 'utf8');
-  return { bytes: raw, data: JSON.parse(raw) };
+  // Read raw bytes for SHA consistency with the composer's byte-level
+  // hash binding; parse JSON separately for structural assertions.
+  const raw = await readFile(p);
+  return { bytes: raw, data: JSON.parse(raw.toString('utf8')) };
 };
 
 const DEEP_FORBIDDEN_FACTS_FIELDS = [

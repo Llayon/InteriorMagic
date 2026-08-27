@@ -19,7 +19,6 @@ import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');
 
@@ -77,7 +76,9 @@ const trackBaseSha = frozenSelection.trackBaseSha;
 // SHA256 of the current committed frozen selection bytes.
 // This is what facts/evidence bind to. If the selection changes,
 // regeneration produces a different SHA256 and the hermetic gate fails.
-const frozenSelectionBytes = readFileSync(frozenSelectionPath, 'utf8');
+// Read as bytes (Buffer) to be platform-independent regardless of
+// local EOL conversion (.gitattributes enforces LF on this file).
+const frozenSelectionBytes = readFileSync(frozenSelectionPath);
 const frozenSelectionSha256 = createHash('sha256')
   .update(frozenSelectionBytes)
   .digest('hex');

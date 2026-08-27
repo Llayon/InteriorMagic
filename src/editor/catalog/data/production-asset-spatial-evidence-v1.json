@@ -3,7 +3,7 @@
   "coordinateContractVersion": 1,
   "k1BaseSha": "e156c8f727f04ae38d358c489fdc9c68e6618eb7",
   "trackBaseSha": "1c32b27bfddb1b98ac7b70c9fa642604cb4d6790",
-  "frozenSelectionSha256": "028d7f30b3db967aebe69cb3742400bc0a13bf27d74a56d34c6935e4edd5ddd4",
+  "frozenSelectionSha256": "c574cadd3850b75b0b6c1dc3c869fad37235699678d79e6026800f81f3d919d0",
   "assetCount": 47,
   "byRawVisualQa": {
     "pass": 37,
