@@ -50,7 +50,9 @@
     "assets:ar0:validate": "node scripts/ar0/validate-revision.mjs",
     "assets:ar0:verify": "node scripts/ar0/validate-revision.mjs --staged",
     "assets:ar0:stage": "node scripts/ar0/stage-release.mjs",
-    "assets:ar0:publish": "node scripts/ar0/publish-release.mjs",
+    "assets:ar0:publish": "node scripts/ar0/publish-release.mjs --upload --verify",
+    "assets:ar0:publish:dry-run": "node scripts/ar0/publish-release.mjs",
+    "test:e2e:ar0:production": "node scripts/ar0/run-production-e2e.mjs",
     "assets:ar0:build": "npm run assets:ar0:canonicalize && npm run assets:ar0:convert && npm run assets:ar0:validate && npm run assets:ar0:stage",
     "format": "prettier --write ."
   },

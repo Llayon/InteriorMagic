@@ -116,6 +116,23 @@ describe('remote AR0 verification boundary', () => {
 });
 
 describe('immutable local release publication guards', () => {
+  it('loads exactly the frozen five-object r1 allowlist with required media types', async () => {
+    const { objects } = await loadValidatedReleaseObjects(revisionRoot);
+    expect(objects.map((object) => object.path)).toEqual(['model.glb', 'model.usdz', 'poster.webp', 'manifest.json', 'checksums.json']);
+    expect(objects.map((object) => object.contentType)).toEqual(['model/gltf-binary', 'model/vnd.usdz+zip', 'image/webp', 'application/json; charset=utf-8', 'application/json; charset=utf-8']);
+  });
+
+  it('treats an exact existing release as idempotent with no uploads', () => {
+    const objects = [{ path: 'model.glb' }, { path: 'checksums.json' }];
+    expect(planImmutableUpload(objects, objects.map((object) => ({ path: object.path, exists: true, identical: true })))).toEqual([]);
+  });
+
+  it('rejects differing model and checksums bytes before mutation', () => {
+    const objects = [{ path: 'model.glb' }, { path: 'checksums.json' }];
+    expect(() => planImmutableUpload(objects, [{ path: 'model.glb', exists: true, identical: false }, { path: 'checksums.json', exists: false, identical: false }])).toThrow(/model\.glb/u);
+    expect(() => planImmutableUpload(objects, [{ path: 'model.glb', exists: true, identical: true }, { path: 'checksums.json', exists: true, identical: false }])).toThrow(/checksums\.json/u);
+  });
+
   it('rejects a local artifact whose bytes no longer match checksums.json', async () => {
     const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), 'ar0-release-'));
     try {

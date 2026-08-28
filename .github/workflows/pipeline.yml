@@ -167,6 +167,8 @@ jobs:
           VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED: "true"
           VITE_ITHAPPY_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev/catalog/v1/
           VITE_ITHAPPY_PREVIEW_PLACEMENT_URL: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev/preview/v1/prototype-placement.json
+          VITE_AR0_ENABLED: "true"
+          VITE_AR_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev
           VITE_M1A_SHOWCASE_ENABLED: "true"
           VITE_M1A_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev
       - name: Upload Pages artifact
