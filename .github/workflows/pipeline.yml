@@ -132,6 +132,8 @@ jobs:
         run: npm run assets:ar0:verify
       - name: Run AR0 browser evidence
         run: npm run test:e2e:ar0
+      - name: Run AR0 production smoke
+        run: npm run test:e2e:ar0:production
       - name: Upload AR0 Playwright artifacts
         if: failure()
         uses: actions/upload-artifact@v6
