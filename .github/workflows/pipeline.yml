@@ -132,6 +132,8 @@ jobs:
         run: npm run assets:ar0:verify
       - name: Run AR0 browser evidence
         run: npm run test:e2e:ar0
+      - name: Run AR0 production smoke
+        run: npm run test:e2e:ar0:production
       - name: Upload AR0 Playwright artifacts
         if: failure()
         uses: actions/upload-artifact@v6
@@ -167,6 +169,8 @@ jobs:
           VITE_ITHAPPY_REMOTE_PREVIEW_ENABLED: "true"
           VITE_ITHAPPY_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev/catalog/v1/
           VITE_ITHAPPY_PREVIEW_PLACEMENT_URL: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev/preview/v1/prototype-placement.json
+          VITE_AR0_ENABLED: "true"
+          VITE_AR_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev
           VITE_M1A_SHOWCASE_ENABLED: "true"
           VITE_M1A_ASSET_ORIGIN: https://pub-6db83428342a40f7842dae4a7e41b009.r2.dev
       - name: Upload Pages artifact
