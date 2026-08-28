@@ -64,6 +64,7 @@ export function App({
       data-planner-source={plannerSource ?? 'none'}
       data-planner-capable={plannerCapable ? 'on' : 'off'}
       data-planner-previewing={isPreviewing ? 'on' : 'off'}
+      data-instance-count={project.objects.length}
     >
       <div className="safe-area-probe" aria-hidden="true" />
       <header data-testid="app-header">

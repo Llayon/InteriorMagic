@@ -2,9 +2,16 @@ import { describe, expect, it } from 'vitest';
 import selection from '@/editor/catalog/data/production-catalog-v1.json';
 import facts from '@/editor/catalog/data/production-asset-facts-v1.json';
 import evidence from '@/editor/catalog/data/production-asset-spatial-evidence-v1.json';
-import { createM1AShowcaseProject, getM1AAssetDefinition, M1A_CATALOG_IDS, M1A_SELECTED_IDS, resolveM1AAsset, type AuthorityInput } from './m1aShowcase';
+import { createM1AShowcaseProject, getM1AAssetDefinition, M1A_CATALOG_IDS, M1A_SELECTED_IDS, resolveM1AAsset, resolveM1AAssetBase, type AuthorityInput } from './m1aShowcase';
 
 describe('M1A private showcase authority boundary', () => {
+  it('resolves local and immutable production delivery URLs fail-closed', () => {
+    expect(resolveM1AAssetBase({ production: false })).toBe('/__m1a_assets__/');
+    expect(resolveM1AAssetBase({ production: true, origin: 'https://assets.example.test' })).toBe('https://assets.example.test/showcase/v1/');
+    expect(() => resolveM1AAssetBase({ production: true })).toThrow(/ASSET_ORIGIN/);
+    expect(() => resolveM1AAssetBase({ production: true, origin: 'http://assets.example.test' })).toThrow(/HTTPS/);
+    expect(() => resolveM1AAssetBase({ production: true, origin: 'https://assets.example.test/showcase/v1' })).toThrow(/origin/);
+  });
   it('uses exactly the seven selected IDs and authoritative K1 records', () => {
     expect(new Set(M1A_SELECTED_IDS).size).toBe(7);
     expect(M1A_SELECTED_IDS).toEqual(['carpet', 'chair', 'coffee_table_026', 'dresser_001', 'electronics', 'lamp', 'sofa_030']);
