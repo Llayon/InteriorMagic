@@ -6,7 +6,7 @@ const ar0EnabledBaseURL = 'http://127.0.0.1:4174';
 export default defineConfig({
   testDir: './tests/e2e',
   // M1A uses local-only licensed bytes and has a dedicated config.
-  testIgnore: /(?:showcase(?:-production)?|planner-(?:preview|integration|intent))\.spec\.ts/,
+  testIgnore: /(?:ar0-production|showcase(?:-production)?|planner-(?:preview|integration|intent))\.spec\.ts/,
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
@@ -29,7 +29,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-small',
-      testIgnore: /(?:ar0(?:-disabled)?|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
+      testIgnore: /(?:ar0(?:-disabled|-production)?|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
       use: { browserName: 'chromium', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
@@ -39,7 +39,7 @@ export default defineConfig({
     },
     {
       name: 'desktop',
-      testIgnore: /(?:ar0(?:-disabled)?|interactions-touch|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
+      testIgnore: /(?:ar0(?:-disabled|-production)?|interactions-touch|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     // Native-AR landing tests instantiate model-viewer, which owns a separate
