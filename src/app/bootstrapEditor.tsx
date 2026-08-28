@@ -50,6 +50,10 @@ export const bootstrapEditor = async () => {
     createRoot(document.getElementById('root')!).render(<IthappyThumbnailView assetId={thumbnailAssetId} />);
     return;
   }
+  if (import.meta.env.MODE !== 'production' && query.get('showcase') === '1') {
+    const { installM1AShowcase } = await import('@/app/showcase/m1aShowcase');
+    await installM1AShowcase();
+  }
   if (query.get('demo') === '1') useEditorStore.setState({ project: createBeautifulRoomProject() });
 
   const requestedFixture = PLANNER_FIXTURE_HARNESS_ENABLED

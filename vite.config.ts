@@ -14,6 +14,44 @@ const AR0_FILES: Record<string, { file: string; contentType: string }> = {
   'checksums.json': { file: 'checksums.json', contentType: 'application/json; charset=utf-8' },
 };
 
+const M1A_MODELS: Record<string, string> = {
+  carpet: 'carpet.glb', chair: 'chair.glb', coffee_table_026: 'coffee_table_026.glb', dresser_001: 'dresser_001.glb',
+  electronics: 'electronics.glb', lamp: 'lamp.glb', sofa_030: 'sofa_030.glb',
+};
+const M1A_THUMBS: Record<string, string> = {
+  carpet: 'carpet__+Z.png', chair: 'chair__+Z.png', coffee_table_026: 'coffee_table_026__+Z.png', dresser_001: 'dresser_001__+Z.png',
+  electronics: 'electronics__+Z.png', lamp: 'lamp__+Z.png', sofa_030: 'sofa_030__+Z.png',
+};
+
+const m1aLocalAssetsPlugin = (enabled: boolean): Plugin => ({
+  name: 'm1a-private-showcase-assets',
+  configureServer: (server) => {
+    if (!enabled) return;
+    const canonicalRoot = path.resolve(process.cwd(), '.agent-data', 'k1-production-assets', 'canonical');
+    const visualRoot = path.resolve(process.cwd(), '.agent-data', 'k1-production-assets', 'visual', 'canonical');
+    const middleware: Connect.NextHandleFunction = async (request, response, next) => {
+      const pathname = decodeURIComponent(request.url?.split('?', 1)[0] ?? '');
+      const model = pathname.match(/^\/__m1a_assets__\/models\/([^/]+)\.glb$/);
+      const thumb = pathname.match(/^\/__m1a_assets__\/thumbs\/([^/]+)\.png$/);
+      const id = model?.[1] ?? thumb?.[1];
+      const file = model ? M1A_MODELS[id ?? ''] : thumb ? M1A_THUMBS[id ?? ''] : undefined;
+      if (!file) { if (pathname.startsWith('/__m1a_assets__/')) { response.statusCode = 404; response.end('Not found'); return; } next(); return; }
+      const filePath = path.join(model ? canonicalRoot : visualRoot, file);
+      try {
+        await access(filePath);
+        response.statusCode = 200;
+        response.setHeader('Content-Type', model ? 'model/gltf-binary' : 'image/png');
+        response.setHeader('Cache-Control', 'no-store');
+        if (request.method === 'HEAD') { response.end(); return; }
+        const stream = createReadStream(filePath);
+        response.on('close', () => stream.destroy());
+        stream.on('error', next).pipe(response);
+      } catch { response.statusCode = 404; response.end('Not found'); }
+    };
+    server.middlewares.use(middleware);
+  },
+});
+
 const ar0LocalAssetsPlugin = (enabled: boolean): Plugin => ({
   name: 'ar0-local-artifact-assets',
   configureServer: (server) => {
@@ -56,7 +94,7 @@ export default defineConfig(({ mode }) => {
   }
   return {
     base: env.VITE_BASE_PATH ?? '/',
-    plugins: [ar0LocalAssetsPlugin(mode !== 'production'), react()],
+    plugins: [ar0LocalAssetsPlugin(mode !== 'production'), m1aLocalAssetsPlugin(mode !== 'production'), react()],
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
     build: { target: 'es2020', sourcemap: true },
   };

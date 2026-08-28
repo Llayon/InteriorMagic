@@ -112,7 +112,7 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
 
   const fallback = <ProceduralFurniture assetId={object.assetId} variantId={object.variantId} />;
   return <group ref={group} position={renderPosition} rotation-y={renderRotationY}>
-    {asset.semantic?.role !== 'rug' && <FurnitureGrounding width={asset.footprint.width} depth={asset.footprint.depth} />}
+    {asset.placement.anchor === 'floor' && asset.semantic?.role !== 'rug' && <FurnitureGrounding width={asset.footprint.width} depth={asset.footprint.depth} />}
     {asset.modelUrl ? <AssetModel assetId={object.assetId} variantId={object.variantId} fallback={fallback} /> : fallback}
     <mesh
       ref={proxy}
