@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import selection from '@/editor/catalog/data/production-catalog-v1.json';
 import facts from '@/editor/catalog/data/production-asset-facts-v1.json';
 import evidence from '@/editor/catalog/data/production-asset-spatial-evidence-v1.json';
-import { createM1AShowcaseProject, getM1AAssetDefinition, M1A_CATALOG_IDS, M1A_SELECTED_IDS } from './m1aShowcase';
+import { createM1AShowcaseProject, getM1AAssetDefinition, M1A_CATALOG_IDS, M1A_SELECTED_IDS, resolveM1AAsset, type AuthorityInput } from './m1aShowcase';
 
 describe('M1A private showcase authority boundary', () => {
   it('uses exactly the seven selected IDs and authoritative K1 records', () => {
@@ -26,5 +26,16 @@ describe('M1A private showcase authority boundary', () => {
     expect(project.objects.filter((object) => object.assetId === 'electronics')).toHaveLength(1);
     expect(getM1AAssetDefinition('electronics')?.placement.anchor).toBe('wall');
     expect(getM1AAssetDefinition('electronics')?.collision).toEqual({ group: 0, mask: 0 });
+  });
+  it('fails closed for missing, duplicate, verdict-mismatched, and invalid authority rows', () => {
+    const authority = (): AuthorityInput => ({ selection: structuredClone(selection), facts: structuredClone(facts), evidence: structuredClone(evidence) });
+    const missing = authority(); missing.facts.assets = missing.facts.assets.filter((row) => row.assetId !== 'chair');
+    expect(() => resolveM1AAsset('chair', missing)).toThrow('cardinality');
+    const duplicate = authority(); duplicate.selection.assets.push(structuredClone(duplicate.selection.assets.find((row) => row.assetId === 'chair')!));
+    expect(() => resolveM1AAsset('chair', duplicate)).toThrow('cardinality');
+    const verdict = authority(); verdict.evidence.entries.find((row) => row.assetId === 'chair')!.semanticMismatch = true;
+    expect(() => resolveM1AAsset('chair', verdict)).toThrow('verdict');
+    const geometry = authority(); geometry.facts.assets.find((row) => row.assetId === 'chair')!.dimensions.width = Number.NaN;
+    expect(() => resolveM1AAsset('chair', geometry)).toThrow('geometry');
   });
 });

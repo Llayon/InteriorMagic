@@ -101,6 +101,7 @@ export interface InteriorMagicTestApi {
   getPlannerSnapshot(): { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null; applyFailure: PlannerApplyFailureReason | null; isPreviewing: boolean; outcome: ProposalOutcome | null };
   getPlannerPreviewTransform(instanceId: string): { position: Vec3; rotationY: number } | null;
   moveObjectForTest(instanceId: string, position: Vec3): void;
+  selectObjectForTest(instanceId: string): void;
   replaceProjectForTest(project: RoomProject): void;
   hasPlanningIntentAnalysis(): boolean;
   beginPlanningIntentAnalysis(text: string): Promise<void>;
@@ -180,6 +181,7 @@ const api: InteriorMagicTestApi = {
     return { position: { x: move.position.x, y: 0, z: move.position.z }, rotationY: move.rotationY };
   },
   moveObjectForTest: (instanceId, position) => useEditorStore.getState().move(instanceId, position),
+  selectObjectForTest: (instanceId) => useEditorStore.getState().select(instanceId),
   replaceProjectForTest: (project) => useEditorStore.setState({ project: structuredClone(project) }),
   hasPlanningIntentAnalysis: () => planningIntentAnalysisPort !== null,
   beginPlanningIntentAnalysis: async (text) => {
