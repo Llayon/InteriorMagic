@@ -34,12 +34,12 @@ export default defineConfig({
     },
     {
       name: 'mobile-large',
-      testMatch: /(?:responsive|beautiful-room)\.spec\.ts/,
+      testMatch: /(?:responsive|beautiful-room|object-rotation-touch)\.spec\.ts/,
       use: { browserName: 'chromium', viewport: { width: 430, height: 932 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1, userAgent: devices['Pixel 5'].userAgent },
     },
     {
       name: 'desktop',
-      testIgnore: /(?:ar0(?:-disabled|-production)?|interactions-touch|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
+      testIgnore: /(?:ar0(?:-disabled|-production)?|interactions-touch|object-rotation-touch|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     // Native-AR landing tests instantiate model-viewer, which owns a separate

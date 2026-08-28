@@ -41,11 +41,11 @@ export async function drag(page: Page, from: Point, to: Point, steps = 12) {
 }
 
 export class TouchGesture {
-  private constructor(private readonly session: CDPSession, private current: Point) {}
+  private constructor(private readonly session: CDPSession, private current: Point, private readonly points = new Map<number, Point>([[1, current]])) {}
 
   static async start(page: Page, point: Point) {
     const session = await page.context().newCDPSession(page);
-    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [TouchGesture.touchPoint(point)] });
+    await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [TouchGesture.touchPoint(point, 1)] });
     return new TouchGesture(session, point);
   }
 
@@ -54,7 +54,7 @@ export class TouchGesture {
     for (let step = 1; step <= steps; step += 1) {
       const ratio = step / steps;
       const point = { x: from.x + (to.x - from.x) * ratio, y: from.y + (to.y - from.y) * ratio };
-      await this.session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [TouchGesture.touchPoint(point)] });
+      this.points.set(1, point); await this.session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [...this.points].map(([id, value]) => TouchGesture.touchPoint(value, id)) });
     }
     this.current = to;
   }
@@ -62,12 +62,15 @@ export class TouchGesture {
   async end() { await this.finish('touchEnd'); }
   async cancel() { await this.finish('touchCancel'); }
 
+  async add(point: Point, id = 2) { this.points.set(id, point); await this.session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [TouchGesture.touchPoint(point, id)] }); }
+  async movePointer(point: Point, id = 2) { this.points.set(id, point); await this.session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [...this.points].map(([pointerId, value]) => TouchGesture.touchPoint(value, pointerId)) }); }
+
   private async finish(type: 'touchEnd' | 'touchCancel') {
     await this.session.send('Input.dispatchTouchEvent', { type, touchPoints: [] });
     await this.session.detach();
   }
 
-  private static touchPoint(point: Point) {
-    return { x: point.x, y: point.y, id: 1, radiusX: 8, radiusY: 8, force: 1 };
+  private static touchPoint(point: Point, id: number) {
+    return { x: point.x, y: point.y, id, radiusX: 8, radiusY: 8, force: 1 };
   }
 }

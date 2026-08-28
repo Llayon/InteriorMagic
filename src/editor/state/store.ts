@@ -3,13 +3,14 @@ import { getAsset } from '@/editor/assets/registry';
 import { cloneProject, createDefaultProject, type FurnitureInstance, type RoomProject, type Vec3 } from '@/editor/model/types';
 import type { CatalogCategoryId } from '@/editor/catalog/CatalogRepository';
 import { findPlacement, isPlacementValid } from '@/editor/placement/placement';
+import { nextSnapRotation } from '@/editor/interactions/rotation';
 import { loadInitialProject, storage, type ProjectStorage } from '@/editor/serialization/project';
 import { catalogRequestGate } from '@/editor/assets/requestGate';
 import type { ProposedMove } from '@/editor/planning/contracts';
 import { planningProjectFingerprint } from '@/editor/planning/integration/projectFingerprint';
 import type { PlannerApplyResult } from '@/editor/planning/application/types';
 
-type Mode = 'idle' | 'dragging';
+export type Mode = 'idle' | 'dragging' | 'rotating' | 'draining';
 export type WorkspacePanel = 'catalog' | 'materials' | 'planner' | null;
 export type SheetState = 'closed' | 'peek' | 'expanded';
 export interface EditorSession {
@@ -34,6 +35,7 @@ export interface EditorStore {
   requestFitRoom(): void;
   add(assetId: string): string | null;
   move(id: string, position: Vec3): void;
+  commitObjectTransform(id: string, position: Vec3, rotationY: number): void;
   rotate(id: string, direction: -1 | 1): void;
   remove(id: string): void;
   duplicate(id: string): void;
@@ -131,13 +133,26 @@ export const createEditorStore = (
       set(commit(state, nextProject));
       persist(nextProject);
     },
+    commitObjectTransform(id, position, rotationY) {
+      const state = get();
+      if (![position.x, position.y, position.z, rotationY].every(Number.isFinite)) return;
+      const object = state.project.objects.find((item) => item.instanceId === id);
+      if (!object) return;
+      if (Math.hypot(object.position.x - position.x, object.position.y - position.y, object.position.z - position.z) < 0.000001 && Math.abs(object.rotationY - rotationY) < 0.000001) return;
+      const candidate = { ...object, position: { ...position }, rotationY };
+      if (!isPlacementValid(state.project, candidate)) return;
+      const nextProject = updateObject(state.project, id, () => candidate);
+      set(commit(state, nextProject));
+      persist(nextProject);
+    },
     rotate(id, direction) {
       const state = get();
       const object = state.project.objects.find((item) => item.instanceId === id);
       if (!object) return;
       const asset = getAsset(object.assetId);
       if (!asset.rotation.enabled) return;
-      const candidate = { ...object, rotationY: object.rotationY + direction * asset.rotation.stepDegrees * Math.PI / 180 };
+      if (asset.placement.anchor !== 'floor') return;
+      const candidate = { ...object, rotationY: nextSnapRotation(object.rotationY, asset.rotation.stepDegrees, direction) };
       if (!isPlacementValid(state.project, candidate)) return;
       const nextProject = updateObject(state.project, id, () => candidate);
       set(commit(state, nextProject));
