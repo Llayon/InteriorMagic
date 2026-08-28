@@ -1,4 +1,6 @@
 import { access, readdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -15,15 +17,13 @@ const walk = async (directory) => {
 try {
   const files = await walk(dist);
   if (files.some((file) => file.includes(`${path.sep}__m1a_assets__${path.sep}`))) throw new Error('M1A private assets must not enter production dist');
-  // Existing fixture models under dist/models are unrelated; these names are
-  // unique to the M1A licensed delivery and must never be emitted here.
-  const licensedM1aIds = ['carpet', 'chair', 'coffee_table_026', 'dresser_001', 'electronics', 'lamp', 'sofa_030'];
-  for (const id of licensedM1aIds) {
-    if (files.some((file) => file.includes(`${path.sep}__m1a_assets__${path.sep}`) && file.endsWith(`${path.sep}${id}.glb`))) throw new Error(`Licensed M1A GLB emitted: ${id}`);
-    if (files.some((file) => file.includes(`${path.sep}__m1a_assets__${path.sep}`) && file.endsWith(`${path.sep}${id}.png`))) throw new Error(`M1A thumbnail emitted: ${id}`);
+  const evidence = JSON.parse(await readFile(path.join(root, 'src/editor/catalog/data/production-asset-spatial-evidence-v1.json'), 'utf8'));
+  const licensedHashes = new Map(evidence.entries.map((asset) => [asset.canonicalSha256, asset.assetId]));
+  for (const file of files.filter((candidate) => /\.(?:glb|usdz)$/i.test(candidate))) {
+    const hash = createHash('sha256').update(await readFile(file)).digest('hex');
+    const assetId = licensedHashes.get(hash);
+    if (assetId) throw new Error(`Licensed M1A binary emitted in dist: ${assetId} (${path.relative(dist, file)})`);
   }
-  // Existing fixture models under dist/models may share carpet/chair/lamp
-  // filenames; only the private M1A output namespace is authoritative here.
 } catch (error) { if (error?.code !== 'ENOENT') throw error; }
 const tracked = execFileSync('git', ['ls-files', '.agent-data'], { encoding: 'utf8' }).trim();
 if (tracked) throw new Error(`.agent-data binaries must not be tracked: ${tracked}`);

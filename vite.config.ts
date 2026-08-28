@@ -27,8 +27,11 @@ const m1aLocalAssetsPlugin = (enabled: boolean): Plugin => ({
   name: 'm1a-private-showcase-assets',
   configureServer: (server) => {
     if (!enabled) return;
-    const canonicalRoot = path.resolve(process.cwd(), '.agent-data', 'k1-production-assets', 'canonical');
-    const visualRoot = path.resolve(process.cwd(), '.agent-data', 'k1-production-assets', 'visual', 'canonical');
+    const localAssetRoot = process.env.M1A_LOCAL_ASSET_ROOT
+      ? path.resolve(process.env.M1A_LOCAL_ASSET_ROOT)
+      : path.resolve(process.cwd(), '.agent-data', 'k1-production-assets');
+    const canonicalRoot = path.join(localAssetRoot, 'canonical');
+    const visualRoot = path.join(localAssetRoot, 'visual', 'canonical');
     const middleware: Connect.NextHandleFunction = async (request, response, next) => {
       const pathname = decodeURIComponent(request.url?.split('?', 1)[0] ?? '');
       const model = pathname.match(/^\/__m1a_assets__\/models\/([^/]+)\.glb$/);
@@ -85,12 +88,19 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const ar0Enabled = env.VITE_AR0_ENABLED === 'true';
   const assetOrigin = env.VITE_AR_ASSET_ORIGIN?.trim();
+  const m1aShowcaseEnabled = env.VITE_M1A_SHOWCASE_ENABLED === 'true';
+  const m1aAssetOrigin = env.VITE_M1A_ASSET_ORIGIN?.trim();
   if (mode === 'production' && ar0Enabled && !assetOrigin) {
     throw new Error('VITE_AR_ASSET_ORIGIN is required when VITE_AR0_ENABLED=true in production');
   }
   if (mode === 'production' && ar0Enabled && assetOrigin) {
     const parsed = new URL(assetOrigin);
     if (parsed.protocol !== 'https:') throw new Error('VITE_AR_ASSET_ORIGIN must use HTTPS in production');
+  }
+  if (mode === 'production' && m1aShowcaseEnabled && !m1aAssetOrigin) throw new Error('VITE_M1A_ASSET_ORIGIN is required when VITE_M1A_SHOWCASE_ENABLED=true in production');
+  if (mode === 'production' && m1aAssetOrigin) {
+    const parsed = new URL(m1aAssetOrigin);
+    if (parsed.protocol !== 'https:' || parsed.pathname !== '/' || parsed.search || parsed.hash) throw new Error('VITE_M1A_ASSET_ORIGIN must be an HTTPS origin without a path');
   }
   return {
     base: env.VITE_BASE_PATH ?? '/',

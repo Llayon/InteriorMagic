@@ -50,7 +50,7 @@ export const bootstrapEditor = async () => {
     createRoot(document.getElementById('root')!).render(<IthappyThumbnailView assetId={thumbnailAssetId} />);
     return;
   }
-  const showcaseEnabled = import.meta.env.MODE !== 'production' && query.get('showcase') === '1';
+  const showcaseEnabled = query.get('showcase') === '1' && (import.meta.env.MODE !== 'production' || import.meta.env.VITE_M1A_SHOWCASE_ENABLED === 'true');
   if (showcaseEnabled) {
     const { installM1AShowcase } = await import('@/app/showcase/m1aShowcase');
     await installM1AShowcase();

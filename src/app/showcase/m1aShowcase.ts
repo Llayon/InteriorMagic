@@ -13,6 +13,17 @@ export const M1A_SELECTED_IDS = ['carpet', 'chair', 'coffee_table_026', 'dresser
 export const M1A_CATALOG_IDS = ['chair', 'carpet', 'dresser_001', 'lamp'] as const;
 export const M1A_SEED_MODEL_IDS = M1A_SELECTED_IDS;
 
+export const M1A_RELEASE_PREFIX = 'showcase/v1';
+export const resolveM1AAssetBase = (options: { production: boolean; origin?: string }): string => {
+  if (!options.production) return '/__m1a_assets__/';
+  const origin = options.origin?.trim().replace(/\/+$/, '');
+  if (!origin) throw new Error('VITE_M1A_ASSET_ORIGIN is required for production M1A showcase');
+  const parsed = new URL(origin);
+  if (parsed.protocol !== 'https:' || parsed.pathname !== '/' || parsed.search || parsed.hash) throw new Error('VITE_M1A_ASSET_ORIGIN must be an HTTPS origin without a path');
+  return `${origin}/${M1A_RELEASE_PREFIX}/`;
+};
+const m1aAssetBase = resolveM1AAssetBase({ production: import.meta.env.MODE === 'production', origin: import.meta.env.VITE_M1A_ASSET_ORIGIN });
+
 const furnitureMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const decorMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const common = { snapping: { grid: true, walls: true }, rotation: { enabled: true, stepDegrees: 45 } };
@@ -45,7 +56,7 @@ export const resolveM1AAsset = (assetId: string, authority: AuthorityInput = { s
   if ((M1A_CATALOG_IDS as readonly string[]).includes(assetId) && (factsRow.placement.anchor !== 'floor' || factsRow.placement.editorPlacementSupport !== 'supported')) throw new Error(`M1A catalog placement failure: ${assetId}`);
   if (assetId === 'electronics' && (assetId !== 'electronics' || selectionRow.semanticRole !== 'tv' || factsRow.placement.anchor !== 'wall' || factsRow.placement.editorPlacementSupport !== 'unsupported')) throw new Error('M1A TV authority failure');
   const policy = policies[assetId as keyof typeof policies];
-  return { ...policy, dimensions: { ...dimensions }, footprint: { width: footprint.width, depth: footprint.depth }, placement: { anchor: factsRow.placement.anchor as PlacementAnchor }, semantic: { role: selectionRow.semanticRole as FurnitureSemanticRole } };
+  return { ...policy, modelUrl: `${m1aAssetBase}models/${assetId}.glb`, thumbnailUrl: `${m1aAssetBase}thumbs/${assetId}.png`, dimensions: { ...dimensions }, footprint: { width: footprint.width, depth: footprint.depth }, placement: { anchor: factsRow.placement.anchor as PlacementAnchor }, semantic: { role: selectionRow.semanticRole as FurnitureSemanticRole } };
 };
 const definitions = Object.fromEntries(M1A_SELECTED_IDS.map((id) => [id, resolveM1AAsset(id)])) as Record<(typeof M1A_SELECTED_IDS)[number], FurnitureAssetDefinition>;
 
@@ -61,11 +72,11 @@ const runtimeNumbers: Record<string, Omit<RuntimeCatalogEntry, 'id' | 'runtimeFi
 const sourceCategories: Record<string, string> = { carpet: 'carpet', chair: 'chair', coffee_table_026: 'coffee', dresser_001: 'dresser', electronics: 'electronics', lamp: 'lamp', sofa_030: 'sofa' };
 const displayCategories: Record<string, DisplayCategory> = { chair: 'seating', carpet: 'decor', dresser_001: 'storage', lamp: 'lighting', coffee_table_026: 'tables', electronics: 'decor', sofa_030: 'seating' };
 
-export const createM1ARuntimeRegistry = () => new RuntimeAssetRegistry(M1A_SELECTED_IDS.map((id) => ({ id, runtimeFilename: `models/${id}.glb`, category: sourceCategories[id]!, ...runtimeNumbers[id]! })), '/__m1a_assets__/');
+export const createM1ARuntimeRegistry = () => new RuntimeAssetRegistry(M1A_SELECTED_IDS.map((id) => ({ id, runtimeFilename: `models/${id}.glb`, category: sourceCategories[id]!, ...runtimeNumbers[id]! })), m1aAssetBase);
 export const createM1ACatalogRepository = () => {
   const registry = createM1ARuntimeRegistry();
   const payload: CatalogPayloadEntry[] = M1A_SELECTED_IDS.map((assetId) => ({ assetId, sourceCategory: sourceCategories[assetId]!, displayCategory: ({ seating: 'Seating', decor: 'Decor', storage: 'Storage', lighting: 'Lighting', tables: 'Tables' } as Record<string, string>)[displayCategories[assetId]!]!, displayName: definitions[assetId]!.name, thumbnailFilename: `thumbs/${assetId}.png`, runtimeFilename: `models/${assetId}.glb`, ...runtimeNumbers[assetId]! }));
-  return new CatalogRepository(registry, parseCatalogPayload(payload), '/__m1a_assets__/');
+  return new CatalogRepository(registry, parseCatalogPayload(payload), m1aAssetBase);
 };
 
 export const createM1AShowcaseProject = (): RoomProject => ({ version: 1, room: { width: 6.2, depth: 5.8, height: 2.7 }, finishes: { floorMaterialId: 'oak', wallMaterialId: 'linen' }, objects: [
