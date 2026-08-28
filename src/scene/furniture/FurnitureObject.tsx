@@ -28,6 +28,7 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
   const floor = (e: ThreeEvent<PointerEvent>) => { const hit = new THREE.Vector3(); return e.ray.intersectPlane(ground, hit) ? { x: hit.x, z: hit.z } : null; };
   const sample = (e: PointerEvent): PointerSample => ({ pointerId: e.pointerId, pointerType: e.pointerType, clientX: e.clientX, clientY: e.clientY });
   const reset = (cancelled: boolean, result?: { position: { x: number; y: number; z: number }; rotationY: number; changed: boolean } | null) => {
+    if (result && group.current) { group.current.position.set(result.position.x, result.position.y, result.position.z); group.current.rotation.y = result.rotationY; }
     clearCancel.current(); gateCamera(true); useEditorStore.getState().setMode('idle'); if (feedback.current) feedback.current.visible = false;
     if (!cancelled && result?.changed) useEditorStore.getState().commitObjectTransform(object.instanceId, result.position, result.rotationY);
     endTestInteraction(cancelled ? 'cancel' : 'commit'); invalidate();
@@ -59,13 +60,13 @@ export function FurnitureObject({ object }: { object: FurnitureInstance }) {
     if (mode !== 'idle') { if (controller.current.addPointer(s)) { e.stopPropagation(); canvas.setPointerCapture(s.pointerId); useEditorStore.getState().setMode('rotating'); } return; }
     const hit = floor(e); if (!hit || !controller.current.begin(s, object, hit, useEditorStore.getState().project)) return;
     e.stopPropagation(); canvas.setPointerCapture(s.pointerId);
-    const cancel = (native: PointerEvent) => { if (controller.current.activePointerIds.includes(native.pointerId)) { controller.current.cancel(); reset(true); } };
+    const cancel = (native: PointerEvent) => { if (controller.current.activePointerIds.includes(native.pointerId)) { const result = controller.current.cancel(); reset(true, result); } };
     canvas.addEventListener('pointercancel', cancel); canvas.addEventListener('lostpointercapture', cancel); clearCancel.current = () => { canvas.removeEventListener('pointercancel', cancel); canvas.removeEventListener('lostpointercapture', cancel); clearCancel.current = () => undefined; };
     beginTestInteraction(e.pointerType, e.pointerId); useEditorStore.getState().select(object.instanceId); gateCamera(false); useEditorStore.getState().setMode('dragging');
   };
   const onMove = (e: ThreeEvent<PointerEvent>) => { const preview = controller.current.update(sample(e.nativeEvent), controller.current.mode === 'dragging' ? floor(e) : null); if (!preview || !group.current) return; e.stopPropagation(); group.current.position.set(preview.position.x, preview.position.y, preview.position.z); group.current.rotation.y = preview.rotationY; if (feedback.current) feedback.current.visible = !preview.valid; invalidate(); };
   const onUp = (e: ThreeEvent<PointerEvent>) => { if (!controller.current.activePointerIds.includes(e.pointerId)) return; e.stopPropagation(); const result = controller.current.release(e.pointerId); if (result) reset(false, result); else useEditorStore.getState().setMode('draining'); try { canvas.releasePointerCapture(e.pointerId); } catch { /* already released */ } };
-  const onCancel = (e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); controller.current.cancel(); reset(true); };
+  const onCancel = (e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); const result = controller.current.cancel(); reset(true, result); };
   const fallback = <ProceduralFurniture assetId={object.assetId} variantId={object.variantId} />;
   return <group ref={group} position={position} rotation-y={rotation}>
     {asset.placement.anchor === 'floor' && asset.semantic?.role !== 'rug' && <FurnitureGrounding width={asset.footprint.width} depth={asset.footprint.depth} />}

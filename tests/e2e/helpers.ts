@@ -62,7 +62,7 @@ export class TouchGesture {
   async end() { await this.finish('touchEnd'); }
   async cancel() { await this.finish('touchCancel'); }
 
-  async add(point: Point, id = 2) { this.points.set(id, point); await this.session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [TouchGesture.touchPoint(point, id)] }); }
+  async add(point: Point, id = 2) { this.points.set(id, point); await this.session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [...this.points].map(([pointerId, value]) => TouchGesture.touchPoint(value, pointerId)) }); }
   async movePointer(point: Point, id = 2) { this.points.set(id, point); await this.session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [...this.points].map(([pointerId, value]) => TouchGesture.touchPoint(value, pointerId)) }); }
 
   private async finish(type: 'touchEnd' | 'touchCancel') {
