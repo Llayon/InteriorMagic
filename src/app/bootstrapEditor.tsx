@@ -50,7 +50,13 @@ export const bootstrapEditor = async () => {
     createRoot(document.getElementById('root')!).render(<IthappyThumbnailView assetId={thumbnailAssetId} />);
     return;
   }
-  if (query.get('demo') === '1') useEditorStore.setState({ project: createBeautifulRoomProject() });
+  const showcaseEnabled = import.meta.env.MODE !== 'production' && query.get('showcase') === '1';
+  if (showcaseEnabled) {
+    const { installM1AShowcase } = await import('@/app/showcase/m1aShowcase');
+    await installM1AShowcase();
+  } else if (query.get('demo') === '1') {
+    useEditorStore.setState({ project: createBeautifulRoomProject() });
+  }
 
   const requestedFixture = PLANNER_FIXTURE_HARNESS_ENABLED
     ? parsePlannerFixture(window.location.search)
