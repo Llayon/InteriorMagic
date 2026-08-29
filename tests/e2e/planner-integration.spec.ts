@@ -3,8 +3,9 @@ import { expect, test } from './fixtures';
 const openRealRoom = async (page: import('@playwright/test').Page, room: 'improved' | 'already-good' | 'no-tv', extra = '') => {
   await page.goto(`/?planning-test-room=${room}${extra}`);
   await expect(page.getByTestId('app-root')).toBeVisible();
-  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-source', 'real');
-  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-capable', room === 'no-tv' ? 'off' : 'on');
+  const readiness = { timeout: 15_000 };
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-source', 'real', readiness);
+  await expect(page.getByTestId('app-root')).toHaveAttribute('data-planner-capable', room === 'no-tv' ? 'off' : 'on', readiness);
   if (room === 'no-tv') await expect(page.getByTestId('planner-entry')).toHaveCount(0);
   else await expect(page.getByTestId('planner-entry')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady()), { timeout: 15_000 }).toBe(true);
