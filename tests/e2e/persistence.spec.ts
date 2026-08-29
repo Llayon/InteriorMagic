@@ -25,7 +25,7 @@ test('H3B: local mutation survives reload without a manual Save', async ({ monit
   const expected = await project(page);
   // No explicit Save: the persistence seam must have written already.
   await page.reload();
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.isReady())).toBe(true);
+  await waitForEditorReady(page);
   await expect.poll(async () => (await project(page)).objects.length).toBe(1);
   expect(await project(page)).toEqual(expected);
 });
