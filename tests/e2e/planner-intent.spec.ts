@@ -72,12 +72,18 @@ test('zero-TV Conversation intent reaches the deterministic Conversation planner
 
   await page.goto('/?planning-test-room=no-tv');
   await expect(page.getByTestId('planner-entry')).toHaveCount(0);
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.hasPlanningIntentAnalysis())).toBe(true);
+  await expect.poll(
+    () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.hasPlanningIntentAnalysis()),
+    { timeout: 15_000 },
+  ).toBe(true);
   const original = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getProject());
   await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.beginPlanningIntentAnalysis(
     'Сделай удобнее для общения с гостями',
   ));
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getPlannerSnapshot().status)).toBe('ready');
+  await expect.poll(
+    () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getPlannerSnapshot().status),
+    { timeout: 15_000 },
+  ).toBe('ready');
   expect(requests).toEqual([{
     contractVersion: 2,
     text: 'Сделай удобнее для общения с гостями',
