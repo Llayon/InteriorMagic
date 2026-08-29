@@ -1,5 +1,5 @@
 import '@google/model-viewer';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getAsset } from '@/editor/assets/registry';
 import { parseAr0Manifest, type Ar0RuntimeManifest } from './manifest';
 import { buildAr0RevisionBaseUrl, getAr0Revision } from './revisions';
@@ -14,6 +14,7 @@ export function ArLanding({ revisionId }: ArLandingProps) {
   const [manifest, setManifest] = useState<Ar0RuntimeManifest | null>(null);
   const [error, setError] = useState<string | null>(null);
   const revisionBaseUrl = useMemo(() => revision ? buildAr0RevisionBaseUrl(revision) : null, [revision]);
+  const modelViewerRef = useRef<HTMLElement & { activateAR?: () => Promise<void> | void }>(null);
 
   useEffect(() => {
     if (!revision || !revisionBaseUrl) return;
@@ -49,6 +50,7 @@ export function ArLanding({ revisionId }: ArLandingProps) {
     <header className="ar0-header"><div><small>INTERIORMAGIC</small><h1>{asset.name}</h1></div><span className="ar0-scale">Масштаб 1:1</span></header>
     <section className="ar0-viewer-shell" aria-label="Интерактивная 3D-модель кресла">
       {manifest && modelUrl && iosUrl && <model-viewer
+        ref={modelViewerRef}
         data-testid="ar0-model-viewer"
         src={modelUrl}
         ios-src={iosUrl}
@@ -61,11 +63,18 @@ export function ArLanding({ revisionId }: ArLandingProps) {
         shadow-intensity="1"
         exposure="1"
       >
-        <button slot="ar-button" className="ar0-primary">Примерить в комнате</button>
       </model-viewer>}
       {!manifest && !error && <div className="ar0-loading" role="status">Загружаем кресло…</div>}
       {error && <div className="ar0-load-error" role="alert">{error}</div>}
     </section>
+    {manifest && modelUrl && iosUrl && <div className="ar0-actions">
+      <button
+        type="button"
+        className="ar0-primary"
+        data-testid="ar0-launch"
+        onClick={() => { void modelViewerRef.current?.activateAR?.(); }}
+      >Примерить в комнате</button>
+    </div>}
     <section className="ar0-details">
       <div className="ar0-dimensions" aria-label="Размеры кресла">
         <span>Ширина: <strong>{manifest ? centimeters(manifest.spatial.dimensionsMeters.width) : '—'}</strong></span>

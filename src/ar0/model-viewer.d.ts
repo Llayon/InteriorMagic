@@ -14,6 +14,7 @@ declare module 'react' {
         'camera-controls'?: boolean;
         'shadow-intensity'?: string;
         exposure?: string;
+        ref?: import('react').Ref<HTMLElement & { activateAR?: () => Promise<void> | void }>;
       };
     }
   }
