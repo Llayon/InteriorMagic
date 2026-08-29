@@ -1,9 +1,9 @@
 import type { AssetId } from '@/editor/assets/registry';
 
 export interface Ar0RevisionDefinition {
-  readonly arRevisionId: 'sheen-chair-r1';
+  readonly arRevisionId: 'sheen-chair-r1' | 'sheen-chair-r2';
   readonly assetId: AssetId;
-  readonly prefix: 'ar0/sheen-chair/r1/';
+  readonly prefix: 'ar0/sheen-chair/r1/' | 'ar0/sheen-chair/r2/';
 }
 
 const SHEEN_CHAIR_R1: Ar0RevisionDefinition = {
@@ -12,11 +12,22 @@ const SHEEN_CHAIR_R1: Ar0RevisionDefinition = {
   prefix: 'ar0/sheen-chair/r1/',
 };
 
+const SHEEN_CHAIR_R2: Ar0RevisionDefinition = {
+  arRevisionId: 'sheen-chair-r2',
+  assetId: 'sheenChair',
+  prefix: 'ar0/sheen-chair/r2/',
+};
+
+const SHEEN_CHAIR_REVISIONS = new Map([
+  [SHEEN_CHAIR_R1.arRevisionId, SHEEN_CHAIR_R1],
+  [SHEEN_CHAIR_R2.arRevisionId, SHEEN_CHAIR_R2],
+]);
+
 export const getAr0RevisionForAsset = (assetId: string): Ar0RevisionDefinition | null =>
-  assetId === SHEEN_CHAIR_R1.assetId ? SHEEN_CHAIR_R1 : null;
+  assetId === SHEEN_CHAIR_R2.assetId ? SHEEN_CHAIR_R2 : null;
 
 export const getAr0Revision = (arRevisionId: string): Ar0RevisionDefinition | null =>
-  arRevisionId === SHEEN_CHAIR_R1.arRevisionId ? SHEEN_CHAIR_R1 : null;
+  SHEEN_CHAIR_REVISIONS.get(arRevisionId as Ar0RevisionDefinition['arRevisionId']) ?? null;
 
 const ensureTrailingSlash = (value: string) => value.endsWith('/') ? value : `${value}/`;
 

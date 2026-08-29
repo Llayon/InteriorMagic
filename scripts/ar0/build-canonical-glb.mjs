@@ -2,14 +2,16 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { encodeGlb, measureGlbJson, parseGlb } from './glb-bounds.mjs';
+import { parseAr0RevisionArgument } from './revision-config.mjs';
 
 // Legacy/audit-only writer for the frozen Sheen Chair r1 derivative. Runtime
 // verification uses the parser and bounds reader; this script must not run in
 // production or mutate committed immutable artifacts.
 
 const root = process.cwd();
+const { arRevisionId: revision } = parseAr0RevisionArgument(process.argv.slice(2));
 const sourceFile = path.join(root, 'public/models/sheen_chair.glb');
-const outputRoot = path.join(root, '.agent-data/ar0/sheen-chair-r1');
+const outputRoot = path.join(root, `.agent-data/ar0/${revision}`);
 const outputFile = path.join(outputRoot, 'model.glb');
 const reportFile = path.join(outputRoot, 'canonical-glb-report.json');
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
@@ -34,9 +36,9 @@ await mkdir(outputRoot, { recursive: true });
 await writeFile(outputFile, canonical);
 await writeFile(reportFile, `${JSON.stringify({
   schemaVersion: 1,
-  arRevisionId: 'sheen-chair-r1',
+  arRevisionId: revision,
   source: { path: 'public/models/sheen_chair.glb', bytes: source.length, sha256: sha256(source), bounds: rawBounds },
-  canonical: { path: '.agent-data/ar0/sheen-chair-r1/model.glb', bytes: canonical.length, sha256: sha256(canonical), bounds: canonicalBounds },
+  canonical: { path: `.agent-data/ar0/${revision}/model.glb`, bytes: canonical.length, sha256: sha256(canonical), bounds: canonicalBounds },
   bakedTranslation: translation,
   orientationEvidence: '+Y up and +Z forward preserved; the derivative adds translation only',
 }, null, 2)}\n`);

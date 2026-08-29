@@ -17,6 +17,20 @@ export const validateUsdzEvidence = (evidence, expected) => {
   if (evidence.metersPerUnit !== 1) throw new Error('USDZ stage metersPerUnit must be 1');
   if (!evidence.dependencies || !Array.isArray(evidence.dependencies.unresolved)) throw new Error('USDZ dependency evidence is malformed');
   if (evidence.dependencies.unresolved.length) throw new Error('USDZ has unresolved dependencies');
+  if (expected.materialProfile) {
+    if (evidence.materialProfile !== expected.materialProfile) throw new Error('USDZ material profile evidence does not match');
+    if (expected.materialProfile === 'quick-look-r2') {
+      const material = evidence.materialEvidence;
+      if (material?.material !== '/root/_materials/fabric_Mystere_Mango_Velvet'
+        || typeof material.diffuseTexture !== 'string'
+        || !material.diffuseTexture.includes('fabric_Mystere_Mango_Velvet_quick_look_r2.png')
+        || material.sourceColorSpace !== 'sRGB'
+        || material.unsupportedSheenRemoved !== true
+        || JSON.stringify(material.baseColorFactorBaked) !== JSON.stringify([0.883, 0.035, 0, 1])) {
+        throw new Error('USDZ Quick Look material evidence is missing or malformed');
+      }
+    }
+  }
 
   const minimum = requireFiniteVector(evidence.stageBounds?.min, 'USDZ stageBounds.min');
   const maximum = requireFiniteVector(evidence.stageBounds?.max, 'USDZ stageBounds.max');

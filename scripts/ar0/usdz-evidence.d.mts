@@ -4,6 +4,7 @@ export interface UsdzEvidenceExpectation {
   arRevisionId: string;
   usdzSha256: string;
   glbSize: readonly number[];
+  materialProfile?: 'legacy-r1' | 'quick-look-r2';
 }
 
 export function validateUsdzEvidence(evidence: unknown, expected: UsdzEvidenceExpectation): {

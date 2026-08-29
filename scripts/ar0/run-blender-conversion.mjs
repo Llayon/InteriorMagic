@@ -3,9 +3,11 @@ import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { readApprovedBlenderVersion } from './blender-provenance.mjs';
+import { parseAr0RevisionArgument } from './revision-config.mjs';
 
 const root = process.cwd();
-const outputRoot = path.join(root, '.agent-data/ar0/sheen-chair-r1');
+const { arRevisionId: revision, materialProfile } = parseAr0RevisionArgument(process.argv.slice(2));
+const outputRoot = path.join(root, `.agent-data/ar0/${revision}`);
 const canonical = path.join(outputRoot, 'model.glb');
 const usdz = path.join(outputRoot, 'model.usdz');
 const poster = path.join(outputRoot, 'poster.webp');
@@ -13,6 +15,7 @@ const blenderReport = path.join(outputRoot, 'converter-report.json');
 const usdReport = path.join(outputRoot, 'usdz-stage-report.json');
 const blenderCandidates = [
   process.env.BLENDER_PATH,
+  'D:/Programms/Blender Foundation/Blender 5.2/blender.exe',
   'D:/Programms/Blender/5.2/blender.exe',
   'D:/Programms/Blender/blender.exe',
 ].filter(Boolean);
@@ -36,6 +39,7 @@ const blender = await findBlender();
 const exportArgs = [
   '--background', '--factory-startup', '--python', path.join(root, 'scripts/ar0/export-usdz.py'), '--',
   '--input', canonical, '--output', usdz, '--poster', poster, '--report', blenderReport,
+  '--material-profile', materialProfile,
 ];
 const previousUsdz = await readFile(usdz).catch(() => null);
 const previousPoster = await readFile(poster).catch(() => null);
@@ -49,7 +53,8 @@ try {
 const actualBlenderVersion = readApprovedBlenderVersion(converterReport);
 await run(blender, [
   '--background', '--factory-startup', '--python', path.join(root, 'scripts/ar0/validate-usdz.py'),
-], { AR0_USDZ_INPUT: usdz, AR0_USDZ_REPORT: usdReport, AR0_AR_REVISION_ID: 'sheen-chair-r1' });
+  '--', '--input', usdz, '--report', usdReport, '--ar-revision-id', revision, '--material-profile', materialProfile,
+]);
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 const [glbBytes, usdzBytes, posterBytes] = await Promise.all([readFile(canonical), readFile(usdz), readFile(poster)]);
@@ -66,6 +71,9 @@ await writeFile(path.join(outputRoot, 'conversion-provenance.json'), `${JSON.str
     previousUsdzSha256: sha256(previousUsdz),
     poster: previousPoster?.equals(posterBytes) ? 'DETERMINISTIC' : 'NOT_DETERMINISTIC',
   } : { usdz: 'NOT_MEASURED', poster: 'NOT_MEASURED' },
-  status: 'USDZ_STRUCTURALLY_BUILT_IOS_MATERIAL_QA_PENDING',
+  materialProfile,
+  status: revision === 'sheen-chair-r2'
+    ? 'USDZ_STRUCTURALLY_BUILT_QUICK_LOOK_SAFE_MATERIAL_PROFILE_PHYSICAL_QA_PENDING'
+    : 'USDZ_STRUCTURALLY_BUILT_IOS_MATERIAL_QA_PENDING',
 }, null, 2)}\n`);
 console.log(JSON.stringify({ modelGlbSha256: sha256(glbBytes), modelUsdzSha256: sha256(usdzBytes), modelUsdzBytes: usdzBytes.length, posterSha256: sha256(posterBytes) }, null, 2));

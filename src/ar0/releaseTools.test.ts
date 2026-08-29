@@ -13,6 +13,8 @@ import { AR0_REVISION_ID, validateUsdzEvidence } from '../../scripts/ar0/usdz-ev
 
 const revisionRoot = path.resolve('artifacts/ar0/sheen-chair/r1');
 const evidencePath = path.resolve('docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json');
+const r2RevisionRoot = path.resolve('artifacts/ar0/sheen-chair/r2');
+const r2EvidencePath = path.resolve('docs/ar/evidence/sheen-chair-r2/usdz-stage-report.json');
 const sha256 = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
 
 const loadCurrentEvidence = async () => {
@@ -24,6 +26,18 @@ const loadCurrentEvidence = async () => {
   return {
     evidence: JSON.parse(evidenceBytes.toString('utf8')),
     expected: { arRevisionId: AR0_REVISION_ID, usdzSha256: sha256(usdzBytes), glbSize: glbBounds.size },
+  };
+};
+
+const loadR2Evidence = async () => {
+  const [evidenceBytes, usdzBytes, glbBounds] = await Promise.all([
+    readFile(r2EvidencePath),
+    readFile(path.join(r2RevisionRoot, 'model.usdz')),
+    measureGlbFile(path.join(r2RevisionRoot, 'model.glb')),
+  ]);
+  return {
+    evidence: JSON.parse(evidenceBytes.toString('utf8')),
+    expected: { arRevisionId: 'sheen-chair-r2', usdzSha256: sha256(usdzBytes), glbSize: glbBounds.size, materialProfile: 'quick-look-r2' as const },
   };
 };
 
@@ -82,6 +96,12 @@ describe('fail-closed USDZ validation evidence', () => {
     stageBounds.sizeMeters[0] *= 1.02;
     expect(() => validateUsdzEvidence({ ...evidence, stageBounds }, expected)).toThrow(/meter size is inconsistent/u);
   });
+
+  it('requires the Quick Look-safe baked Mango texture for r2', async () => {
+    const { evidence, expected } = await loadR2Evidence();
+    expect(validateUsdzEvidence(evidence, expected).materialProfile).toBe('quick-look-r2');
+    expect(() => validateUsdzEvidence({ ...evidence, materialEvidence: null }, expected)).toThrow(/Quick Look material/u);
+  });
 });
 
 describe('remote AR0 MIME validation', () => {
@@ -120,6 +140,11 @@ describe('immutable local release publication guards', () => {
     const { objects } = await loadValidatedReleaseObjects(revisionRoot);
     expect(objects.map((object) => object.path)).toEqual(['model.glb', 'model.usdz', 'poster.webp', 'manifest.json', 'checksums.json']);
     expect(objects.map((object) => object.contentType)).toEqual(['model/gltf-binary', 'model/vnd.usdz+zip', 'image/webp', 'application/json; charset=utf-8', 'application/json; charset=utf-8']);
+  });
+
+  it('loads exactly the frozen five-object r2 allowlist', async () => {
+    const { objects } = await loadValidatedReleaseObjects(r2RevisionRoot, 'sheen-chair-r2');
+    expect(objects.map((object) => object.path)).toEqual(['model.glb', 'model.usdz', 'poster.webp', 'manifest.json', 'checksums.json']);
   });
 
   it('treats an exact existing release as idempotent with no uploads', () => {

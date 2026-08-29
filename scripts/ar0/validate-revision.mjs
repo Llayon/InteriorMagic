@@ -3,15 +3,19 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { unzipSync } from 'three/examples/jsm/libs/fflate.module.js';
 import { measureGlbFile, parseGlb } from './glb-bounds.mjs';
-import { AR0_REVISION_ID, validateUsdzEvidence } from './usdz-evidence.mjs';
+import { parseAr0RevisionArgument } from './revision-config.mjs';
+import { validateUsdzEvidence } from './usdz-evidence.mjs';
 
 const root = process.cwd();
-const staged = process.argv.includes('--staged');
+const args = process.argv.slice(2);
+const staged = args.includes('--staged');
+const revision = parseAr0RevisionArgument(args);
+const { arRevisionId, artifactDirectory, materialProfile } = revision;
 const revisionRoot = staged
-  ? path.join(root, 'artifacts/ar0/sheen-chair/r1')
-  : path.join(root, '.agent-data/ar0/sheen-chair-r1');
+  ? path.join(root, `artifacts/ar0/sheen-chair/${artifactDirectory}`)
+  : path.join(root, `.agent-data/ar0/${arRevisionId}`);
 const stageEvidencePath = staged
-  ? path.join(root, 'docs/ar/evidence/sheen-chair-r1/usdz-stage-report.json')
+  ? path.join(root, `docs/ar/evidence/${arRevisionId}/usdz-stage-report.json`)
   : path.join(revisionRoot, 'usdz-stage-report.json');
 const files = {
   glb: { path: 'model.glb', contentType: 'model/gltf-binary' },
@@ -61,9 +65,10 @@ try {
   throw new Error(`USDZ validation evidence is malformed: ${error instanceof Error ? error.message : String(error)}`);
 }
 const stageReport = validateUsdzEvidence(parsedStageEvidence, {
-  arRevisionId: AR0_REVISION_ID,
+  arRevisionId,
   usdzSha256: sha256(usdz),
   glbSize: glbBounds.size,
+  materialProfile: materialProfile === 'quick-look-r2' ? materialProfile : undefined,
 });
 const usdzSize = stageReport.stageBounds.sizeMeters;
 if (Math.abs(glbBounds.min[1]) > 0.001 || Math.abs(glbBounds.center[0]) > 0.001 || Math.abs(glbBounds.center[2]) > 0.001) {
@@ -85,7 +90,7 @@ for (const [axis, expected] of Object.entries(dimensionsMeters)) {
 }
 const manifest = {
   schemaVersion: 2,
-  arRevisionId: AR0_REVISION_ID,
+  arRevisionId,
   assetId: 'sheenChair',
   spatial: { dimensionsMeters, placementAnchor: 'floor' },
   ar: { scale: 'fixed', placement: 'floor' },
@@ -105,7 +110,7 @@ const checksumEntries = [
   }),
   { path: 'manifest.json', bytes: manifestBytes.length, sha256: sha256(manifestBytes), contentType: 'application/json; charset=utf-8' },
 ];
-const checksums = { schemaVersion: 2, arRevisionId: AR0_REVISION_ID, files: checksumEntries };
+const checksums = { schemaVersion: 2, arRevisionId, files: checksumEntries };
 const checksumBytes = Buffer.from(`${JSON.stringify(checksums, null, 2)}\n`);
 if (staged) {
   const existingChecksums = await readFile(path.join(revisionRoot, 'checksums.json'));

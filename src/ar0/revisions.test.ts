@@ -3,10 +3,15 @@ import { buildAr0LandingUrl, buildAr0RevisionBaseUrl, getAr0Revision, getAr0Revi
 
 describe('AR0 revision resolution', () => {
   it('maps only Sheen Chair to its immutable revision', () => {
-    expect(getAr0RevisionForAsset('sheenChair')).toMatchObject({ arRevisionId: 'sheen-chair-r1', assetId: 'sheenChair' });
+    expect(getAr0RevisionForAsset('sheenChair')).toMatchObject({ arRevisionId: 'sheen-chair-r2', assetId: 'sheenChair' });
     expect(getAr0RevisionForAsset('chair')).toBeNull();
     expect(getAr0RevisionForAsset('sofa')).toBeNull();
     expect(getAr0Revision('unknown')).toBeNull();
+  });
+
+  it('keeps the immutable r1 URL resolvable while the catalog selects r2', () => {
+    expect(getAr0Revision('sheen-chair-r1')).toMatchObject({ prefix: 'ar0/sheen-chair/r1/' });
+    expect(getAr0Revision('sheen-chair-r2')).toMatchObject({ prefix: 'ar0/sheen-chair/r2/' });
   });
 
   it('builds an absolute landing URL under Vite BASE_URL', () => {

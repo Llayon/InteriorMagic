@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 2,
+  "arRevisionId": "sheen-chair-r2",
+  "usdzSha256": "ad1e36abcf95b44f1de5494c4104ad9b28200b9b0e83862df798e7377e5254cb",
+  "parser": "Blender-bundled pxr.Usd/UsdGeom",
+  "upAxis": "Y",
+  "metersPerUnit": 1.0,
+  "materialProfile": "quick-look-r2",
+  "materialEvidence": {
+    "material": "/root/_materials/fabric_Mystere_Mango_Velvet",
+    "surfaceShader": "/root/_materials/fabric_Mystere_Mango_Velvet/Principled_BSDF",
+    "diffuseTexture": "@./textures/fabric_Mystere_Mango_Velvet_quick_look_r2.png@",
+    "sourceColorSpace": "sRGB",
+    "baseColorFactorBaked": [
+      0.883,
+      0.035,
+      0.0,
+      1.0
+    ],
+    "unsupportedSheenRemoved": true
+  },
+  "stageBounds": {
+    "min": [
+      -0.4132789890281856,
+      -8.868773770931426e-17,
+      -0.2851327294483783
+    ],
+    "max": [
+      0.4132789750583471,
+      0.6862470911801213,
+      0.28513274248689413
+    ],
+    "size": [
+      0.8265579640865327,
+      0.6862470911801214,
+      0.5702654719352724
+    ],
+    "sizeMeters": [
+      0.8265579640865327,
+      0.6862470911801214,
+      0.5702654719352724
+    ]
+  },
+  "dependencies": {
+    "layers": [
+      "model.usdz"
+    ],
+    "assets": [
+      "model.usdz[textures/Image_0.png]",
+      "model.usdz[textures/Image_4.png]",
+      "model.usdz[textures/Image_5.png]",
+      "model.usdz[textures/fabric_Mystere_Mango_Velvet_quick_look_r2.png]",
+      "model.usdz[textures/wood_Brown_quick_look_r2.png]"
+    ],
+    "unresolved": []
+  }
+}
