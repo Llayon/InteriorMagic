@@ -11,7 +11,7 @@ const EXPECTED_FILES = [
 
 const sha256 = (value) => createHash('sha256').update(value).digest('hex');
 
-export const loadValidatedReleaseObjects = async (revisionRoot) => {
+export const loadValidatedReleaseObjects = async (revisionRoot, expectedRevisionId = 'sheen-chair-r1') => {
   const checksumsPath = path.join(revisionRoot, 'checksums.json');
   const checksumsBytes = await readFile(checksumsPath);
   let checksums;
@@ -20,8 +20,8 @@ export const loadValidatedReleaseObjects = async (revisionRoot) => {
   } catch (error) {
     throw new Error(`AR0 checksums.json is malformed: ${error instanceof Error ? error.message : String(error)}`);
   }
-  if (checksums?.schemaVersion !== 2 || checksums.arRevisionId !== 'sheen-chair-r1' || !Array.isArray(checksums.files)) {
-    throw new Error('AR0 checksums.json does not match sheen-chair-r1');
+  if (checksums?.schemaVersion !== 2 || checksums.arRevisionId !== expectedRevisionId || !Array.isArray(checksums.files)) {
+    throw new Error(`AR0 checksums.json does not match ${expectedRevisionId}`);
   }
   if (checksums.files.length !== EXPECTED_FILES.length) throw new Error('AR0 checksums.json has an unexpected file set');
 

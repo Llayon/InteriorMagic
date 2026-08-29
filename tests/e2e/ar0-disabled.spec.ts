@@ -8,7 +8,7 @@ test('AR0 is default-off while the ordinary editor still boots', async ({ monito
 });
 
 test('a direct AR0 URL fails closed without instantiating model-viewer', async ({ monitoredPage: page }) => {
-  await page.goto('/?ar=sheen-chair-r1');
+  await page.goto('/?ar=sheen-chair-r2');
   await expect(page.getByTestId('ar0-disabled')).toBeVisible();
   await expect(page.getByTestId('ar0-model-viewer')).toHaveCount(0);
   await expect(page.getByTestId('app-root')).toHaveCount(0);

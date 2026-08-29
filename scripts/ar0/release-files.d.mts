@@ -6,7 +6,7 @@ export interface ReleaseObject {
   localFile: string;
 }
 
-export function loadValidatedReleaseObjects(revisionRoot: string): Promise<{
+export function loadValidatedReleaseObjects(revisionRoot: string, expectedRevisionId?: string): Promise<{
   checksumsBytes: Buffer;
   checksums: unknown;
   objects: ReleaseObject[];

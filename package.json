@@ -48,12 +48,15 @@
     "assets:ar0:canonicalize": "node scripts/ar0/build-canonical-glb.mjs",
     "assets:ar0:convert": "node scripts/ar0/run-blender-conversion.mjs",
     "assets:ar0:validate": "node scripts/ar0/validate-revision.mjs",
-    "assets:ar0:verify": "node scripts/ar0/validate-revision.mjs --staged",
+    "assets:ar0:verify": "node scripts/ar0/validate-revision.mjs --staged && node scripts/ar0/validate-revision.mjs --staged --revision sheen-chair-r2",
     "assets:ar0:stage": "node scripts/ar0/stage-release.mjs",
     "assets:ar0:publish": "node scripts/ar0/publish-release.mjs --upload --verify",
     "assets:ar0:publish:dry-run": "node scripts/ar0/publish-release.mjs",
     "test:e2e:ar0:production": "node scripts/ar0/run-production-e2e.mjs",
     "assets:ar0:build": "npm run assets:ar0:canonicalize && npm run assets:ar0:convert && npm run assets:ar0:validate && npm run assets:ar0:stage",
+    "assets:ar0:r2:build": "node scripts/ar0/build-canonical-glb.mjs --revision sheen-chair-r2 && node scripts/ar0/run-blender-conversion.mjs --revision sheen-chair-r2 && node scripts/ar0/validate-revision.mjs --revision sheen-chair-r2 && node scripts/ar0/stage-release.mjs --revision sheen-chair-r2",
+    "assets:ar0:r2:publish": "node scripts/ar0/publish-release.mjs --revision sheen-chair-r2 --upload --verify",
+    "assets:ar0:r2:publish:dry-run": "node scripts/ar0/publish-release.mjs --revision sheen-chair-r2",
     "format": "prettier --write ."
   },
   "dependencies": {

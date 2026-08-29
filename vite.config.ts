@@ -5,7 +5,7 @@ import { access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 
-const AR0_ROOT = 'ar0/sheen-chair/r1';
+const AR0_ROOTS = { r1: 'ar0/sheen-chair/r1', r2: 'ar0/sheen-chair/r2' } as const;
 const AR0_FILES: Record<string, { file: string; contentType: string }> = {
   'model.glb': { file: 'model.glb', contentType: 'model/gltf-binary' },
   'model.usdz': { file: 'model.usdz', contentType: 'model/vnd.usdz+zip' },
@@ -59,12 +59,12 @@ const ar0LocalAssetsPlugin = (enabled: boolean): Plugin => ({
   name: 'ar0-local-artifact-assets',
   configureServer: (server) => {
     if (!enabled) return;
-    const artifactRoot = path.resolve(process.cwd(), 'artifacts', AR0_ROOT);
     const middleware: Connect.NextHandleFunction = async (request, response, next) => {
       const pathname = decodeURIComponent(request.url?.split('?', 1)[0] ?? '');
-      const match = pathname.match(/^\/ar0\/sheen-chair\/r1\/([^/]+)$/);
-      const entry = match ? AR0_FILES[match[1]] : undefined;
+      const match = pathname.match(/^\/ar0\/sheen-chair\/(r1|r2)\/([^/]+)$/);
+      const entry = match ? AR0_FILES[match[2]] : undefined;
       if (!entry) { next(); return; }
+      const artifactRoot = path.resolve(process.cwd(), 'artifacts', AR0_ROOTS[match![1] as keyof typeof AR0_ROOTS]);
       const filePath = path.join(artifactRoot, entry.file);
       try {
         await access(filePath);

@@ -7,10 +7,10 @@ import { measureGlbFile } from '../../scripts/ar0/glb-bounds.mjs';
 import { getAr0Revision } from './revisions';
 import { parseAr0Manifest } from './manifest';
 
-const revisionRoot = path.resolve('artifacts/ar0/sheen-chair/r1');
+const revisionRoot = path.resolve('artifacts/ar0/sheen-chair/r2');
 const sha256 = (value: Buffer) => createHash('sha256').update(value).digest('hex');
 
-describe('AR0 immutable Sheen Chair assets', () => {
+describe('AR0 immutable Sheen Chair r2 assets', () => {
   it('requires the canonical derivative because the raw GLB is not centered', async () => {
     const raw = await measureGlbFile(path.resolve('public/models/sheen_chair.glb'));
     const canonical = await measureGlbFile(path.join(revisionRoot, 'model.glb'));
@@ -21,7 +21,7 @@ describe('AR0 immutable Sheen Chair assets', () => {
   });
 
   it('matches frozen AR revision dimensions within tolerance', async () => {
-    const revision = getAr0Revision('sheen-chair-r1')!;
+    const revision = getAr0Revision('sheen-chair-r2')!;
     const manifest = parseAr0Manifest(
       JSON.parse((await readFile(path.join(revisionRoot, 'manifest.json'))).toString('utf8')),
       revision,
@@ -40,7 +40,7 @@ describe('AR0 immutable Sheen Chair assets', () => {
   });
 
   it('binds manifest and checksums to exact staged bytes and immutable physical facts', async () => {
-    const revision = getAr0Revision('sheen-chair-r1')!;
+    const revision = getAr0Revision('sheen-chair-r2')!;
     const manifestBytes = await readFile(path.join(revisionRoot, 'manifest.json'));
     const manifest = parseAr0Manifest(JSON.parse(manifestBytes.toString('utf8')), revision);
     const serialized = JSON.stringify(manifest);
@@ -56,6 +56,6 @@ describe('AR0 immutable Sheen Chair assets', () => {
   });
 
   it('passes staged GLB/USDZ package validation without Blender in the runtime path', () => {
-    expect(() => execFileSync(process.execPath, ['scripts/ar0/validate-revision.mjs', '--staged'], { cwd: process.cwd(), stdio: 'pipe' })).not.toThrow();
+    expect(() => execFileSync(process.execPath, ['scripts/ar0/validate-revision.mjs', '--staged', '--revision', 'sheen-chair-r2'], { cwd: process.cwd(), stdio: 'pipe' })).not.toThrow();
   });
 });
