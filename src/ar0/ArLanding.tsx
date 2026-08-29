@@ -13,8 +13,14 @@ export function ArLanding({ revisionId }: ArLandingProps) {
   const revision = getAr0Revision(revisionId);
   const [manifest, setManifest] = useState<Ar0RuntimeManifest | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isAppleMobile, setIsAppleMobile] = useState(false);
   const revisionBaseUrl = useMemo(() => revision ? buildAr0RevisionBaseUrl(revision) : null, [revision]);
   const modelViewerRef = useRef<HTMLElement & { activateAR?: () => Promise<void> | void }>(null);
+
+  useEffect(() => {
+    setIsAppleMobile(/iPhone|iPad|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+  }, []);
 
   useEffect(() => {
     if (!revision || !revisionBaseUrl) return;
@@ -68,12 +74,20 @@ export function ArLanding({ revisionId }: ArLandingProps) {
       {error && <div className="ar0-load-error" role="alert">{error}</div>}
     </section>
     {manifest && modelUrl && iosUrl && <div className="ar0-actions">
-      <button
+      {isAppleMobile ? <a
+        className="ar0-primary ar0-ios-launch"
+        data-testid="ar0-launch"
+        href={`${iosUrl}#allowsContentScaling=0`}
+        rel="ar"
+      >
+        <img src={posterUrl} alt="" aria-hidden="true" />
+        Примерить в комнате
+      </a> : <button
         type="button"
         className="ar0-primary"
         data-testid="ar0-launch"
         onClick={() => { void modelViewerRef.current?.activateAR?.(); }}
-      >Примерить в комнате</button>
+      >Примерить в комнате</button>}
     </div>}
     <section className="ar0-details">
       <div className="ar0-dimensions" aria-label="Размеры кресла">
