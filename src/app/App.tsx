@@ -1,5 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
-import { SceneCanvas } from '@/scene/SceneCanvas';
+import { Component, lazy, Suspense, useCallback, useMemo, useRef, type ReactNode } from 'react';
 import { DebugOverlay } from '@/scene/debug/DebugOverlay';
 import { Toolbar } from '@/ui/Toolbar';
 import { WorkspaceSheet } from '@/ui/WorkspaceSheet';
@@ -11,6 +10,19 @@ import { useEditorStore } from '@/editor/state/store';
 import { useWorkspaceGeometry } from './useWorkspaceGeometry';
 import { usePlannerStore, type PlannerOrchestrator } from '@/editor/planning/ui';
 import { resolveTvPlannerCapability } from '@/editor/planning/integration';
+
+const LazySceneCanvas = lazy(() => import('@/scene/SceneCanvas').then(({ SceneCanvas }) => ({ default: SceneCanvas })));
+
+class SceneLoadBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state: { error: Error | null } = { error: null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return <div className="scene-load-error" data-testid="scene-load-error" role="alert">Не удалось загрузить 3D-сцену. <button type="button" onClick={() => window.location.reload()}>Повторить</button></div>;
+    }
+    return this.props.children;
+  }
+}
 
 export function App({
   plannerOrchestrator = null,
@@ -72,7 +84,11 @@ export function App({
         <ProjectMenu disabled={isPreviewing} />
       </header>
       <div className="scene" data-testid="scene">
-        <SceneCanvas workspace={geometry} />
+        <SceneLoadBoundary>
+          <Suspense fallback={<div className="scene-loading" data-testid="scene-loading">Загрузка 3D…</div>}>
+            <LazySceneCanvas workspace={geometry} />
+          </Suspense>
+        </SceneLoadBoundary>
         <div className="hint">Перетаскивайте мебель одним пальцем</div>
         <Toolbar orchestrator={exposedPlanner} entryLabel={entryLabel} />
         {isDebugEnabled && <DebugOverlay />}

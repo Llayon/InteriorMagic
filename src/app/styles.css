@@ -13,6 +13,9 @@ small { font-size: 10px; letter-spacing: .12em; color: #77736c; }
 h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px 0; }
 .scene { position: absolute; inset: 0; overflow: hidden; }
 .scene canvas { touch-action: none; }
+.scene-loading, .scene-load-error { position: absolute; inset: 0; display: grid; place-items: center; color: #77736c; font-size: 13px; }
+.scene-load-error { z-index: 2; background: #eee9df; padding: 24px; text-align: center; }
+.scene-load-error button { margin-left: 6px; border: 0; border-radius: 999px; padding: 8px 14px; background: #30312e; color: #fff; cursor: pointer; }
 .glass { background: rgba(255,255,255,.78); box-shadow: 0 5px 24px #574d3d18; backdrop-filter: blur(14px); }
 .round { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.72); font-weight: 700; }
 .hint { position: absolute; z-index: 2; top: calc(var(--safe-top) + 76px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #363631aa; color: white; font-size: 11px; padding: 7px 11px; border-radius: 15px; pointer-events: none; }

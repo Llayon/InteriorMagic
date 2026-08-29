@@ -3,7 +3,6 @@ import { assetList, getAsset } from '@/editor/assets/registry';
 import { catalogRequestGate } from '@/editor/assets/requestGate';
 import type { Category, FurnitureAssetDefinition } from '@/editor/model/types';
 import { useEditorStore } from '@/editor/state/store';
-import { assetCache } from '@/scene/assets/AssetCache';
 import { DISPLAY_CATEGORY_LABELS, getCatalogConfiguration, type CatalogCategoryId, type DisplayCategory } from '@/editor/catalog/CatalogRepository';
 import { buildAr0LandingUrl, getAr0RevisionForAsset } from '@/ar0/revisions';
 import { openExternalLink } from '@/platform/externalLink';
@@ -35,6 +34,7 @@ export function Catalog() {
     const requestId = catalogRequestGate.begin();
     setLoadingAssetId(asset.id); setError(null);
     try {
+      const { assetCache } = await import('@/scene/assets/AssetCache');
       await assetCache.load(asset);
       if (catalogRequestGate.isCurrent(requestId)) {
         const instanceId = useEditorStore.getState().add(asset.id);

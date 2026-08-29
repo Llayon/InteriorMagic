@@ -1,7 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
-import { installTestDiagnostics, registerPlanningIntentAnalysisPort } from '@/test/diagnostics';
 import { initIdentity } from '@/platform/identity/client';
 import { initProjectSync } from '@/editor/persistence/projectSyncController';
 import { createBeautifulRoomProject } from '@/app/demo/beautifulRoom';
@@ -26,7 +25,12 @@ import {
 export const bootstrapEditor = async () => {
   initIdentity();
   initProjectSync();
-  installTestDiagnostics();
+  let registerPlanningIntentAnalysisPort: (port: PlanningIntentAnalysisPort | null) => void = () => {};
+  if (import.meta.env.MODE === 'test') {
+    const diagnostics = await import('@/test/diagnostics');
+    diagnostics.installTestDiagnostics();
+    registerPlanningIntentAnalysisPort = diagnostics.registerPlanningIntentAnalysisPort;
+  }
   const query = new URLSearchParams(window.location.search);
   if (import.meta.env.MODE === 'test' && query.get('registry') === 'ithappy') {
     const { installIthappyRegistryPrototype } = await import('@/app/local/ithappyRegistryPrototype');
