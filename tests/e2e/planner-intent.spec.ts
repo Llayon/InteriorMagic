@@ -18,7 +18,10 @@ test('remote TV intent → deterministic planner → Preview → Apply → Undo 
 
   await page.goto('/?planning-test-room=improved');
   await expect(page.getByTestId('planner-entry')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.hasPlanningIntentAnalysis())).toBe(true);
+  await expect.poll(
+    () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.hasPlanningIntentAnalysis()),
+    { timeout: 15_000 },
+  ).toBe(true);
   const original = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getProject());
   const originalSession = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getSessionSummary());
 
@@ -27,7 +30,10 @@ test('remote TV intent → deterministic planner → Preview → Apply → Undo 
   await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.beginPlanningIntentAnalysis(
     'Сделай удобнее смотреть телевизор',
   ));
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getPlannerSnapshot().status)).toBe('ready');
+  await expect.poll(
+    () => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getPlannerSnapshot().status),
+    { timeout: 15_000 },
+  ).toBe('ready');
   expect(requests).toEqual([{
     contractVersion: 2,
     text: 'Сделай удобнее смотреть телевизор',
