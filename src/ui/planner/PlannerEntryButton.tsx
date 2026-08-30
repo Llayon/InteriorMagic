@@ -38,7 +38,7 @@ export function PlannerEntryButton({
       }}
     >
       <span className="sparkle" aria-hidden="true">✦</span>
-      <span>{label}</span>
+      <span className="planner-entry-label">{label}</span>
     </button>
   );
 }

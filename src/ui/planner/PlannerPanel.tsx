@@ -94,29 +94,37 @@ function PlannerReady({ proposal, orchestrator, onApplied }: {
   };
   return (
     <div className="planner-ready" data-testid="planner-ready" data-planner-outcome={outcome.outcome}>
-      <ScoreDelta before={proposal.scoreBefore.total} after={proposal.scoreAfter.total} />
-      <p className="planner-summary" data-testid="planner-summary">{outcome.summary}</p>
-      <ul className="planner-findings" data-testid="planner-findings">
-        {proposal.findings.map((finding, index) => {
-          const presentation = presentFinding(finding);
-          return (
-            <li
-              key={`${finding.ruleId}-${index}`}
-              className={`planner-finding severity-${presentation.severity}`}
-              data-severity={presentation.severity}
-              data-finding-code={finding.code}
-            >
-              <span className="planner-finding-icon" aria-hidden="true">
-                {presentation.severity === 'positive' ? '✓' : presentation.severity === 'warning' ? '!' : 'i'}
-              </span>
-              <div>
-                <strong>{presentation.copy.title}</strong>
-                {presentation.copy.detail && <p>{presentation.copy.detail}</p>}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="planner-content-scroll" data-testid="planner-content-scroll">
+        <ScoreDelta before={proposal.scoreBefore.total} after={proposal.scoreAfter.total} />
+        <p className="planner-summary" data-testid="planner-summary">{outcome.summary}</p>
+        <ul className="planner-findings" data-testid="planner-findings">
+          {proposal.findings.map((finding, index) => {
+            const presentation = presentFinding(finding);
+            return (
+              <li
+                key={`${finding.ruleId}-${index}`}
+                className={`planner-finding severity-${presentation.severity}`}
+                data-severity={presentation.severity}
+                data-finding-code={finding.code}
+              >
+                <span className="planner-finding-icon" aria-hidden="true">
+                  {presentation.severity === 'positive' ? '✓' : presentation.severity === 'warning' ? '!' : 'i'}
+                </span>
+                <div>
+                  <strong>{presentation.copy.title}</strong>
+                  {presentation.copy.detail && <p>{presentation.copy.detail}</p>}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        {isPreviewing && (
+          <p className="planner-preview-banner" data-testid="planner-preview-banner">
+            Просмотр варианта. Изменения временные и не сохраняются.
+          </p>
+        )}
+        {!outcome.hasPreview && <NoopOutcomeNote outcome={outcome.outcome} />}
+      </div>
       <div className="planner-actions">
         {outcome.hasPreview && !isPreviewing && (
           <button
@@ -162,12 +170,6 @@ function PlannerReady({ proposal, orchestrator, onApplied }: {
           Проанализировать заново
         </button>
       </div>
-      {isPreviewing && (
-        <p className="planner-preview-banner" data-testid="planner-preview-banner">
-          Просмотр варианта. Изменения временные и не сохраняются.
-        </p>
-      )}
-      {!outcome.hasPreview && <NoopOutcomeNote outcome={outcome.outcome} />}
     </div>
   );
 }

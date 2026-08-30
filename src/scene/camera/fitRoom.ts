@@ -5,6 +5,7 @@ import type { RoomProject } from '@/editor/model/types';
 export interface WorkspaceInsets { top: number; right: number; bottom: number; left: number }
 const HOME_DIRECTION = new THREE.Vector3(5, 3.25, 6.5).normalize();
 const MARGIN = 16;
+export const FIT_MAX_DISTANCE = 32;
 
 function roomCorners(room: RoomProject['room']) {
   const corners: THREE.Vector3[] = [];
@@ -33,12 +34,15 @@ export async function fitRoom(camera: THREE.PerspectiveCamera, controls: CameraC
     return { bounds, dx, dy, fits: bounds.left + dx >= usable.left && bounds.right + dx <= usable.right && bounds.top + dy >= usable.top && bounds.bottom + dy <= usable.bottom };
   };
   let low = 4.8, high = 18;
+  while (high < FIT_MAX_DISTANCE && !evaluate(high).fits) {
+    high = Math.min(FIT_MAX_DISTANCE, high * 1.25);
+  }
   for (let index = 0; index < 16; index += 1) { const middle = (low + high) / 2; if (evaluate(middle).fits) high = middle; else low = middle; }
   const distance = high, result = evaluate(distance);
   const vFov = THREE.MathUtils.degToRad(camera.fov), worldPerPixel = 2 * distance * Math.tan(vFov / 2) / canvas.height;
   const position = center.clone().addScaledVector(direction, distance);
   await Promise.all([
     controls.setLookAt(position.x, position.y, position.z, center.x, center.y, center.z, transition),
-    controls.setFocalOffset(-result.dx * worldPerPixel, result.dy * worldPerPixel, 0, transition),
+    controls.setFocalOffset(-result.dx * worldPerPixel, -result.dy * worldPerPixel, 0, transition),
   ]);
 }

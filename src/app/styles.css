@@ -1,9 +1,9 @@
-:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; color: #292a27; background: #eee9df; font-synthesis: none; --safe-top: max(env(safe-area-inset-top), var(--tg-safe-top, 0px)); --safe-right: max(env(safe-area-inset-right), var(--tg-safe-right, 0px)); --safe-bottom: max(env(safe-area-inset-bottom), var(--tg-safe-bottom, 0px)); --safe-left: max(env(safe-area-inset-left), var(--tg-safe-left, 0px)); --sheet-height: clamp(142px, 20dvh, 158px); }
+:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; color: #292a27; background: #eee9df; font-synthesis: none; --safe-top: max(env(safe-area-inset-top), var(--tg-safe-top, 0px)); --safe-right: max(env(safe-area-inset-right), var(--tg-safe-right, 0px)); --safe-bottom: max(env(safe-area-inset-bottom), var(--tg-safe-bottom, 0px)); --safe-left: max(env(safe-area-inset-left), var(--tg-safe-left, 0px)); --visual-viewport-bottom-obstruction: 0px; --sheet-height: clamp(212px, 26dvh, 220px); }
 * { box-sizing: border-box; }
 html, body, #root { margin: 0; width: 100%; height: 100%; overflow: hidden; }
 button { min-width: 40px; min-height: 40px; font: inherit; color: inherit; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 button:disabled { opacity: .3; cursor: default; }
-main { --workspace-sheet-height: clamp(142px, 20dvh, 158px); width: 100%; height: 100%; height: var(--tg-viewport-stable-height, 100dvh); max-width: 900px; margin: auto; position: relative; overflow: hidden; background: #eee9df; }
+main { --workspace-sheet-height: clamp(212px, 26dvh, 220px); width: 100%; height: 100%; height: var(--tg-viewport-stable-height, 100dvh); max-width: 900px; margin: auto; position: relative; overflow: hidden; background: #eee9df; }
 main[data-sheet-state="expanded"] { --workspace-sheet-height: clamp(260px, 42dvh, 420px); }
 main[data-sheet-state="closed"] { --workspace-sheet-height: 48px; }
 .safe-area-probe { position: absolute; visibility: hidden; pointer-events: none; padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left); }
@@ -21,8 +21,8 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 .hint { position: absolute; z-index: 2; top: calc(var(--safe-top) + 76px); left: 50%; transform: translateX(-50%); white-space: nowrap; background: #363631aa; color: white; font-size: 11px; padding: 7px 11px; border-radius: 15px; pointer-events: none; }
 .global-toolbar, .object-toolbar { position: absolute; z-index: 7; display: flex; padding: 4px; border-radius: 16px; gap: 2px; }
 .global-toolbar { top: calc(var(--safe-top) + 68px); right: max(12px, var(--safe-right)); }
-.object-toolbar { left: 50%; bottom: calc(var(--workspace-sheet-height) + var(--safe-bottom) + 12px); transform: translateX(-50%); }
-.global-toolbar button, .object-toolbar button { width: 42px; height: 42px; background: transparent; border-radius: 12px; font-size: 21px; }
+.object-toolbar { left: 50%; bottom: calc(var(--workspace-sheet-height) + var(--safe-bottom) + var(--visual-viewport-bottom-obstruction) + 12px); transform: translateX(-50%); }
+.global-toolbar button:not(.planner-entry), .object-toolbar button { width: 42px; height: 42px; background: transparent; border-radius: 12px; font-size: 21px; }
 .global-toolbar button:hover, .object-toolbar button:hover { background: #fff; }
 .danger, .danger-text { color: #a4433e; }
 .project-menu { position: relative; }
@@ -36,21 +36,23 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 .reset-dialog > div { display: flex; justify-content: flex-end; gap: 8px; }
 .reset-dialog button { padding: 0 14px; border-radius: 12px; background: #e9e4da; }
 .reset-dialog .confirm-danger { color: white; background: #9f433d; }
-.workspace-sheet { position: absolute; z-index: 10; left: 0; right: 0; bottom: 0; height: calc(var(--workspace-sheet-height) + var(--safe-bottom)); padding: 4px max(14px, var(--safe-right)) var(--safe-bottom) max(14px, var(--safe-left)); border-radius: 24px 24px 0 0; background: #faf8f3; box-shadow: 0 -8px 30px #574d3d18; transition: height .22s ease; touch-action: pan-x; overflow: hidden; }
+.workspace-sheet { position: absolute; z-index: 10; left: 0; right: 0; bottom: var(--visual-viewport-bottom-obstruction); height: calc(var(--workspace-sheet-height) + var(--safe-bottom)); padding: 4px max(14px, var(--safe-right)) var(--safe-bottom) max(14px, var(--safe-left)); border-radius: 24px 24px 0 0; background: #faf8f3; box-shadow: 0 -8px 30px #574d3d18; transition: height .22s ease, bottom .12s ease; touch-action: pan-x pan-y; overflow: hidden; display: flex; flex-direction: column; }
 .sheet-handle { display: block; width: 100%; height: 24px; min-height: 24px; background: transparent; touch-action: none; }
 .sheet-handle span { display: block; width: 38px; height: 4px; margin: auto; border-radius: 4px; background: #c9c3b8; }
-.workspace-tabs { display: flex; gap: 5px; height: 42px; }
+.workspace-tabs { display: flex; flex: none; gap: 5px; height: 42px; }
 .workspace-tabs button { flex: 1; border-radius: 13px; background: transparent; color: #77736c; }
 .workspace-tabs button.active { background: #30312e; color: white; }
-.sheet-content { min-height: 0; height: calc(100% - 66px); overflow: hidden; }
+.sheet-content { min-height: 0; flex: 1 1 auto; overflow: hidden; }
 .catalog-panel { height: 100%; min-height: 0; display: flex; flex-direction: column; }
 .sheet-title { display: flex; justify-content: space-between; align-items: center; }
 .sheet-title strong { display: block; font: 500 18px Georgia, serif; }
 .workspace-sheet[data-sheet-state="peek"] .sheet-title { display: none; }
-.categories { flex: none; display: flex; gap: 5px; overflow-x: auto; margin: 7px -2px 6px; scrollbar-width: none; }
+.categories { flex: none; display: flex; gap: 5px; overflow-x: auto; margin: 4px -2px 2px; scrollbar-width: none; touch-action: pan-x; }
 .categories button { flex: none; background: transparent; color: #77736c; padding: 4px 10px; min-height: 40px; border-radius: 14px; font-size: 12px; white-space: nowrap; }
 .categories button.active { background: #30312e; color: white; }
-.items { min-height: 0; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+/* Sheet padding owns safe-area space and its bottom offset owns visual-viewport
+   obstruction, so the catalog only needs its own eight-pixel breathing room. */
+.items { min-height: 0; display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scroll-padding-bottom: 8px; }
 .item-shell { flex: 0 0 105px; height: 92px; position: relative; }
 .item { flex: 0 0 105px; height: 92px; border-radius: 16px; background: #eee9e1; display: grid; place-content: center; gap: 1px; position: relative; overflow: hidden; }
 .item-shell > .item { width: 100%; height: 100%; }
@@ -82,7 +84,7 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 .swatches button, .variants button { width: 42px; height: 42px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 1px #bbb; }
 .swatches button.active, .variants button.active { box-shadow: 0 0 0 2px #292a27; }
 .debug { position: absolute; z-index: 20; left: 8px; top: 90px; background: #111d; color: #cfc; padding: 6px 7px; font: 9px/1.45 monospace; border-radius: 5px; white-space: pre; pointer-events: none; }
-@media (max-height: 740px) { .hint { display: none; } main { --workspace-sheet-height: 142px; } main[data-sheet-state="expanded"] { --workspace-sheet-height: 294px; } .item { height: 76px; } }
+@media (max-height: 740px) { .hint { display: none; } main { --workspace-sheet-height: 212px; } main[data-sheet-state="expanded"] { --workspace-sheet-height: 294px; } .item { height: 76px; } }
 @media (min-width: 700px) {
   body { background: #d8d2c7; }
   main { display: grid; grid-template-columns: minmax(0,1fr) 280px; grid-template-rows: 76px minmax(0,1fr); box-shadow: 0 0 60px #554a3930; }
@@ -91,7 +93,7 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
   .workspace-sheet, .workspace-sheet[data-sheet-state="expanded"], .workspace-sheet[data-sheet-state="closed"] { position: relative; grid-column: 2; grid-row: 2; height: auto; inset: auto; border-radius: 22px 0 0 0; padding: 10px 16px 14px; transition: none; }
   .sheet-handle { display: none; }
   .workspace-tabs { margin-bottom: 4px; }
-  .sheet-content { height: calc(100% - 46px); overflow: hidden; }
+  .sheet-content { overflow: hidden; }
   .workspace-sheet[data-sheet-state="peek"] .sheet-title { display: flex; }
   .categories { flex: none; flex-wrap: wrap; }
   .items { min-height: 0; display: grid; grid-template-columns: 1fr 1fr; overflow-x: hidden; overflow-y: auto; align-content: start; }
@@ -129,6 +131,7 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 }
 .planner-entry:hover:not(:disabled) { background: #1d1e1b; }
 .planner-entry:disabled { opacity: .55; cursor: progress; }
+.planner-entry-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .planner-entry .sparkle {
   display: inline-flex;
   align-items: center;
@@ -141,7 +144,6 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
   font-size: 11px;
   line-height: 1;
 }
-.planner-entry .sparkle::before { content: "✦"; }
 
 .planner-fixture-tag {
   font-size: 9px;
@@ -182,9 +184,21 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 @keyframes planner-spin { to { transform: rotate(360deg); } }
 
 .planner-ready {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.planner-content-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+  touch-action: pan-y;
 }
 .planner-summary {
   margin: 0;
@@ -212,8 +226,7 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 180px;
-  overflow-y: auto;
+  overflow: visible;
 }
 .planner-finding {
   display: flex;
@@ -253,6 +266,15 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 2px;
+}
+.planner-ready > .planner-actions {
+  flex: none;
+  position: sticky;
+  z-index: 1;
+  bottom: 0;
+  margin: 0 0 8px;
+  padding-top: 8px;
+  background: #faf8f3;
 }
 .planner-primary, .planner-secondary, .planner-tertiary {
   flex: 1 1 auto;
@@ -325,9 +347,8 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
 .planner-error strong { font: 500 15px Georgia, serif; color: #8c2c25; }
 .planner-error p { margin: 0; color: #6f4844; font-size: 12.5px; line-height: 1.4; }
 
-/* When the planner panel is open, the workspace sheet should not show its
-   catalog/materials tab strip. Keep the rest of the sheet chrome intact. */
-.workspace-sheet[data-workspace-panel="planner"] .sheet-content { height: calc(100% - 24px); }
+/* Planner has no catalog tab strip; flex sizing gives it all space below the handle. */
+.workspace-sheet[data-workspace-panel="planner"] .sheet-content { flex: 1 1 auto; min-height: 0; }
 
 /* Disable the project menu affordance while preview is active so users do
    not accidentally save/load/reset during a read-only preview state. */
@@ -337,5 +358,17 @@ h1 { font-family: Georgia, serif; font-size: 25px; font-weight: 500; margin: 1px
    workspace grid. The panel identity is the same on every breakpoint. */
 @media (min-width: 700px) {
   .planner-entry { max-width: 260px; }
-  .planner-findings { max-height: 320px; }
+}
+
+@media (max-width: 699px) {
+  .planner-entry {
+    width: 42px;
+    max-width: 42px;
+    height: 42px;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+  }
+  .planner-entry-label { display: none; }
 }

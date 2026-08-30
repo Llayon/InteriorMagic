@@ -13,7 +13,17 @@ const baseInput = (): DeviceReportInput => ({
     telegram: { insideTelegram: true, platform: 'ios', version: '12.0', safeAreaInset: { top: 59, bottom: 34 }, contentSafeAreaInset: { top: 103, bottom: 0 } },
     webgl: { vendor: 'Apple', renderer: 'Apple GPU' },
   },
-  renderer: { frameloop: 'demand', calls: 12, triangles: 3456, textures: 7, geometries: 9, dpr: 1.5, canvasCssSize: { width: 390, height: 700 } },
+  renderer: { frameloop: 'demand', calls: 12, triangles: 3456, textures: 7, geometries: 9, programs: 4, dpr: 1.5, canvasCssSize: { width: 390, height: 700 } },
+  renderingLifecycle: {
+    webglContextLostCount: 1,
+    webglContextRestoredCount: 1,
+    environmentPresent: true,
+    environmentRevision: 2,
+    environmentBuildFailureCount: 0,
+    contextLost: false,
+    rendererTextures: 7,
+    rendererPrograms: 4,
+  },
   assets: { loadedAssets: 2, totalKnownBytes: 1024, entries: [{ assetId: 'sofa', status: 'ready', byteSize: 512 }, { assetId: 'missing', status: 'error', byteSize: 0 }], loadFailures: [{ assetId: 'missing', status: 'error', byteSize: 0 }] },
   textureMemory: { kind: 'estimate', bytes: 42_000_000, method: 'heuristic', coverage: 'scene-discoverable-textures', textures: 6 },
   textureDetails: [],
@@ -34,6 +44,7 @@ describe('assembleReport', () => {
     expect(report.environment.telegram.safeAreaInset).toBeDefined();
     expect(report.environment.telegram.contentSafeAreaInset).toBeDefined();
     expect(report.renderer?.frameloop).toBe('demand');
+    expect(report.renderingLifecycle).toMatchObject({ environmentPresent: true, environmentRevision: 2 });
     expect(report.assets.loadFailures).toHaveLength(1);
   });
 });

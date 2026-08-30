@@ -4,8 +4,8 @@ import { deviceQa } from './deviceQa';
 
 /** Mounted only when device QA is enabled. Bridges real rendered frames into
  *  the pacing recorder (useFrame fires only when R3F actually renders, which
- *  is exactly what demand-frame pacing must measure) and observes WebGL
- *  context loss WITHOUT preventDefault or any recovery behavior. */
+ *  is exactly what demand-frame pacing must measure). EnvironmentLighting
+ *  owns restoration; this bridge records the same browser events for QA. */
 export function DeviceQaSceneBridge() {
   const gl = useThree((state) => state.gl);
   useEffect(() => {

@@ -7,6 +7,7 @@ import selection from '@/editor/catalog/data/production-catalog-v1.json';
 import facts from '@/editor/catalog/data/production-asset-facts-v1.json';
 import evidence from '@/editor/catalog/data/production-asset-spatial-evidence-v1.json';
 import type { FurnitureSemanticRole, PlacementAnchor } from '@/editor/model/types';
+import { createM1AShowcaseProjectForVariation, M1A_SHOWCASE_SEED_ID } from './m1aShowcaseSeed';
 
 export const M1A_SELECTED_IDS = ['carpet', 'chair', 'coffee_table_026', 'dresser_001', 'electronics', 'lamp', 'sofa_030'] as const;
 export const M1A_CATALOG_IDS = ['chair', 'carpet', 'dresser_001', 'lamp'] as const;
@@ -78,18 +79,7 @@ export const createM1ACatalogRepository = () => {
   return new CatalogRepository(registry, parseCatalogPayload(payload), m1aAssetBase);
 };
 
-export const createM1AShowcaseProject = (): RoomProject => ({ version: 1, room: { width: 6.2, depth: 5.8, height: 2.7 }, finishes: { floorMaterialId: 'oak', wallMaterialId: 'linen' }, objects: [
-  { instanceId: 'showcase-rug', assetId: 'carpet', position: { x: 0, y: 0, z: -0.20 }, rotationY: 0 },
-  // Tuned only after the real K1-sized assets produced no useful
-  // Conversation candidate with the original visual placement.
-  { instanceId: 'showcase-sofa', assetId: 'sofa_030', position: { x: 2.0187060322612527, y: 0, z: -0.10532019697129735 }, rotationY: -1.7903640423630027 },
-  { instanceId: 'showcase-chair-left', assetId: 'chair', position: { x: -1.654823091533035, y: 0, z: -1.0881974458694457 }, rotationY: 2.7221120578877978 },
-  { instanceId: 'showcase-chair-right', assetId: 'chair', position: { x: 0.18200833294540653, y: 0, z: 1.3365686874836684 }, rotationY: 1.4761035179107473 },
-  { instanceId: 'showcase-table', assetId: 'coffee_table_026', position: { x: -1.481598057691008, y: 0, z: 1.3113003082573411 }, rotationY: -1.4677411955844668 },
-  { instanceId: 'showcase-console', assetId: 'dresser_001', position: { x: 0.42395460084080705, y: 0, z: -2.3450603049248455 }, rotationY: -3.103538188275347 },
-  { instanceId: 'showcase-lamp', assetId: 'lamp', position: { x: -0.28129944233223814, y: 0, z: 0.06766651421785363 }, rotationY: 2.2746501885848716 },
-  { instanceId: 'showcase-tv', assetId: 'electronics', position: { x: 0, y: 1.15, z: 2.84 }, rotationY: Math.PI },
-] });
+export const createM1AShowcaseProject = (): RoomProject => createM1AShowcaseProjectForVariation(M1A_SHOWCASE_SEED_ID);
 
 // installM1AShowcase is intentionally synchronous: it only registers asset
 // definitions, configures the catalog, and sets the showcase RoomProject on
