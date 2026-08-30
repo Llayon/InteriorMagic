@@ -83,9 +83,17 @@ test('HTTP 500 on a real model never triggers global bootstrap failure', async (
   // Catalog remains accessible.
   await expect(page.getByTestId('catalog')).toBeVisible({ timeout: 15_000 });
 
-  // Wait for the deep tree to mount so the AssetModel useEffect fires the
-  // chair fetch and the route handler runs.
-  await page.waitForTimeout(500);
+  // Wait deterministically for AssetModel's useEffect to fire the chair load
+  // (otherwise the route handler never runs and chairAttempts stays 0).
+  await expect
+    .poll(
+      async () => {
+        const stats = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.getAssetCacheStats());
+        return stats?.assets.find((entry: { assetId: string }) => entry.assetId === 'chair')?.status;
+      },
+      { timeout: 10_000, intervals: [50, 100, 200, 500] },
+    )
+    .toMatch(/^(loading|ready|error)$/);
 
   // No bootstrap-level pageerror. Chair 500 console.error is expected and
   // surfaced only as an asset-cache error, not as a bootstrap exception.
@@ -108,8 +116,18 @@ test('two showcase chair instances share a single network request', async ({ pag
 
   await page.goto('/?showcase=1');
   await expect(page.getByTestId('app-root')).toBeVisible({ timeout: 20_000 });
-  // Give both chair instances time to subscribe to the cache.
-  await page.waitForTimeout(500);
-  // The showcase contains TWO chair instances. AssetCache must dedupe.
+  // Wait deterministically for AssetModel's useEffect to fire the chair load.
+  // Polling on the cache state avoids fragile time-based waits: CI runners
+  // vary too widely for a fixed waitForTimeout to be reliable here.
+  await expect
+    .poll(
+      async () => {
+        const stats = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__?.getAssetCacheStats());
+        return stats?.assets.find((entry: { assetId: string }) => entry.assetId === 'chair')?.status;
+      },
+      { timeout: 10_000, intervals: [50, 100, 200, 500] },
+    )
+    .toMatch(/^(loading|ready|error)$/);
+  // Both chair instances must share a single fetch — AssetCache dedupe.
   expect(requests.length).toBe(1);
 });
