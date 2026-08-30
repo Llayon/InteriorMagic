@@ -12,11 +12,13 @@ import type { PlannerApplyFailureReason } from '@/editor/planning/integration';
 import type { PlanningIntentAnalysisPort } from '@/editor/planning/integration';
 import { getIdentitySnapshot as getIdentitySnapshotImpl } from '@/platform/identity/store';
 import type { IdentitySnapshot } from '@/platform/identity/types';
+import { renderingLifecycleDiagnostics, type RenderingLifecycleSnapshot } from '@/scene/lighting/renderingLifecycleDiagnostics';
 
 type SceneContext = { camera: THREE.Camera; gl: THREE.WebGLRenderer; getControls: () => CameraControlsImpl | null; getWorkspace: () => WorkspaceGeometry };
 type SceneObject = { group: THREE.Group; proxy: THREE.Mesh };
 export type ScreenPoint = { x: number; y: number };
 export type ScreenBounds = ScreenPoint & { width: number; height: number };
+export type ProjectedRoomBounds = { corners: ScreenPoint[]; bounds: ScreenBounds };
 
 let sceneContext: SceneContext | null = null;
 const sceneObjects = new Map<string, SceneObject>();
@@ -80,6 +82,22 @@ const proxyBounds = (proxy: THREE.Mesh): ScreenBounds | null => {
   return { x: left, y: top, width: Math.max(...xs) - left, height: Math.max(...ys) - top };
 };
 
+const projectedRoomBounds = (): ProjectedRoomBounds | null => {
+  const room = useEditorStore.getState().project.room;
+  const corners: ScreenPoint[] = [];
+  for (const x of [-room.width / 2, room.width / 2]) for (const y of [0, room.height]) for (const z of [-room.depth / 2, room.depth / 2]) {
+    const point = projectPoint(new THREE.Vector3(x, y, z));
+    if (point) corners.push(point);
+  }
+  if (corners.length !== 8) return null;
+  const xs = corners.map((point) => point.x), ys = corners.map((point) => point.y);
+  const left = Math.min(...xs), top = Math.min(...ys);
+  return {
+    corners,
+    bounds: { x: left, y: top, width: Math.max(...xs) - left, height: Math.max(...ys) - top },
+  };
+};
+
 export interface InteriorMagicTestApi {
   isReady(): boolean;
   getProject(): RoomProject;
@@ -93,10 +111,14 @@ export interface InteriorMagicTestApi {
   getRendererStats(): { ready: boolean; frameloop: 'demand'; calls: number; triangles: number; textures: number; geometries: number; dpr: number; canvas: ScreenBounds | null };
   getAssetCacheStats(): ReturnType<typeof assetCache.diagnostics>;
   getSessionSummary(): { interactionMode: string; undoCount: number; redoCount: number; sheetState: string; workspacePanel: string | null };
+  getProjectedRoomBounds(): ProjectedRoomBounds | null;
   getRoomScreenBounds(): ScreenBounds | null;
   getCameraState(): { position: Vec3; target: Vec3; direction: Vec3; controlsEnabled: boolean } | null;
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
   getWorkspaceGeometry(): WorkspaceGeometry | null;
+  getRenderingLifecycleDiagnostics(): RenderingLifecycleSnapshot;
+  forceWebglContextLoss(): boolean;
+  forceWebglContextRestore(): boolean;
   getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[]; placementEnabledCategories: string[] } | null;
   getPlannerSnapshot(): { status: 'idle' | 'loading' | 'ready' | 'error'; proposal: PlanProposal | null; error: string | null; applyFailure: PlannerApplyFailureReason | null; isPreviewing: boolean; outcome: ProposalOutcome | null };
   getPlannerPreviewTransform(instanceId: string): { position: Vec3; rotationY: number } | null;
@@ -137,14 +159,8 @@ const api: InteriorMagicTestApi = {
   },
   getAssetCacheStats: () => assetCache.diagnostics(),
   getSessionSummary: () => { const { session } = useEditorStore.getState(); return { interactionMode: session.mode, undoCount: session.undoStack.length, redoCount: session.redoStack.length, sheetState: session.sheetState, workspacePanel: session.workspacePanel }; },
-  getRoomScreenBounds: () => {
-    const room = useEditorStore.getState().project.room;
-    const points: ScreenPoint[] = [];
-    for (const x of [-room.width / 2, room.width / 2]) for (const y of [0, room.height]) for (const z of [-room.depth / 2, room.depth / 2]) { const point = projectPoint(new THREE.Vector3(x, y, z)); if (point) points.push(point); }
-    if (points.length !== 8) return null;
-    const xs = points.map((point) => point.x), ys = points.map((point) => point.y);
-    return { x: Math.min(...xs), y: Math.min(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys) };
-  },
+  getProjectedRoomBounds: () => projectedRoomBounds(),
+  getRoomScreenBounds: () => projectedRoomBounds()?.bounds ?? null,
   getCameraState: () => {
     if (!sceneContext) return null;
     const controls = sceneContext.getControls();
@@ -155,6 +171,26 @@ const api: InteriorMagicTestApi = {
   },
   getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
   getWorkspaceGeometry: () => sceneContext ? structuredClone(sceneContext.getWorkspace()) : null,
+  getRenderingLifecycleDiagnostics: () => renderingLifecycleDiagnostics.snapshot(),
+  forceWebglContextLoss: () => {
+    if (!sceneContext) return false;
+    try {
+      if (!sceneContext.gl.extensions.get('WEBGL_lose_context')) return false;
+      sceneContext.gl.forceContextLoss();
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  forceWebglContextRestore: () => {
+    if (!sceneContext) return false;
+    try {
+      sceneContext.gl.forceContextRestore();
+      return true;
+    } catch {
+      return false;
+    }
+  },
   getCatalogStats: () => {
     const configuration = getCatalogConfiguration();
     if (!configuration) return null;

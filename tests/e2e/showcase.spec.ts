@@ -24,10 +24,12 @@ test('M1A local showcase is real, reduced, and restores through undo', async ({ 
   expect(new Set(modelRequests).size).toBe(7);
   expect(new Set(modelRequests).size).toBe(modelRequests.length);
 
-  await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.moveObjectForTest('showcase-chair-left', { x: -1.7, y: 0, z: -1.4 }));
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getObject('showcase-chair-left')?.position.x)).toBe(-1.7);
+  await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.moveObjectForTest('showcase-chair-left', { x: -2, y: 0, z: 1.3 }));
+  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getObject('showcase-chair-left')?.position.x)).toBe(-2);
   await page.getByRole('button', { name: 'Undo' }).click();
-  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getObject('showcase-chair-left')?.position.x)).toBe(-1.654823091533035);
+  await expect.poll(() => page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getObject('showcase-chair-left')?.position.x)).toBe(
+    snapshot.objects.find((object) => object.instanceId === 'showcase-chair-left')!.position.x,
+  );
   await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.selectObjectForTest('showcase-chair-left'));
   const beforeRotate = await page.evaluate(() => window.__INTERIOR_MAGIC_TEST__!.getObject('showcase-chair-left')!.rotationY);
   await page.getByTestId('toolbar-rotate-right').click();

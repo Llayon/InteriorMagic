@@ -13,7 +13,7 @@ import { isDebugEnabled } from '@/shared/debug';
 import { isTestMode, registerTestScene } from '@/test/diagnostics';
 import { isDeviceQaEnabled } from '@/shared/deviceQa';
 import { DeviceQaSceneBridge } from '@/deviceqa/DeviceQaSceneBridge';
-import { fitRoom } from '@/scene/camera/fitRoom';
+import { FIT_MAX_DISTANCE, fitRoom } from '@/scene/camera/fitRoom';
 import type { WorkspaceGeometry } from '@/app/useWorkspaceGeometry';
 import { EnvironmentLighting, RENDERING_BASELINE } from '@/scene/lighting/EnvironmentLighting';
 
@@ -36,7 +36,7 @@ function Content({ workspace }: { workspace: WorkspaceGeometry }) {
     initialFit.current = true;
   }, [camera, fitRevision, room, workspace]);
   const setCameraEnabled = useCallback((enabled: boolean) => { if (controls.current) controls.current.enabled = enabled; }, []);
-  return <CameraGateContext.Provider value={setCameraEnabled}><color attach="background" args={['#e9e4da']} /><EnvironmentLighting /><Room />{objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}<CameraControls ref={controls} enabled={!dragging} makeDefault minDistance={4.8} maxDistance={18} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />{isDebugEnabled && <DebugStatsBridge />}{isTestMode && <TestSceneBridge controls={controls} workspace={workspace} />}{isDeviceQaEnabled && <DeviceQaSceneBridge />}</CameraGateContext.Provider>;
+  return <CameraGateContext.Provider value={setCameraEnabled}><color attach="background" args={['#e9e4da']} /><EnvironmentLighting /><Room />{objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}<CameraControls ref={controls} enabled={!dragging} makeDefault minDistance={4.8} maxDistance={FIT_MAX_DISTANCE} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />{isDebugEnabled && <DebugStatsBridge />}{isTestMode && <TestSceneBridge controls={controls} workspace={workspace} />}{isDeviceQaEnabled && <DeviceQaSceneBridge />}</CameraGateContext.Provider>;
 }
 
 export function SceneCanvas({ workspace }: { workspace: WorkspaceGeometry }) {

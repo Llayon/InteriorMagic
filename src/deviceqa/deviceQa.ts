@@ -6,6 +6,7 @@ import { useEditorStore } from '@/editor/state/store';
 import { assembleReport, type DeviceReportInput, type LifecycleEventRecord, type RendererSnapshot } from './deviceReport';
 import { FrameWindow, type FrameWindowStats } from './framePacing';
 import { aggregateTextureEstimate, scanSceneTextures } from './textureEstimate';
+import { renderingLifecycleDiagnostics } from '@/scene/lighting/renderingLifecycleDiagnostics';
 
 export const APP_VERSION = '0.2.0';
 export const MANUAL_WINDOW_MS = 5000;
@@ -96,6 +97,7 @@ export class DeviceQa {
       triangles: this.renderer.info.render.triangles,
       textures: this.renderer.info.memory.textures,
       geometries: this.renderer.info.memory.geometries,
+      programs: Array.isArray(this.renderer.info.programs) ? this.renderer.info.programs.length : null,
       dpr: this.renderer.getPixelRatio(),
       canvasCssSize: rect.width > 0 ? { width: Math.round(rect.width), height: Math.round(rect.height) } : null,
     };
@@ -138,6 +140,7 @@ export class DeviceQa {
         webgl: this.webglIdentity(),
       },
       renderer: this.rendererSnapshot(),
+      renderingLifecycle: renderingLifecycleDiagnostics.snapshot(),
       assets: {
         loadedAssets: cacheDiagnostics.loadedAssets,
         totalKnownBytes: cacheDiagnostics.byteSize,
@@ -159,8 +162,7 @@ export const deviceQa = new DeviceQa();
 
 /** Installs document/Telegram lifecycle observers for the device QA session.
  *  No-op outside device QA mode. Observational only: nothing here changes app
- *  or rendering behavior, and context loss is logged without preventDefault()
- *  so the natural WebView behavior stays visible. */
+ *  or rendering behavior. */
 export const installDeviceQaObservers = (): (() => void) => {
   if (!isDeviceQaEnabled) return () => undefined;
   const onVisibility = () => deviceQa.record('visibilitychange', document.visibilityState);

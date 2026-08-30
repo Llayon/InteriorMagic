@@ -1,5 +1,6 @@
 import type { FrameWindowStats } from './framePacing';
 import type { TelegramInsets } from '@/platform/telegram/types';
+import type { RenderingLifecycleSnapshot } from '@/scene/lighting/renderingLifecycleDiagnostics';
 
 /** p50/p95/worst describe intervals BETWEEN rendered frames while a captured
  *  interaction runs (demand frameloop). They are NOT GPU render durations and
@@ -39,6 +40,8 @@ export interface RendererSnapshot {
   /** Authoritative texture COUNT from renderer.info.memory. */
   textures: number;
   geometries: number;
+  /** Compiled WebGL program count when Three exposes renderer.info.programs. */
+  programs: number | null;
   dpr: number;
   canvasCssSize: { width: number; height: number } | null;
 }
@@ -75,6 +78,7 @@ export interface DeviceReportInput {
   checkpoint: string;
   environment: EnvironmentReport;
   renderer: RendererSnapshot | null;
+  renderingLifecycle: RenderingLifecycleSnapshot | null;
   assets: {
     loadedAssets: number;
     totalKnownBytes: number;
