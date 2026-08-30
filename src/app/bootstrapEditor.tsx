@@ -22,7 +22,18 @@ import {
   type PlanningIntentAnalysisPort,
 } from '@/editor/planning/integration';
 
+const safeMark = (name: string) => {
+  if (typeof performance !== 'undefined' && typeof performance.mark === 'function') {
+    try {
+      performance.mark(name);
+    } catch {
+      // Performance marks are diagnostics only; never affect product behavior.
+    }
+  }
+};
+
 export const bootstrapEditor = async () => {
+  safeMark('interiormagic:bootstrap-editor-start');
   initIdentity();
   initProjectSync();
   let registerPlanningIntentAnalysisPort: (port: PlanningIntentAnalysisPort | null) => void = () => {};
@@ -56,8 +67,14 @@ export const bootstrapEditor = async () => {
   }
   const showcaseEnabled = query.get('showcase') === '1' && (import.meta.env.MODE !== 'production' || import.meta.env.VITE_M1A_SHOWCASE_ENABLED === 'true');
   if (showcaseEnabled) {
+    // installM1AShowcase is synchronous: it only wires authority, catalog,
+    // and project. Real GLB fetches are kicked off after React mount by the
+    // per-instance AssetModel lifecycle so a slow or failing model never
+    // blocks first paint of the fallback room.
+    safeMark('interiormagic:showcase-install-start');
     const { installM1AShowcase } = await import('@/app/showcase/m1aShowcase');
-    await installM1AShowcase();
+    installM1AShowcase();
+    safeMark('interiormagic:showcase-project-ready');
   } else if (query.get('demo') === '1') {
     useEditorStore.setState({ project: createBeautifulRoomProject() });
   }
@@ -108,6 +125,7 @@ export const bootstrapEditor = async () => {
   }
 
   registerPlanningIntentAnalysisPort(planningIntentAnalysisPort);
+  safeMark('interiormagic:react-mount-requested');
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <App plannerOrchestrator={plannerOrchestrator} plannerSource={plannerSource} />
