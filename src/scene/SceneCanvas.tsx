@@ -40,5 +40,5 @@ function Content({ workspace }: { workspace: WorkspaceGeometry }) {
 }
 
 export function SceneCanvas({ workspace }: { workspace: WorkspaceGeometry }) {
-  return <Canvas onCreated={({ gl }) => { gl.toneMapping = RENDERING_BASELINE.toneMapping; gl.toneMappingExposure = RENDERING_BASELINE.exposure; gl.outputColorSpace = THREE.SRGBColorSpace; }} onPointerMissed={() => useEditorStore.getState().select(null)} frameloop="demand" dpr={QUALITY[qualityProfile].dpr} camera={{ position: [5, 4.6, 6.5], fov: 44, near: .1, far: 40 }} gl={{ antialias: qualityProfile !== 'low', powerPreference: 'high-performance' }}><Content workspace={workspace} /></Canvas>;
+  return <Canvas fallback={<div className="scene-load-error" data-testid="scene-webgl-unavailable" role="alert">3D-сцена недоступна в этом браузере. Включите аппаратное ускорение или откройте приложение в Safari/Chrome.</div>} onCreated={({ gl }) => { gl.toneMapping = RENDERING_BASELINE.toneMapping; gl.toneMappingExposure = RENDERING_BASELINE.exposure; gl.outputColorSpace = THREE.SRGBColorSpace; }} onPointerMissed={() => useEditorStore.getState().select(null)} frameloop="demand" dpr={QUALITY[qualityProfile].dpr} camera={{ position: [5, 4.6, 6.5], fov: 44, near: .1, far: 40 }} gl={{ antialias: qualityProfile !== 'low', powerPreference: 'default' }}><Content workspace={workspace} /></Canvas>;
 }
