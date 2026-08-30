@@ -8,10 +8,64 @@ export interface LoadedAsset {
   byteSize: number;
   bounds: THREE.Box3;
 }
-type CacheEntry = { status: 'loading' | 'ready' | 'error'; promise: Promise<LoadedAsset>; value?: LoadedAsset; error?: Error };
+
+// Per-entry timing trace. Stages are filled in monotonically as the load
+// pipeline progresses. Any stage may be undefined if the corresponding
+// phase was not reached (e.g. headers fail → bodyReceived is never set).
+export interface AssetLoadTiming {
+  fetchStart: number;
+  headersReceived?: number;
+  bodyReceived?: number;
+  parseStart?: number;
+  parseComplete?: number;
+  ready?: number;
+  errorAt?: number;
+  errorStage?: 'headers' | 'body' | 'parse';
+}
+
+// Public-facing derived durations. Negative or NaN values are coerced to 0
+// so the diagnostics surface never reports nonsensical numbers.
+export interface AssetTimingDurations {
+  ttfbMs: number;
+  downloadMs: number;
+  parseMs: number;
+  totalMs: number;
+}
+
+export interface AssetDiagnosticsEntry {
+  assetId: string;
+  status: 'loading' | 'ready' | 'error';
+  byteSize: number;
+  timing?: AssetTimingDurations;
+  errorStage?: 'headers' | 'body' | 'parse';
+}
+
+export interface AssetCacheDiagnostics {
+  loadedAssets: number;
+  byteSize: number;
+  assets: AssetDiagnosticsEntry[];
+}
+
+type CacheEntry = {
+  status: 'loading' | 'ready' | 'error';
+  promise: Promise<LoadedAsset>;
+  value?: LoadedAsset;
+  error?: Error;
+  timing: AssetLoadTiming;
+};
 
 const loader = new GLTFLoader();
 const noRaycast: THREE.Mesh['raycast'] = () => undefined;
+
+const safeMark = (name: string) => {
+  if (typeof performance !== 'undefined' && typeof performance.mark === 'function') {
+    try {
+      performance.mark(name);
+    } catch {
+      // Diagnostics only; never affect product behavior.
+    }
+  }
+};
 
 const applyScale = (object: THREE.Object3D, scale: number | { x: number; y: number; z: number } | undefined) => {
   if (typeof scale === 'number') object.scale.setScalar(scale);
@@ -98,38 +152,109 @@ export const instantiateLoadedAsset = (
   return instance;
 };
 
-class AssetCache {
+const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+const sanitizeDuration = (value: number | undefined): number => {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return 0;
+  return value;
+};
+
+const deriveDurations = (timing: AssetLoadTiming): AssetTimingDurations => {
+  const ttfbMs = sanitizeDuration(
+    timing.headersReceived !== undefined ? timing.headersReceived - timing.fetchStart : undefined,
+  );
+  const downloadMs = sanitizeDuration(
+    timing.bodyReceived !== undefined && timing.headersReceived !== undefined
+      ? timing.bodyReceived - timing.headersReceived
+      : undefined,
+  );
+  const parseMs = sanitizeDuration(
+    timing.parseComplete !== undefined && timing.parseStart !== undefined
+      ? timing.parseComplete - timing.parseStart
+      : undefined,
+  );
+  const totalEnd = timing.ready ?? timing.errorAt;
+  const totalMs = sanitizeDuration(totalEnd !== undefined ? totalEnd - timing.fetchStart : undefined);
+  return { ttfbMs, downloadMs, parseMs, totalMs };
+};
+
+export class AssetCache {
   private entries = new Map<string, CacheEntry>();
   private listeners = new Set<() => void>();
   private revision = 0;
 
-  subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
+  subscribe = (listener: () => void) => {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  };
   getRevision = () => this.revision;
-  private notify() { this.revision += 1; this.listeners.forEach((listener) => listener()); }
+  private notify() {
+    this.revision += 1;
+    this.listeners.forEach((listener) => listener());
+  }
 
   load(asset: FurnitureAssetDefinition): Promise<LoadedAsset | null> {
     if (!asset.modelUrl) return Promise.resolve(null);
     const existing = this.entries.get(asset.id);
     if (existing) return existing.promise;
+    const timing: AssetLoadTiming = { fetchStart: now() };
     const promise = fetch(asset.modelUrl)
       .then(async (response) => {
-        if (!response.ok) throw new Error(`Could not load ${asset.modelUrl}: ${response.status}`);
+        timing.headersReceived = now();
+        if (!response.ok) {
+          timing.errorAt = now();
+          timing.errorStage = 'headers';
+          throw new Error(`Could not load ${asset.modelUrl}: ${response.status}`);
+        }
         const buffer = await response.arrayBuffer();
+        timing.bodyReceived = now();
+        timing.parseStart = now();
         const base = asset.modelUrl!.slice(0, asset.modelUrl!.lastIndexOf('/') + 1);
-        return parseAssetBuffer(buffer, asset, base);
+        const parsed = await parseAssetBuffer(buffer, asset, base);
+        timing.parseComplete = now();
+        return parsed;
       })
-      .then((value) => { const entry = this.entries.get(asset.id); if (entry) { entry.status = 'ready'; entry.value = value; } this.notify(); return value; })
+      .then((value) => {
+        timing.ready = now();
+        const entry = this.entries.get(asset.id);
+        if (entry) {
+          entry.status = 'ready';
+          entry.value = value;
+        }
+        safeMark(`interiormagic:asset:${asset.id}:ready`);
+        this.notify();
+        return value;
+      })
       .catch((reason: unknown) => {
+        if (timing.errorAt === undefined) {
+          timing.errorAt = now();
+          if (timing.bodyReceived !== undefined && timing.errorStage === undefined) {
+            timing.errorStage = 'parse';
+          } else if (timing.headersReceived !== undefined && timing.errorStage === undefined) {
+            timing.errorStage = 'body';
+          } else if (timing.errorStage === undefined) {
+            timing.errorStage = 'headers';
+          }
+        }
         const error = reason instanceof Error ? reason : new Error(String(reason));
-        const entry = this.entries.get(asset.id); if (entry) { entry.status = 'error'; entry.error = error; }
-        this.notify(); throw error;
+        const entry = this.entries.get(asset.id);
+        if (entry) {
+          entry.status = 'error';
+          entry.error = error;
+        }
+        this.notify();
+        throw error;
       });
-    this.entries.set(asset.id, { status: 'loading', promise });
+    this.entries.set(asset.id, { status: 'loading', promise, timing });
     this.notify();
     return promise;
   }
 
-  get(assetId: string) { return this.entries.get(assetId); }
+  get(assetId: string) {
+    return this.entries.get(assetId);
+  }
 
   instantiate(asset: FurnitureAssetDefinition, variantId?: string): THREE.Group | null {
     const loaded = this.entries.get(asset.id)?.value;
@@ -147,10 +272,28 @@ class AssetCache {
     return { loadedAssets: ready.length, byteSize: ready.reduce((sum, entry) => sum + (entry.value?.byteSize ?? 0), 0) };
   }
 
-  diagnostics() {
+  diagnostics(): AssetCacheDiagnostics {
+    const readyEntries = [...this.entries.values()].filter((entry) => entry.status === 'ready' && entry.value);
+    const assets: AssetDiagnosticsEntry[] = [];
+    for (const [assetId, entry] of this.entries) {
+      if (entry.status === 'ready' && entry.value) {
+        assets.push({ assetId, status: 'ready', byteSize: entry.value.byteSize, timing: deriveDurations(entry.timing) });
+      } else if (entry.status === 'error') {
+        assets.push({
+          assetId,
+          status: 'error',
+          byteSize: 0,
+          timing: deriveDurations(entry.timing),
+          errorStage: entry.timing.errorStage,
+        });
+      } else {
+        assets.push({ assetId, status: 'loading', byteSize: 0, timing: deriveDurations(entry.timing) });
+      }
+    }
     return {
-      ...this.metrics(),
-      assets: [...this.entries.entries()].map(([assetId, entry]) => ({ assetId, status: entry.status, byteSize: entry.value?.byteSize ?? 0 })),
+      loadedAssets: readyEntries.length,
+      byteSize: readyEntries.reduce((sum, entry) => sum + (entry.value?.byteSize ?? 0), 0),
+      assets,
     };
   }
 }

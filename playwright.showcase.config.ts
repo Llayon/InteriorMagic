@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 // Local-only: the showcase bytes are licensed and intentionally never enter CI.
 export default defineConfig({
-  testDir: './tests/e2e', testMatch: /showcase\.spec\.ts/, workers: 1, retries: 0,
+  testDir: './tests/e2e', testMatch: /showcase(?:-startup-resilience)?\.spec\.ts/, workers: 1, retries: 0,
   reporter: 'list', use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   projects: [
     { name: 'showcase-mobile', use: { ...devices['Pixel 5'], viewport: { width: 390, height: 844 } } },

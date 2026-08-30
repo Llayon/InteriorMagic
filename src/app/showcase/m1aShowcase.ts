@@ -2,7 +2,6 @@ import { CollisionGroup, type FurnitureAssetDefinition, type RoomProject } from 
 import { registerEphemeralAssets } from '@/editor/assets/registry';
 import { RuntimeAssetRegistry, type RuntimeCatalogEntry } from '@/editor/assets/RuntimeAssetRegistry';
 import { CatalogRepository, configureCatalogRepository, parseCatalogPayload, type CatalogPayloadEntry, type DisplayCategory } from '@/editor/catalog/CatalogRepository';
-import { assetCache } from '@/scene/assets/AssetCache';
 import { useEditorStore } from '@/editor/state/store';
 import selection from '@/editor/catalog/data/production-catalog-v1.json';
 import facts from '@/editor/catalog/data/production-asset-facts-v1.json';
@@ -92,12 +91,16 @@ export const createM1AShowcaseProject = (): RoomProject => ({ version: 1, room: 
   { instanceId: 'showcase-tv', assetId: 'electronics', position: { x: 0, y: 1.15, z: 2.84 }, rotationY: Math.PI },
 ] });
 
-export const installM1AShowcase = async () => {
+// installM1AShowcase is intentionally synchronous: it only registers asset
+// definitions, configures the catalog, and sets the showcase RoomProject on
+// the store. Real GLB fetches are owned by the per-instance AssetModel
+// lifecycle so a slow or failing model never gates the React mount or the
+// fallback room. See the P0 performance contract in `docs/...`.
+export const installM1AShowcase = () => {
   registerEphemeralAssets(Object.values(definitions), { overrideExisting: true });
   const catalog = createM1ACatalogRepository();
   configureCatalogRepository(catalog, { visibleIds: M1A_CATALOG_IDS, placementEnabledCategories: ['seating', 'storage', 'lighting', 'decor'] });
   useEditorStore.setState({ project: createM1AShowcaseProject(), session: { ...useEditorStore.getState().session, catalogCategory: 'seating' } });
-  await Promise.all(M1A_SEED_MODEL_IDS.map((id) => assetCache.load(definitions[id])));
 };
 
 export const getM1AAssetDefinition = (assetId: string) => definitions[assetId as keyof typeof definitions];
