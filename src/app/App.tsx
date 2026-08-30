@@ -89,7 +89,7 @@ export function App({
             <LazySceneCanvas workspace={geometry} />
           </Suspense>
         </SceneLoadBoundary>
-        <div className="hint">Перетаскивайте мебель одним пальцем</div>
+        <div className="hint">Перетащите одним пальцем · поверните двумя</div>
         <Toolbar orchestrator={exposedPlanner} entryLabel={entryLabel} />
         {isDebugEnabled && <DebugOverlay />}
         {isDeviceQaEnabled && <DeviceQaOverlay />}

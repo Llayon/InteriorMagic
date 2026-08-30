@@ -153,7 +153,7 @@ const api: InteriorMagicTestApi = {
     const direction = sceneContext.camera.getWorldDirection(new THREE.Vector3()).negate();
     return { position: { x: position.x, y: position.y, z: position.z }, target: { x: target.x, y: target.y, z: target.z }, direction: { x: direction.x, y: direction.y, z: direction.z }, controlsEnabled: controls?.enabled ?? false };
   },
-  getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
+  getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging' || useEditorStore.getState().session.mode === 'rotating' || useEditorStore.getState().session.mode === 'draining', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
   getWorkspaceGeometry: () => sceneContext ? structuredClone(sceneContext.getWorkspace()) : null,
   getCatalogStats: () => {
     const configuration = getCatalogConfiguration();

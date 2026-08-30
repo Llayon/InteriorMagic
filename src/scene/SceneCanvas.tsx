@@ -24,7 +24,7 @@ function TestSceneBridge({ controls, workspace }: { controls: RefObject<CameraCo
 }
 
 function Content({ workspace }: { workspace: WorkspaceGeometry }) {
-  const objects = useEditorStore((state) => state.project.objects), dragging = useEditorStore((state) => state.session.mode === 'dragging');
+  const objects = useEditorStore((state) => state.project.objects), interactionActive = useEditorStore((state) => state.session.mode === 'dragging' || state.session.mode === 'rotating' || state.session.mode === 'draining');
   const room = useEditorStore((state) => state.project.room), fitRevision = useEditorStore((state) => state.session.fitRoomRevision);
   const controls = useRef<CameraControlsImpl>(null), initialFit = useRef(false), previousFitRevision = useRef(fitRevision);
   const camera = useThree((state) => state.camera);
@@ -36,7 +36,7 @@ function Content({ workspace }: { workspace: WorkspaceGeometry }) {
     initialFit.current = true;
   }, [camera, fitRevision, room, workspace]);
   const setCameraEnabled = useCallback((enabled: boolean) => { if (controls.current) controls.current.enabled = enabled; }, []);
-  return <CameraGateContext.Provider value={setCameraEnabled}><color attach="background" args={['#e9e4da']} /><EnvironmentLighting /><Room />{objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}<CameraControls ref={controls} enabled={!dragging} makeDefault minDistance={4.8} maxDistance={18} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />{isDebugEnabled && <DebugStatsBridge />}{isTestMode && <TestSceneBridge controls={controls} workspace={workspace} />}{isDeviceQaEnabled && <DeviceQaSceneBridge />}</CameraGateContext.Provider>;
+  return <CameraGateContext.Provider value={setCameraEnabled}><color attach="background" args={['#e9e4da']} /><EnvironmentLighting /><Room />{objects.map((object) => <FurnitureObject key={object.instanceId} object={object} />)}<CameraControls ref={controls} enabled={!interactionActive} makeDefault minDistance={4.8} maxDistance={18} minPolarAngle={.65} maxPolarAngle={1.32} minAzimuthAngle={-.95} maxAzimuthAngle={1.05} truckSpeed={0} dollySpeed={.4} />{isDebugEnabled && <DebugStatsBridge />}{isTestMode && <TestSceneBridge controls={controls} workspace={workspace} />}{isDeviceQaEnabled && <DeviceQaSceneBridge />}</CameraGateContext.Provider>;
 }
 
 export function SceneCanvas({ workspace }: { workspace: WorkspaceGeometry }) {

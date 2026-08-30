@@ -27,6 +27,7 @@
     "test:watch": "vitest src",
     "test:e2e": "playwright test",
     "test:e2e:ar0": "playwright test --project=ar0-mobile-small --project=ar0-desktop --project=ar0-default-off tests/e2e/ar0.spec.ts tests/e2e/ar0-disabled.spec.ts",
+    "test:e2e:mobile-rotation": "playwright test --project=mobile-small --project=mobile-large tests/e2e/object-rotation-touch.spec.ts",
     "test:e2e:planner": "playwright test --config=playwright.planner.config.ts tests/e2e/planner-preview.spec.ts",
     "test:e2e:planner-real": "playwright test --config=playwright.planner-integration.config.ts tests/e2e/planner-integration.spec.ts",
     "test:e2e:planner-intent": "playwright test --config=playwright.planner-intent.config.ts tests/e2e/planner-intent.spec.ts",

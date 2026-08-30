@@ -179,14 +179,14 @@ export const installDeviceQaObservers = (): (() => void) => {
 };
 
 /** Automatic drag pacing window driven by editor session mode transitions:
- *  dragging → open, any other mode → close. Manual chips cannot be tapped
+ *  dragging/rotating → open, any other mode → close. Manual chips cannot be tapped
  *  while a finger drags an object, so drag must be captured automatically.
  *  The recorder only observes renders; it never invalidates frames itself. */
 export const installDragPacingObserver = (): (() => void) => {
   if (!isDeviceQaEnabled) return () => undefined;
-  let wasDragging = useEditorStore.getState().session.mode === 'dragging';
+  let wasDragging = useEditorStore.getState().session.mode === 'dragging' || useEditorStore.getState().session.mode === 'rotating';
   return useEditorStore.subscribe((state) => {
-    const dragging = state.session.mode === 'dragging';
+    const dragging = state.session.mode === 'dragging' || state.session.mode === 'rotating';
     if (dragging === wasDragging) return;
     wasDragging = dragging;
     if (dragging) deviceQa.beginWindow('drag');
