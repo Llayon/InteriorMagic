@@ -117,6 +117,8 @@ export interface InteriorMagicTestApi {
   getInteractionState(): { active: boolean; pointerId: number | null; pointerType: string | null; lastPointerType: string | null; lastEndReason: 'commit' | 'cancel' | null };
   getWorkspaceGeometry(): WorkspaceGeometry | null;
   getRenderingLifecycleDiagnostics(): RenderingLifecycleSnapshot;
+  getRenderInvalidationStats(): { invalidateCount: number; lastInvalidateAt: number | null; framesSinceLastInvalidate: number | null; frameloopMode: 'demand' | 'always' | 'never' | null };
+  getAssetInstanceDiagnostics(): Array<{ assetId: string; cacheStatus: 'loading' | 'ready' | 'error'; instancePresent: boolean | null }>;
   forceWebglContextLoss(): boolean;
   forceWebglContextRestore(): boolean;
   getCatalogStats(): { totalEntries: number; visibleEntries: number; categories: Record<string, number>; visibleIds: string[]; placementEnabledCategories: string[] } | null;
@@ -125,6 +127,11 @@ export interface InteriorMagicTestApi {
   moveObjectForTest(instanceId: string, position: Vec3): void;
   selectObjectForTest(instanceId: string): void;
   replaceProjectForTest(project: RoomProject): void;
+  /** Test-only: synchronously add an object to the editor project, mounting
+   *  its FurnitureObject/AssetModel without awaiting the cache load. Used
+   *  by deterministic browser reproductions that need to drive AssetModel
+   *  mounting while the GLB fetch is held by page.route. */
+  addAssetByIdForTest(assetId: string): string | null;
   hasPlanningIntentAnalysis(): boolean;
   beginPlanningIntentAnalysis(text: string): Promise<void>;
   getIdentitySnapshot(): IdentitySnapshot;
@@ -172,6 +179,35 @@ const api: InteriorMagicTestApi = {
   getInteractionState: () => ({ active: useEditorStore.getState().session.mode === 'dragging', pointerId: activePointerId, pointerType: activePointerType, lastPointerType, lastEndReason }),
   getWorkspaceGeometry: () => sceneContext ? structuredClone(sceneContext.getWorkspace()) : null,
   getRenderingLifecycleDiagnostics: () => renderingLifecycleDiagnostics.snapshot(),
+  getRenderInvalidationStats: () => {
+    const snap = renderingLifecycleDiagnostics.snapshot();
+    return {
+      invalidateCount: snap.invalidateCount,
+      lastInvalidateAt: snap.lastInvalidateAt,
+      framesSinceLastInvalidate: snap.framesSinceLastInvalidate,
+      frameloopMode: snap.frameloopMode,
+    };
+  },
+  getAssetInstanceDiagnostics: () => {
+    const cache = assetCache.diagnostics();
+    // Build assetId → instanceId mapping via the editor store. sceneObjects
+    // is keyed by instanceId; we walk the project to recover assetId.
+    const objects = useEditorStore.getState().project.objects;
+    const assetIdsByObjectKey = new Map<string, string>();
+    for (const obj of objects) {
+      assetIdsByObjectKey.set(obj.instanceId, obj.assetId);
+    }
+    const liveAssetIds = new Set<string>();
+    for (const [instanceId, entry] of sceneObjects) {
+      const assetId = assetIdsByObjectKey.get(instanceId);
+      if (assetId && entry.group.parent) liveAssetIds.add(assetId);
+    }
+    return cache.assets.map((entry) => ({
+      assetId: entry.assetId,
+      cacheStatus: entry.status,
+      instancePresent: entry.status === 'ready' ? liveAssetIds.has(entry.assetId) : null,
+    }));
+  },
   forceWebglContextLoss: () => {
     if (!sceneContext) return false;
     try {
@@ -219,6 +255,7 @@ const api: InteriorMagicTestApi = {
   moveObjectForTest: (instanceId, position) => useEditorStore.getState().move(instanceId, position),
   selectObjectForTest: (instanceId) => useEditorStore.getState().select(instanceId),
   replaceProjectForTest: (project) => useEditorStore.setState({ project: structuredClone(project) }),
+  addAssetByIdForTest: (assetId) => useEditorStore.getState().add(assetId),
   hasPlanningIntentAnalysis: () => planningIntentAnalysisPort !== null,
   beginPlanningIntentAnalysis: async (text) => {
     if (!planningIntentAnalysisPort) throw new Error('Planning intent analysis is not configured');

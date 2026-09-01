@@ -74,7 +74,7 @@ export class RestoreSafeEnvironment {
     this.mounted = true;
     this.previousEnvironment = this.scene.environment;
     this.previousIntensity = this.scene.environmentIntensity;
-    this.diagnostics.register(this.renderer, this.scene);
+    this.diagnostics.register(this.renderer, this.scene, 'demand');
     this.renderer.domElement.addEventListener('webglcontextlost', this.onContextLost);
     this.renderer.domElement.addEventListener('webglcontextrestored', this.onContextRestored);
     try {

@@ -39,7 +39,7 @@ export default defineConfig({
     },
     {
       name: 'desktop',
-      testIgnore: /(?:ar0(?:-disabled|-production)?|interactions-touch|mobile-showcase-product|planner-(?:preview|integration|intent)|showcase(?:-production)?)\.spec\.ts/,
+      testIgnore: /(?:ar0(?:-disabled|-production)?|interactions-touch|mobile-showcase-product|planner-(?:preview|integration|intent)|progressive-load-black-render|showcase(?:-production)?)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
     // Native-AR landing tests instantiate model-viewer, which owns a separate
