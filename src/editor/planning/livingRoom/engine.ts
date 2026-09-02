@@ -84,6 +84,8 @@ export type LayoutPlanRequest = {
   buildFindings: (before: LayoutQuality, after: LayoutQuality, outcome: SelectionOutcome) => PlanningFinding[];
   /** Optional scenario policy for entities that may overlap an immediate opening zone. */
   openingZoneExempt?: (entity: PlanningEntity) => boolean;
+  /** Optional scenario hard rule evaluated after generic placement/collision checks. */
+  arrangementConstraint?: (arrangement: Arrangement, complete: boolean) => boolean;
   /** Optional cap on valid arrangements evaluated by the exhaustive search. */
   searchLimits?: LayoutSearchLimits;
 };
@@ -172,7 +174,7 @@ const hardConstraintsPass = (
         if (!collisionPass(a, activeTransform(a, arrangement), b, activeTransform(b, arrangement))) return false;
       }
     }
-    return true;
+    return request.arrangementConstraint?.(arrangement, true) ?? true;
   }
 
   for (const entity of assigned) {
@@ -188,7 +190,7 @@ const hardConstraintsPass = (
       if (!collisionPass(a, activeTransform(a, arrangement), b, activeTransform(b, arrangement))) return false;
     }
   }
-  return true;
+  return request.arrangementConstraint?.(arrangement, false) ?? true;
 };
 
 const aggregateQuality = (
