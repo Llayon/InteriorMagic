@@ -55,6 +55,57 @@ const m1aLocalAssetsPlugin = (enabled: boolean): Plugin => ({
   },
 });
 
+/**
+ * DEV-ONLY: serves the experimental M1A quality-tier control GLBs from the
+ * gitignored .agent-data/safari-gpu-investigation/ directory tree. Three URL
+ * prefixes are mapped to the three tiers:
+ *
+ *   /__m1a_quality__/high/models/<id>.glb   -> .agent-data/.../canonical-snapshots/<id>.glb
+ *   /__m1a_quality__/medium/models/<id>.glb -> .agent-data/.../control-1024/<id>.glb
+ *   /__m1a_quality__/low/models/<id>.glb    -> .agent-data/.../control-512/<id>.glb
+ *
+ * The control GLBs are gitignored licensed bytes (R2-delivery preview only).
+ * Never wire this plugin into a production build — the plugin is only
+ * registered when the dev server is starting (mode !== 'production').
+ */
+const m1aQualityTierPlugin = (): Plugin => ({
+  name: 'm1a-experimental-quality-tier',
+  apply: 'serve',
+  configureServer: (server) => {
+    const investigationRoot = path.resolve(
+      process.env.SAFARI_GPU_INVESTIGATION_ROOT
+        ?? path.resolve(process.cwd(), '.agent-data', 'safari-gpu-investigation'),
+    );
+    const tierMap: Record<string, string> = {
+      high: path.join(investigationRoot, 'canonical-snapshots'),
+      medium: path.join(investigationRoot, 'control-1024'),
+      low: path.join(investigationRoot, 'control-512'),
+    };
+    const middleware: Connect.NextHandleFunction = async (request, response, next) => {
+      const pathname = decodeURIComponent(request.url?.split('?', 1)[0] ?? '');
+      const match = pathname.match(/^\/__m1a_quality__\/(high|medium|low)\/models\/([^/]+)\.glb$/);
+      if (!match) { next(); return; }
+      const tier = match[1]!;
+      const id = match[2]!;
+      const filePath = path.join(tierMap[tier] ?? '', `${id}.glb`);
+      try {
+        await access(filePath);
+        response.statusCode = 200;
+        response.setHeader('Content-Type', 'model/gltf-binary');
+        response.setHeader('Cache-Control', 'no-store');
+        if (request.method === 'HEAD') { response.end(); return; }
+        const stream = createReadStream(filePath);
+        response.on('close', () => stream.destroy());
+        stream.on('error', next).pipe(response);
+      } catch {
+        response.statusCode = 404;
+        response.end(`M1A quality-tier file not found: ${filePath}`);
+      }
+    };
+    server.middlewares.use(middleware);
+  },
+});
+
 const ar0LocalAssetsPlugin = (enabled: boolean): Plugin => ({
   name: 'ar0-local-artifact-assets',
   configureServer: (server) => {
@@ -104,7 +155,7 @@ export default defineConfig(({ mode }) => {
   }
   return {
     base: env.VITE_BASE_PATH ?? '/',
-    plugins: [ar0LocalAssetsPlugin(mode !== 'production'), m1aLocalAssetsPlugin(mode !== 'production'), react()],
+    plugins: [ar0LocalAssetsPlugin(mode !== 'production'), m1aLocalAssetsPlugin(mode !== 'production'), m1aQualityTierPlugin(), react()],
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
     build: { target: 'es2020', sourcemap: true },
   };
