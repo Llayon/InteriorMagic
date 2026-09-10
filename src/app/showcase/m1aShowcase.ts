@@ -8,12 +8,23 @@ import facts from '@/editor/catalog/data/production-asset-facts-v1.json';
 import evidence from '@/editor/catalog/data/production-asset-spatial-evidence-v1.json';
 import type { FurnitureSemanticRole, PlacementAnchor } from '@/editor/model/types';
 import { createM1AShowcaseProjectForVariation, M1A_SHOWCASE_SEED_ID } from './m1aShowcaseSeed';
+import { resolveExperimentalM1AQualityTier, resolveProductionM1AExperimentalTier } from './m1aQualityTier';
+import { renderingLifecycleDiagnostics } from '@/scene/lighting/renderingLifecycleDiagnostics';
 
 export const M1A_SELECTED_IDS = ['carpet', 'chair', 'coffee_table_026', 'dresser_001', 'electronics', 'lamp', 'sofa_030'] as const;
 export const M1A_CATALOG_IDS = ['chair', 'carpet', 'dresser_001', 'lamp'] as const;
 export const M1A_SEED_MODEL_IDS = M1A_SELECTED_IDS;
 
 export const M1A_RELEASE_PREFIX = 'showcase/v1';
+/**
+ * Immutable experimental prefix for the Safari iOS GPU-pressure controlled
+ * experiment. The assets under this prefix are uploaded once for the
+ * experiment and never modified. The build that activates this prefix
+ * requires an explicit `VITE_M1A_EXPERIMENTAL_QUALITY_TIER=1` env var
+ * (see vite.config.ts). Without the env var, ordinary production builds
+ * never see this prefix and never query it.
+ */
+export const M1A_EXPERIMENTAL_TIER_RELEASE_PREFIX = 'showcase/experiments/safari-quality-20260902';
 export const resolveM1AAssetBase = (options: { production: boolean; origin?: string }): string => {
   if (!options.production) return '/__m1a_assets__/';
   const origin = options.origin?.trim().replace(/\/+$/, '');
@@ -22,7 +33,70 @@ export const resolveM1AAssetBase = (options: { production: boolean; origin?: str
   if (parsed.protocol !== 'https:' || parsed.pathname !== '/' || parsed.search || parsed.hash) throw new Error('VITE_M1A_ASSET_ORIGIN must be an HTTPS origin without a path');
   return `${origin}/${M1A_RELEASE_PREFIX}/`;
 };
-const m1aAssetBase = resolveM1AAssetBase({ production: import.meta.env.MODE === 'production', origin: import.meta.env.VITE_M1A_ASSET_ORIGIN });
+/**
+ * DEV-ONLY: when running under `npm run dev` with a valid `?m1aQuality=high|medium|low`
+ * query parameter, swap the asset base to the corresponding local tier directory
+ * served by the Vite dev middleware (see vite.config.ts `m1aQualityTierPlugin`).
+ *
+ * Production code path (`import.meta.env.PROD === true`) is NEVER affected
+ * by this DEV-only resolver — it always returns 'high' and the base stays at
+ * the canonical `showcase/v1` (or the production R2 origin).
+ *
+ * See src/app/showcase/m1aQualityTier.ts and m1aQualityTier.test.ts for the
+ * contract and the invariants.
+ */
+const experimentalDevM1AQualityTier = resolveExperimentalM1AQualityTier({
+  isDev: import.meta.env.DEV,
+  search: typeof window !== 'undefined' ? window.location.search : null,
+});
+
+/**
+ * PRODUCTION-GATED experimental resolver. Active only when the build env
+ * `VITE_M1A_EXPERIMENTAL_QUALITY_TIER=1` is set. The ordinary production
+ * build (no env var) returns null and falls through to `showcase/v1`.
+ *
+ * When active, an EXPLICIT `?m1aQuality=high|medium|low` swaps the base to
+ * the immutable experimental prefix. No UA sniffing, no automatic browser
+ * selection — this is a manual experiment selector only.
+ */
+const productionExperimentalTier = resolveProductionM1AExperimentalTier({
+  enabled: import.meta.env.VITE_M1A_EXPERIMENTAL_QUALITY_TIER === '1'
+    || import.meta.env.VITE_M1A_EXPERIMENTAL_QUALITY_TIER === 'true',
+  search: typeof window !== 'undefined' ? window.location.search : null,
+});
+
+const m1aAssetBase = (() => {
+  const canonical = resolveM1AAssetBase({ production: import.meta.env.MODE === 'production', origin: import.meta.env.VITE_M1A_ASSET_ORIGIN });
+
+  // Production experimental selector (strictly opt-in via env var). Only
+  // triggers when (a) the build env var is set, AND (b) the URL has an
+  // explicit valid m1aQuality value. Production builds without the env
+  // var tree-shake to the canonical path.
+  if (productionExperimentalTier) {
+    // Production path: build an HTTPS URL to the experimental R2 prefix.
+    // The base shape must match resolveM1AAssetBase's contract: an HTTPS
+    // origin (the configured VITE_M1A_ASSET_ORIGIN) with the experimental
+    // tier prefix instead of 'showcase/v1'.
+    const origin = (import.meta.env.VITE_M1A_ASSET_ORIGIN ?? '').trim().replace(/\/+$/, '');
+    if (!origin) {
+      // Defensive: if a build has the experiment env var set but no asset
+      // origin configured, fall back to canonical. This branch should be
+      // unreachable in practice because resolveM1AAssetBase's upstream
+      // production check throws for production-without-origin.
+      return canonical;
+    }
+    return `${origin}/${M1A_EXPERIMENTAL_TIER_RELEASE_PREFIX}/${productionExperimentalTier}/`;
+  }
+
+  // DEV-only selector: when running under `npm run dev`, swap the asset
+  // base to the corresponding local tier directory served by the Vite dev
+  // middleware. In production (import.meta.env.DEV === false), the
+  // experimentalDevM1AQualityTier always evaluates to 'high' and the
+  // conditional below collapses to the canonical base.
+  if (!import.meta.env.DEV) return canonical;
+  if (experimentalDevM1AQualityTier === 'high') return canonical;
+  return `/__m1a_quality__/${experimentalDevM1AQualityTier}/`;
+})();
 
 const furnitureMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
 const decorMask = CollisionGroup.FURNITURE | CollisionGroup.DECOR;
@@ -87,10 +161,19 @@ export const createM1AShowcaseProject = (): RoomProject => createM1AShowcaseProj
 // lifecycle so a slow or failing model never gates the React mount or the
 // fallback room. See the P0 performance contract in `docs/...`.
 export const installM1AShowcase = () => {
+  renderingLifecycleDiagnostics.setQualityTier(productionExperimentalTier ?? experimentalDevM1AQualityTier);
   registerEphemeralAssets(Object.values(definitions), { overrideExisting: true });
   const catalog = createM1ACatalogRepository();
   configureCatalogRepository(catalog, { visibleIds: M1A_CATALOG_IDS, placementEnabledCategories: ['seating', 'storage', 'lighting', 'decor'] });
   useEditorStore.setState({ project: createM1AShowcaseProject(), session: { ...useEditorStore.getState().session, catalogCategory: 'seating' } });
 };
+
+/** The experimental quality tier that this install path will use. In
+ *  production without the env var, returns 'high' (the canonical showcase/v1
+ *  tier). When the production experiment is enabled and an explicit
+ *  m1aQuality=medium|low is in the URL, returns that tier. Exposed for
+ *  tests and for the deviceQa report. */
+export const getM1AExperimentalQualityTier = () =>
+  productionExperimentalTier ?? experimentalDevM1AQualityTier;
 
 export const getM1AAssetDefinition = (assetId: string) => definitions[assetId as keyof typeof definitions];

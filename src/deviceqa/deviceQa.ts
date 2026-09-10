@@ -88,6 +88,52 @@ export class DeviceQa {
     } catch { return {}; }
   }
 
+  /**
+   * Walk the live scene to enumerate UNIQUE textures by uuid. This avoids
+   * the previous mistake of multiplying shared textures by instance count
+   * (the showcase seed mounts two chair instances that share every texture
+   * by reference, so the "twice as many chairs = twice as much memory" math
+   * was wrong).
+   *
+   * Output is a labelled heuristic: the method scans the THREE.Scene, not
+   * the GPU, so it cannot see PMREM intermediates or driver-internal
+   * formats. renderer.info.memory.textures remains the authoritative count.
+   */
+  computeUniqueTextureMemory = (scene: THREE.Scene | null): { uniqueTextureCount: number; uniqueEstimatedBytes: number; maxTextureDimension: number | null } => {
+    if (!scene) return { uniqueTextureCount: 0, uniqueEstimatedBytes: 0, maxTextureDimension: null };
+    const TEXTURE_SLOTS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap', 'alphaMap', 'specularMap', 'bumpMap', 'displacementMap', 'clearcoatMap', 'sheenColorMap'] as const;
+    const seen = new Map<string, { texture: THREE.Texture; bytes: number }>();
+    scene.traverse((node) => {
+      if (!(node instanceof THREE.Mesh)) return;
+      const materials = Array.isArray(node.material) ? node.material : [node.material];
+      for (const material of materials) {
+        if (!(material instanceof THREE.Material)) continue;
+        for (const slot of TEXTURE_SLOTS) {
+          const texture = (material as unknown as Record<string, THREE.Texture | null>)[slot];
+          if (!(texture instanceof THREE.Texture)) continue;
+          if (seen.has(texture.uuid)) continue;
+          const image = texture.image as { width?: number; height?: number } | undefined;
+          const w = typeof image?.width === 'number' ? image.width : 0;
+          const h = typeof image?.height === 'number' ? image.height : 0;
+          // mipmap ~1.33x base; raw decoded RGBA. Same heuristic as textureEstimate.ts.
+          const bytes = w > 0 && h > 0 ? Math.round(w * h * 4 * 1.33) : 0;
+          seen.set(texture.uuid, { texture, bytes });
+        }
+      }
+    });
+    let totalBytes = 0;
+    let maxDim: number | null = null;
+    for (const entry of seen.values()) {
+      totalBytes += entry.bytes;
+      const image = entry.texture.image as { width?: number; height?: number } | undefined;
+      const w = typeof image?.width === 'number' ? image.width : 0;
+      const h = typeof image?.height === 'number' ? image.height : 0;
+      if (w > 0 && (maxDim === null || w > maxDim)) maxDim = w;
+      if (h > 0 && (maxDim === null || h > maxDim)) maxDim = h;
+    }
+    return { uniqueTextureCount: seen.size, uniqueEstimatedBytes: totalBytes, maxTextureDimension: maxDim };
+  };
+
   private rendererSnapshot(): RendererSnapshot | null {
     if (!this.renderer) return null;
     const rect = this.renderer.domElement.getBoundingClientRect();
